@@ -1,0 +1,120 @@
+% This template is created by SV Bùi Vân Anh, và Thầy Nguyễn Tiến Hòa từ phòng Lab xử lý tín hiệu băng gốc hệ thống 5G. Chúng tôi rất vui nếu được nhắc đến trong lời cảm ơn.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass{article} % Tạo một bản báo cáo
+\usepackage[utf8]{inputenc}
+\usepackage[T5]{fontenc} % Để sử dụng Tiếng Việt
+\usepackage[fontsize=13pt]{scrextend} % Set fontsize=13pt
+%\usepackage[paperheight=29.7cm,paperwidth=21cm,right=2cm,left=3cm,top=2cm,bottom=2.5cm]{geometry}% Chuẩn A4, căn lề phải, trái, trên, dưới.
+\usepackage[paperheight=29.7cm,paperwidth=21cm,right=2cm,left=3cm,top=2cm,bottom=2.5cm,twoside]{geometry}% Chuẩn A4, căn lề phải, trái, trên, dưới.
+\usepackage{svg}
+\usepackage{amsmath}
+\usepackage{mathptmx} % Time New Roman
+\usepackage{graphicx} % Thư viện chèn ảnh
+\usepackage{float} % Set vị trí chèn ảnh
+\usepackage{tikz} % Thư viện tạo khung bìa
+\usepackage{parskip}
+\usepackage{slashbox}
+\usetikzlibrary{calc} % Thư viện tikz
+\usepackage{indentfirst} % Thư viện thụt đầu dòng
+\renewcommand{\baselinestretch}{1.2} % Giãn dòng 1.2
+\setlength{\parskip}{6pt} % Spacing after
+\setlength{\parindent}{15pt} % Set khoảng cách thụt đầu dòng mỗi đoạn
+\usepackage{titlesec} % Thư viện để set up các kiểu chữ
+\setcounter{secnumdepth}{4} % 4 Heading
+\titlespacing{\section}{0pt}{0pt}{30pt} % Heading 1
+\titleformat*{\section}{\fontsize{16pt}{0pt}\selectfont \bfseries \centering}
+
+\titlespacing{\subsection}{0pt}{\parskip}{0.6\parskip} % Heading 2
+\titleformat*{\subsection}{\fontsize{14pt}{0pt}\selectfont \bfseries}
+
+\titlespacing{\subsubsection}{0pt}{\parskip}{0.6\parskip} % Heading 3
+\titleformat*{\subsubsection}{\fontsize{13pt}{0pt}\selectfont \bfseries \itshape}
+
+\titlespacing{\paragraph}{0pt}{\parskip}{0.6\parskip}  % Heading 4
+\titleformat{\paragraph}{\fontsize{13pt}{0pt}\selectfont \itshape}{\theparagraph}{1em}{}
+
+\renewcommand{\figurename}{\fontsize{12pt}{0pt}\selectfont \bfseries Hình}
+\renewcommand{\thefigure}{\thesection.\arabic{figure}}
+\usepackage[font=bf]{caption}
+\captionsetup[figure]{labelsep=space}
+
+\renewcommand{\tablename}{\fontsize{12pt}{0pt}\selectfont \bfseries Bảng}
+\renewcommand{\thetable}{\thesection.\arabic{table}}
+\captionsetup[table]{labelsep=space}
+
+\usepackage{tabularx}
+\newcolumntype{s}{>{\hsize=.3\hsize}X}
+\newcolumntype{y}{>{\hsize=.4\hsize}X}
+\newcolumntype{d}{>{\hsize=.1\hsize}X}
+\newcolumntype{a}{>{\hsize=1.1\hsize}X}
+\newcolumntype{g}{>{\hsize=5\hsize}X}
+\renewcommand{\tabularxcolumn}[1]{>{\small}m{#1}}
+
+\renewcommand{\theequation}{\thesection.\arabic{equation}} % Thay đổi đánh số phương trình mặc định
+\newtheorem{theorem}{Định lý}[section]
+\newtheorem{defn}[theorem]{Định nghĩa}
+\newtheorem{corollary}[theorem]{Hệ quả}
+\newtheorem{lemma}[theorem]{Bổ đề}
+
+\usepackage{lipsum} % Thư viện tạo chữ linh tinh.
+\renewcommand{\contentsname}{MỤC LỤC}
+\renewcommand{\listfigurename}{DANH MỤC HÌNH VẼ}
+\renewcommand{\listtablename}{DANH MỤC BẢNG BIỂU}
+\renewcommand{\refname}{TÀI LIỆU THAM KHẢO}
+
+\usepackage[unicode]{hyperref}
+\usepackage{bookmark}
+\usepackage{colortbl}
+\definecolor{LightCyan}{rgb}{0.88,1,1}
+\usepackage{forloop}
+\newcounter{loopcntr}
+\newcommand{\rpt}[2][1]{\forloop{loopcntr}{0}{\value{loopcntr}<#1}{#2}}
+
+\begin{document}
+
+\input{PhanDau/Bia.tex} % Bìa đồ án.
+\input{PhanDau/Bia.tex} % Bìa đồ án.
+
+\input{PhanDau/DanhGia.tex} % Đánh giá quyển đồ án tốt nghiệp cho giảng viên hướng dẫn và cán bộ phản biện.
+
+\input{PhanDau/LoiNoiDau.tex} % Lời nói đầu.
+
+\input{PhanDau/LoiCamDoan.tex} % Lời cam đoan.
+
+ % Tạo mục lục tự động
+\addtocontents{toc}{\protect\thispagestyle{empty}}
+\tableofcontents 
+\thispagestyle{empty}
+\cleardoublepage
+
+\input{VietTat.tex} % Danh mục ký hiệu và chữ viết tắt
+
+%Tạo danh mục hình vẽ.
+{\let\oldnumberline\numberline
+\renewcommand{\numberline}{Hình~\oldnumberline}
+\listoffigures} 
+\phantomsection\addcontentsline{toc}{section}{\numberline {} DANH MỤC HÌNH VẼ}
+\newpage
+
+ %Tạo danh mục bảng biểu.
+{\let\oldnumberline\numberline
+\renewcommand{\numberline}{Bảng~\oldnumberline}
+\listoftables}
+\phantomsection\addcontentsline{toc}{section}{\numberline {} DANH MỤC BẢNG BIỂU}
+\newpage
+
+\input{PhanDau/Abstract.tex} % Tóm tắt đồ án 
+
+\pagenumbering{arabic} % Đánh số thứ tự 1,2,3...
+\input{NoiDung/1_ChuongMoDau.tex}
+\input{NoiDung/2_CoSoLyThuyet.tex}
+\input{NoiDung/3_PDM2PCM_soft.tex}
+\input{NoiDung/4_ThietKeIPSo.tex}
+% \include{NoiDung/KetLuan.tex}
+\phantomsection\addcontentsline{toc}{section}{\numberline {}TÀI LIỆU THAM KHẢO}
+\bibliographystyle{IEEEtran}
+\bibliography{TaiLieuThamKhao}
+\newpage
+\input{NoiDung/PhuLuc.tex} % Phụ lục nếu có
+\end{document}
+
