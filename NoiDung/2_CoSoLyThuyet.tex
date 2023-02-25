@@ -335,7 +335,7 @@ Bộ lọc FIR được thiết kế bằng cách tìm các hệ số và thứ 
 
 Các phương pháp thiết kế phố biến hiện nay như phương pháp thiết kế cửa số, lấy mẫu tần số, Parks–McClellan,  bằng thuật toán DFT, 	\ldots Do phạm vi đề tài nên các phương pháp này sẽ được trình bày và nói rõ chi tiết ở \cite{TAN2014xiii}.
 
-\subsubsection{Bộ lọc CIC -  Cascaded Integrator Comb}
+\subsubsection{Bộ lọc CIC -  Cascaded Integrator Comb} \label{cic_filter_ref}
 Khi nghiên cứu chủ đề chuyển đổi PDM sang PCM, hầu như không thể bỏ qua về bộ lọc lược tích hợp xếp tầng (CIC), chúng cực kỳ nhẹ về mặt tài nguyên, nhờ một số thủ thuật và chuyển đổi. Mục này sẽ trình bày cái nhìn tổng quan về bộ lọc trung bình động và cách tối ưu bộ lọc trung bình động sang bộ lọc CIC.
 \paragraph{Bộ lọc trung bình động - Moving Average Filters}\label{maf}
 Các bộ lọc FIR điển hình có độ dài nhất định hoặc các tap và mỗi tap yêu cầu một phép nhân và một phép cộng. Các hệ số nhân ở đó để định hình bộ lọc sao cho nó có các đặc tính dải thông, dải chuyển tiếp và dải triệt mong muốn. Việc áp dụng FIR nhiều tap lên phần cứng có thể tiêu tốn rất nhiều tài nguyên và điều đó không hiệu quả. Vì vậy chúng ta cần triển khai các bộ lọc loại bỏ các phép toán phức tạp. Khi đó bộ lọc đơn giản nhất là bộ lọc trung bình động - Moving Average Filters. Bộ lọc thực hiện cực kỳ đơn giản, nó tính tổng của N mẫu đến cùng và chia nó cho N.
