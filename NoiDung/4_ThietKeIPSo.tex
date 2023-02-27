@@ -1,26 +1,25 @@
 \phantomsection\addcontentsline{toc}{section}{\numberline {}CHƯƠNG 4. THIẾT KẾ IP SỐ VÀ KIỂM THỬ}
-\section*{CHƯƠNG 4. THIẾT KẾ IP SỐ VÀ KIỂM THỬ}
+\section*{CHƯƠNG 4. THIẾT KẾ IP SỐ VÀ KIỂM THỬ} \label{chuong4}
 \setcounter{section}{4}
+\setcounter{subsection}{0}
 \setcounter{figure}{0}
 \setcounter{table}{0}
-Trong chương này, mô hình hệ thống chuyển đổi PDM sang PCM sử dụng nhiều giai đoạn đề cập ở \hyperref[chuong3]{chương 3} được thiết kế và kiểm thử ở mức Register Transfer Logic (RTL). Ngôn ngữ mô tả phần cứng SystemVerilog được sử dụng để xây dựng thiết kế cũng như testbench. Bản thiết kế cuối cùng được mô phỏng, kiểm thử trên phần mềm Mentor Questasim.
+Trong chương này, mô hình hệ thống chuyển đổi PDM sang PCM sử dụng nhiều giai đoạn đề cập ở \hyperref[chuong3]{chương 3} được thiết kế và kiểm thử ở mức Register Transfer Logic (RTL). Ngôn ngữ mô tả phần cứng SystemVerilog được sử dụng để xây dựng thiết kế cũng như testbench. Bản thiết kế cuối cùng được mô phỏng, kiểm thử trên phần mềm Mentor Questasim và môi trường \textbf{Python}.
 \subsection{Thiết kế}
 Với yêu cầu của hệ thống số là tối ưu diện tích và công suất. Ở thiết kế này sẽ sử dụng kỹ thuật tăng tần số làm sao để một bộ nhân hoặc bộ cộng có thể thực hiện nhiều phép toán trong 1 khoảng thời gian. Với các yêu cầu như mục \ref{spec_muc}, chúng ta tiến hành thiết kế như sau.
-\subsubsection{Vấn đề về tính toán fixed-point cho các hệ số của bộ lọc}
+\subsubsection{Vấn đề về tính toán fixed-point cho các hệ số của bộ lọc} \label{fix-fil}
 Trong phần mềm, các phép tính toán truyền thống với số dấu phẩy động đều thực hiện
-trên GPU hay CPU. Nhưng khi đưa lên phần cứng, việc triển khai dấu phẩy động cực kỳ phức tạp và tốn tài nguyên. Do đó chúng ta cần chuyển đổi các hệ số của các bộ lọc sang dấu phẩy tĩnh, nhưng phải đảm bảo là các yêu cầu đặt ra với bộ lọc trước đó phải đúng.
-
+trên GPU hay CPU. Nhưng khi đưa lên phần cứng, việc triển khai dấu phẩy động cực kỳ phức tạp và tốn tài nguyên. Do đó chúng ta cần chuyển đổi các hệ số của các bộ lọc sang dấu phẩy tĩnh, song song với đó phải đảm bảo các yêu cầu đã đặt ra của hệ thống.
 \begin{figure}[H]
     \centering
-    \includesvg[width=17cm]{Images/Chuong4/hb1.svg}
+    \includesvg[width=16.5cm]{Images/Chuong4/hb1.svg}
     \caption[Đáp ứng tần số của bộ lọc Half band (1) trước và sau khi sử dụng fixed-point]{\bfseries \fontsize{12pt}{0pt}\selectfont Đáp ứng tần số của bộ lọc Half band (1) trước và sau khi sử dụng fixed-point}
     \label{hb1_d}
 \end{figure}
 
-
 \begin{figure}[H]
     \centering
-    \includesvg[width=17cm]{Images/Chuong4/hb2.svg}
+    \includesvg[width=16.5cm]{Images/Chuong4/hb2.svg}
     \caption[Đáp ứng tần số của bộ lọc Half band (2) trước và sau khi sử dụng fixed-point]{\bfseries \fontsize{12pt}{0pt}\selectfont Đáp ứng tần số của bộ lọc Half band (2) trước và sau khi sử dụng fixed-point}
     \label{hb2_d}
 \end{figure}
@@ -31,9 +30,9 @@ Thực hiện nhân với tất cả các hệ số của bộ lọc với $2^N$
     \caption[Đáp ứng tần số của bộ lọc FIR trước và sau khi sử dụng fixed-point]{\bfseries \fontsize{12pt}{0pt}\selectfont Đáp ứng tần số của bộ lọc FIR trước và sau khi sử dụng fixed-point}
     \label{fir_d}
 \end{figure}
-Theo chúng ta quan sát, bộ lọc chỉ biến thiên lớn ở thông số suy giảm giải dừng, còn độ gợn sóng và các thông số còn lại hầu như không thay đổi. Độ suy giảm dải dừng giảm từ 0.794 dB đối với FIR, 3 và 5 dB với 2 bộ lọc còn lại, tuy nhiên độ suy giảm đó vẫn lớn hơn 89 dB (yêu cầu của hệ thống).
+Theo quan sát, bộ lọc chỉ biến thiên lớn ở thông số suy giảm dải dừng, còn độ gợn sóng và các thông số còn lại hầu như không thay đổi. Độ suy giảm dải dừng giảm từ 0.794 dB đối với FIR, 3 và 5 dB với 2 bộ lọc còn lại, tuy nhiên độ suy giảm đó vẫn lớn hơn 89 dB (yêu cầu của hệ thống).
 
-\textbf{Kết luận}: Chúng ta sẽ sử dụng tất cả hệ số nhân với $2^20$ để ép thành số nguyên (hệ thập phân), đồng nghĩa với việc sau mỗi bộ lọc, kết quả phải dịch phải 20 lần.
+\textbf{Kết luận}: Chúng ta sẽ sử dụng tất cả hệ số nhân với $2^{20}$ để ép thành số nguyên (hệ thập phân).
 \subsubsection{Mô tả chung}
 Bộ chuyển đổi PDM sang PCM nhiều giai đoạn sử dụng Decimation (dti\_pdm2pcm) chuyển đổi dữ liệu PDM 1 bit với tốc lấy mẫu cao thành dữ liệu PCM với  tốc độc lấy mẫu thấp hơn. Tần số cấp cho bộ gấp 4 lần tần số lấy mẫu của PDM, từ tần số này sẽ cấp và chia tần ra các tần số cần thiết cho dti\_pdm2pcm. Tín hiệu PCM đầu ra sẽ đi kèm theo sườn dương của tín hiệu đồng hồ PCM đầu ra với độ rộng bit do người dùng quyết định (16 - 32 bit), độ rộng càng lớn thì chất lượng âm thanh đầu ra càng cao. Sơ đồ chân của dti\_pdm2pcm được mô tả như hình \ref{top_pdm2pcm}.
 
@@ -126,14 +125,15 @@ sample\_clk & ra  & 1 & Clock đã được hạ tần                 \\ \hline
 \end{tabular}
     \label{frequency_t}
 \end{table}
+Kiến trúc của khối được mô tả ở hình \ref{frequency_a}, quá trình hoạt động tương ứng được biểu diễn như hình \ref{frequency_tt}, bộ đếm thực hiện đếm bắt đầu đếm từ giá trị 0, đến nửa DECIMITION là đổi chiều giá trị của sample\_clk đồng nghĩa với việc tạo ra clock với độ lớn nhỏ hơn DECIMTION với tần số vào. Ở giá trị bộ đếm bằng 0, tín hiệu start được kích hoạt.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=15cm]{Images/Chuong4/frequency/frequency_timing.png}
+    \includegraphics[width=14cm]{Images/Chuong4/frequency/frequency_timing.png}
     \caption[Biểu đồ thời gian của dti\_frequency\_divider]{\bfseries \fontsize{12pt}{0pt}\selectfont Biểu đồ thời gian của dti\_frequency\_divider}
-    \label{frequency_t}
+    \label{frequency_tt}
 \end{figure}
 
-Kiến trúc của khối được mô tả ở hình \ref{frequency_a}, quá trình hoạt động tương ứng được biểu diễn như hình \ref{frequency_t}.
+
 
 \begin{figure}[H]
     \centering
@@ -177,19 +177,6 @@ start\_hb2 &
   1 &
   \begin{tabular}[c]{@{}l@{}}Tín hiệu điều khiển cho biết liệu dữ liệu \\ có sẵn ở đầu vào của bộ lọc HB2\end{tabular} \\ \hline
 
-\end{tabular}
-    \label{top_frequency_signal}
-\end{table}
-
-\begin{table}[H]
-    \centering
-    % \caption[Mô tả chân vào ra của dti\_top\_frequency\_divider]{\bfseries\fontsize{12pt}{0pt}\selectfont Mô tả chân vào ra của dti\_top\_frequency\_divider}
-    \begin{tabular}{|l|c|c|l|}
-\hline
-\multicolumn{1}{|c|}{\textbf{Tên chân}} &
-  \textbf{Vào/ ra} &
-  \textbf{Độ rộng bit} &
-  \multicolumn{1}{c|}{\textbf{Mô tả chức năng}} \\ \hline
 start\_fir &
   ra &
   1 &
@@ -203,7 +190,8 @@ pcm\_clk &
   1 &
   Clock lấy mẫu của PCM \\ \hline
   \end{tabular}
-  \end{table}
+    \label{top_frequency_signal}
+\end{table}
 
   Bảng \ref{top_frequency_signal} cho miêu tả chức năng của các chân vào ra của khối. Kiến trúc của dti\_top\_frequency\_divider gồm 4 bộ dti\_top\_frequency\_divider như hình \ref{top_frequency_arc}.
 
@@ -256,7 +244,7 @@ pcm\_data &
     \label{cic_top_t}
 \end{table}
 
-Bảng \ref{cic_top_t} liệt kê các cổng vào ra của khối dti\_cic\_decimator. Khi chỉ sử dụng một bộ công và 1 bộ cộng, chúng ta phải phân công theo từng thời gian tính toán các phép tính 1 cách hợp lý, hình \ref{cic_top_arc} mô tả kiến trúc đáp ứng được điều kiện trên.
+Bảng \ref{cic_top_t} liệt kê các cổng vào ra của khối dti\_cic\_decimator. Khi chỉ sử dụng 1 bộ cộng và 1 bộ trừ, chúng ta phải phân công theo từng thời gian tính toán các phép tính 1 cách hợp lý, hình \ref{cic_top_arc} mô tả kiến trúc đáp ứng được điều kiện trên.
 
 \begin{figure}[H]
     \centering
@@ -294,5 +282,290 @@ Do bộ FIR sẽ có 52 taps, đồng nghĩa với việc trong 1 chu kỳ của
     \label{hb_fir_top}
 \end{figure}
 Hình \ref{hb_fir_top} mô tả sơ đồ khối của khối dti\_hb\_fir\_filter.
+
+\begin{table}[H]
+    \centering
+    \caption[Mô tả chân vào ra của dti\_hb\_fir\_filter]{\bfseries\fontsize{12pt}{0pt}\selectfont Mô tả chân vào ra của dti\_hb\_fir\_filter}
+    \begin{tabular}{|l|c|c|l|}
+\hline
+\multicolumn{1}{|c|}{\textbf{Tên chân}} & \textbf{Vào/ ra} & \textbf{Độ rộng bit} & \multicolumn{1}{c|}{\textbf{Mô tả chức năng}} \\ \hline
+clk        & vào & 1          & Clock đồng bộ hoạt động của hệ thống                                                        \\ \hline
+reset\_n   & vào & 1          & \begin{tabular}[c]{@{}l@{}}Chân reset không đồng bộ, tích cực mức\\ thấp\end{tabular}       \\ \hline
+start\_hb1 & vào & 1          & \begin{tabular}[c]{@{}l@{}}Báo hiệu rằng dữ liệu đầu vào HB1 là\\ giá trị mới\end{tabular}  \\ \hline
+start\_hb1 & vào & 1          & \begin{tabular}[c]{@{}l@{}}Báo hiệu rằng dữ liệu đầu vào HB2 là \\ giá trị mới\end{tabular} \\ \hline
+start\_fir & vào & 1          & \begin{tabular}[c]{@{}l@{}}Báo hiệu rằng dữ liệu đầu vào FIR là\\ giá trị mới\end{tabular}  \\ \hline
+hb1\_in    & vào & CIC\_WIDTH & Dữ liệu đầu vào của bộ lọc HB1                                                              \\ \hline
+pcm\_data  & ra  & PCM\_WIDTH & Tín hiệu PCM đầu ra                                                                         \\ \hline
+\end{tabular}
+    \label{hb_fir_t}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption[Hằng số thiết kế của dti\_hb\_fir\_filter]{\bfseries\fontsize{12pt}{0pt}\selectfont Hằng số thiết kế của dti\_hb\_fir\_filter}
+\begin{tabular}{|l|c|l|}
+\hline
+\multicolumn{1}{|c|}{\textbf{Hằng số}} & \textbf{Giá trị} & \multicolumn{1}{c|}{\textbf{Mô tả}} \\ \hline
+PCM\_WIDTH  & 24 & Độ rộng của tín hiệu PCM đầu ra \\ \hline
+CIC\_WIDTH  & 16 & Độ rộng của đầu ra của bộ lọc CIC \\ \hline
+MULP\_WIDTH & 21 & Kích thước đầu vào của bộ nhân \\ \hline
+FIR\_SIZE   & 51 & Số lượng taps của bộ lọc FIR    \\ \hline
+HB1\_SIZE   & 11 & Số lượng taps của bộ lọc HB1    \\ \hline
+HB2\_SIZE   & 19 & Số lượng taps của bộ lọc HB2    \\ \hline
+SHIFT\_NUMBER   & 20 & Số lần dịch phải sau mỗi tầng lọc    \\ \hline
+HB1\_SUM\_OUT\_WIDTH   & 36 & Độ rộng dữ liệu đầu ra của bộ lọc HB1    \\ \hline
+HB2\_SUM\_OUT\_WIDTH   & 37 & Độ rộng dữ liệu đầu ra của bộ lọc HB2    \\ \hline
+FIR\_SUM\_OUT\_WIDTH   & 37 & Độ rộng dữ liệu đầu ra của bộ lọc FIR    \\ \hline
+\end{tabular}
+    \label{hangso_hb_fir}
+\end{table}
+
+Trong đó việc tối ưu độ rộng của đầu ra của các bộ lọc (độ rộng của bộ cộng cuối cùng của dãy). Để tìm được giá trị tối ưu nhất, chúng ta đưa đầu vào lớn nhất và nhỏ nhất của đầu vào (đầu vào CIC 16 bit có dải giá trị [20736, -20736]), tiến hành nhân số bé nhất cho đáp ứng xung có giá trị âm và ngược lại. Lúc này đầu ra của từng tầng lọc sẽ có dải giá trị tương ứng với số bit biểu diễn nó như bảng \ref{hangso_hb_fir}. Độ rộng của bộ nhân được là giá trị biểu diễn từ hệ số của taps đã nêu ở mục \ref{fix-fil}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=15cm]{Images/Chuong4/hb_fir/pre_fir.png}
+    \caption[Kiến trúc của khối liên quan đến bộ lọc FIR trong dti\_hb\_fir\_filter (1)]{\bfseries \fontsize{12pt}{0pt}\selectfont Kiến trúc của khối liên quan đến bộ lọc FIR trong dti\_hb\_fir\_filter (1)}
+    \label{pre}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=11cm]{Images/Chuong4/hb_fir/pos_fir.png}
+    \caption[Kiến trúc của khối liên quan đến bộ lọc FIR trong dti\_hb\_fir\_filter (2)]{\bfseries \fontsize{12pt}{0pt}\selectfont Kiến trúc của khối liên quan đến bộ lọc FIR trong dti\_hb\_fir\_filter (2)}
+    \label{pos}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=11cm]{Images/Chuong4/hb_fir/mul.png}
+    \caption[Kiến trúc khối bộ nhân chung trong dti\_hb\_fir\_filter]{\bfseries \fontsize{12pt}{0pt}\selectfont Kiến trúc khối bộ nhân chung trong dti\_hb\_fir\_filter}
+    \label{c_mul}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=13cm]{Images/Chuong4/hb_fir/fir.png}
+    \caption[Kiến trúc các khối điều khiển trong dti\_hb\_fir\_filter]{\bfseries \fontsize{12pt}{0pt}\selectfont Kiến trúc các khối điều khiển trong dti\_hb\_fir\_filter}
+    \label{control}
+\end{figure}
+
+Hình \ref{pre} và hình \ref{pos} mô tả kiến trúc của phần trước và sau của bộc lọc FIR. Chúng ta có thể thấy chỉ sử dụng 2 bộ cộng - 1 cộng cho các phần tử đối xứng và 1 để cộng dồn các phép toán nhân. Với 2 bộ lọc HB1 và HB2 còn lại sẽ thực hiện tương tự.
+
+Bộ nhân sử dụng ở đây là bộ nhân Booth Wallace, nó là IP số có sẵn của công ty \textbf{Dolphin Technology Việt Nam}.
+
+Với kiến trúc của bộ nhân chung (hình \ref{c_mul}), chúng ta sẽ duyệt các hệ số của các taps sau đó tiến hành nhân ở các thời điểm nhất định. Các hệ số sẽ được lưu ở bộ \textbf{coeff\_lut}, nó được xem là 1 bộ mem, các hệ số sẽ được lưu thứ tự FIR - HB1 - HB2 - HB1 (từ 0 đến 39). Dữ liệu sẽ đưa đưa ra theo địa chỉ \textit{count} tương ứng. Bảng \ref{coeffff} mô tả trình tự sắp đặt dữ liệu trong khối \textbf{coeff\_lut}.
+
+\textbf{dti\_count} hoạt động như một trình tạo địa chỉ và bộ điều khiển của \textbf{dti\_filter\_controller}. Giá trị đếm dùng để chọn hệ số trong bảng tra cứu hệ số bộ lọc (\textbf{dti\_coeff\_lut}).
+
+\paragraph{dti\_filter\_controller}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=6cm]{Images/Chuong4/hb_fir/control-top.png}
+    \caption[Sơ đồ khối của dti\_filter\_controller]{\bfseries \fontsize{12pt}{0pt}\selectfont Sơ đồ khối của dti\_filter\_controller}
+    \label{control_t}
+\end{figure}
+\textbf{dti\_hb\_fir\_filter} chỉ sử dụng 1 bộ nhân nên 2 bộ lọc Half band và bộ lọc FIR buộc phải chia sẻ tài nguyên. \textbf{dti\_filter\_controller} kiểm soát việc sử dụng tài nguyên của các bộ lọc bằng tín hiệu \textbf{select\_filter}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=13cm]{Images/Chuong4/hb_fir/control-timing.png}
+    \caption[Biểu đồ thời của dti\_filter\_controller]{\bfseries \fontsize{12pt}{0pt}\selectfont Biểu đồ thời  của dti\_filter\_controller}
+    \label{control_timing}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=14cm]{Images/Chuong4/hb_fir/control-fsm.png}
+    \caption[Sơ đồ máy trạng thái hữu hạn của dti\_filter\_controller]{\bfseries \fontsize{12pt}{0pt}\selectfont Sơ đồ máy trạng thái hữu hạn của dti\_filter\_controller}
+    \label{control_fsm}
+\end{figure}
+Sơ đồ chân vào ra mô tả ở hình \ref{control_t}. Các tín hiệu điều khiển hoạt động với chức năng thể hiện ở biểu đồ hình \ref{control_timing}.
+
+Qua sơ đồ hình \ref{control_fsm}, máy trạng thái của bộ có 2 trạng thái:
+\begin{itemize}
+    \item \textbf{ST\_COUNTING}: bộ đếm tăng giá trị
+    \item \textbf{ST\_STOP}: bộ đếm dừng hoạt động
+\end{itemize}
+
+Bộ điều khiển có chức năng chia pha cho và chọn thời điểm lấy giá trị đưa vào bộ nhân. Nó cũng điều khiển bộ đếm để lấy giá trị các hệ số của các bộ lọc trong MEM ra. Việc kích hoạt từng bộ lọc sẽ được điều khiển bởi tín hiệu choose\_filter. Vì tần số hệ thống lớn hơn rất nhiều so với điều kiện trong 1 chu kỳ thực hiện phép nhân nên bộ điều khiển phải lấy tín hiệu thực hiện xong tính toán của từng bộ lọc để chờ ở các pha tính toán tiếp theo. 
+
+\begin{table}[H]
+\centering
+    \caption[Các hệ số của các bộ lọc ứng với từng địa chỉ trong khối coeff\_lut]{\bfseries \fontsize{12pt}{0pt}\selectfont Các hệ số của các bộ lọc ứng với từng địa chỉ trong khối coeff\_lut}
+\begin{tabular}{|l|c|c|l|l|c|c|}
+\cline{1-3} \cline{5-7}
+\multicolumn{1}{|c|}{\textbf{Địa chỉ}} & \textbf{Bộ lọc}       & \textbf{Giá trị} &  & \multicolumn{1}{c|}{\textbf{Địa chỉ}} & \textbf{Bộ lọc}       & \textbf{Giá trị} \\ \cline{1-3} \cline{5-7} 
+0                                      & \multirow{10}{*}{FIR} & -96              &  & 10                                    & \multirow{10}{*}{FIR} & 5333             \\ \cline{1-1} \cline{3-3} \cline{5-5} \cline{7-7} 
+1 &  & -191  &  & 11 &  & 8971   \\ \cline{1-1} \cline{3-3} \cline{5-5} \cline{7-7} 
+2 &  & -12   &  & 12 &  & 4117   \\ \cline{1-1} \cline{3-3} \cline{5-5} \cline{7-7} 
+3 &  & 683   &  & 13 &  & -8082  \\ \cline{1-1} \cline{3-3} \cline{5-5} \cline{7-7} 
+4 &  & 1560  &  & 14 &  & -17116 \\ \cline{1-1} \cline{3-3} \cline{5-5} \cline{7-7} 
+5 &  & 1559  &  & 15 &  & -10866 \\ \cline{1-1} \cline{3-3} \cline{5-5} \cline{7-7} 
+6 &  & -220  &  & 16 &  & 10947  \\ \cline{1-1} \cline{3-3} \cline{5-5} \cline{7-7} 
+7 &  & -3024 &  & 17 &  & 30749  \\ \cline{1-1} \cline{3-3} \cline{5-5} \cline{7-7} 
+8 &  & -4108 &  & 18 &  & 24711  \\ \cline{1-1} \cline{3-3} \cline{5-5} \cline{7-7} 
+9 &  & -938  &  & 19 &  & -13469 \\ \cline{1-3} \cline{5-7} 
+\end{tabular}
+\label{coeffff}
+\end{table}
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|l|l|c|c|}
+\cline{1-3} \cline{5-7}
+\multicolumn{1}{|c|}{\textbf{Địa chỉ}} & \textbf{Bộ lọc} & \textbf{Giá trị} &  & \multicolumn{1}{c|}{\textbf{Địa chỉ}} & \textbf{Bộ lọc} & \textbf{Giá trị} \\ \cline{1-3} \cline{5-7} 
+20 & \multirow{6}{*}{FIR} & -57165 &  & 30 & \multirow{6}{*}{HB2} & 749    \\ \cline{1-1} \cline{3-3} \cline{5-5} \cline{7-7} 
+21 &                      & -58588 &  & 31 &                      & -5783  \\ \cline{1-1} \cline{3-3} \cline{5-5} \cline{7-7} 
+22 &                      & 15205  &  & 32 &                      & 24260  \\ \cline{1-1} \cline{3-3} \cline{5-5} \cline{7-7} 
+23 &                      & 149059 &  & 33 &                      & -78249 \\ \cline{1-1} \cline{3-3} \cline{5-5} \cline{7-7} 
+24 &                      & 279548 &  & 34 &                      & 321172 \\ \cline{1-1} \cline{3-3} \cline{5-5} \cline{7-7} 
+25 &                      & 333704 &  & 35 &                      & 524288 \\ \cline{1-3} \cline{5-7} 
+26 & \multirow{4}{*}{HB1} & 7025   &  & 36 & \multirow{4}{*}{HB1} & 7025   \\ \cline{1-1} \cline{3-3} \cline{5-5} \cline{7-7} 
+27 &                      & -53701 &  & 37 &                      & -53701 \\ \cline{1-1} \cline{3-3} \cline{5-5} \cline{7-7} 
+28 &                      & 308825 &  & 38 &                      & 308825 \\ \cline{1-1} \cline{3-3} \cline{5-5} \cline{7-7} 
+29 &                      & 524288 &  & 39 &                      & 524288 \\ \cline{1-3} \cline{5-7} 
+\end{tabular}
+\end{table}
+
+\subsection{Kiểm thử}
+Việc mô phỏng RTL sẽ được thực hiện trên Mentor Questasim. Tương tự chương 2, chúng ta sẽ trích xuất tín hiệu PDM từ bộ điều chế (thư viện sigmadelta) ra dữ liệu dạng chữ và lưu vào tệp text. Từ đó có thể đưa vào testbench và chạy mô phỏng.
+\subsubsection{Cấu trúc testbench}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=13cm]{Images/Chuong4/tb/tb_top.png}
+    \caption[Cấu trúc của testbench]{\bfseries \fontsize{12pt}{0pt}\selectfont  Cấu trúc của testbench}
+    \label{tb_top}
+\end{figure}
+
+Tín hiệu PDM được đọc từ tệp text thu được bộ điều chế đưa vào thiết kế với tần số lấy mẫu của PDM (2304 kHz). Dữ liệu PCM thu được đầu ra với tần số mẫu là 48 kHz đưa ghi vào tệp text. Từ tệp đó chúng ta sẽ so sánh với kết quả tính toán bằng phần mềm sử dụng ngôn ngữ \textbf{python} (hình \ref{tb_top}). Việc so sánh sẽ đựa vào biểu đồ mật độ phổ công suất và tín hiệu ở miền thời gian.
+
+\subsubsection{Kết quả mô phỏng}
+\paragraph{Tín hiệu nhiều thành phần sin}
+Như ở trong \hyperref[chuong3]{chương 3}, tín hiệu 3 thành phần gồm 3 sóng sin có tần số lần lượt 4 kHz, 13 kHz, 22 kHz như phương trình \ref{3sin2}.
+\begin{equation} \label{3sin2}
+    x(t) = \frac{0.4}{3} (sin(2\pi \times 4000\times t) + sin(2\pi \times 13000\times t) + sin(2\pi \times 22000\times t))
+\end{equation}
+
+Ban đầu chúng ta sẽ cấu hình độ rộng của PCM là 20.
+
+Hình \ref{sin_1} và \ref{sin_1_1} miêu tả biểu đồ thời gian của tín hiệu PCM sau mô phỏng của cả phần cứng và phần mềm. Ở miền này hầu như chúng ta không thể nhận ra sự khác biệt. Các thần phần tần số 13 kHz, 22 kHz đã được loại bỏ chỉ còn sóng sin của tần số 4 kHz tồn tại.
+
+Để kết luận một cách rõ ràng hơn, chúng sẽ xem xét miền tần số của 2 tín hiệu. Hình \ref{psd_sin_1}, hình \ref{psd_sin_1_1} mô tả biểu đồ phổ mật độ công suất của 2 tín hiệu trên. Vì 2 thành phần tần số 13 kHz và 22 kHz nằm trong dải dừng (thành phần bị loại bỏ) và nó có biên độ bằng thành phần tần số 4 kHz (nằm trong dải thông), chúng ta có thể lấy độ chênh lệch của các thành phần tần số này trong miền tần số để kết luận về độ suy hao của dải dừng.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=14cm]{Images/Chuong4/tb/sim/sin_1.png}
+    \caption[Miền thời gian của tín hiệu mô phỏng bằng phần cứng với độ rộng PCM là 20]{\bfseries \fontsize{12pt}{0pt}\selectfont Miền thời gian của tín hiệu mô phỏng bằng phần cứng với độ rộng PCM là 20}
+    \label{sin_1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=14cm]{Images/Chuong4/tb/sim/sin_1_1.png}
+    \caption[Miền thời gian của tín hiệu mô phỏng trên phần mềm với độ rộng PCM là 20]{\bfseries \fontsize{12pt}{0pt}\selectfont Miền thời gian của tín hiệu mô phỏng trên phần mềm}
+    \label{sin_1_1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=14cm]{Images/Chuong4/tb/sim/psd_sin_1.png}
+    \caption[Phổ của tín hiệu mô phỏng bằng phần cứng với độ rộng PCM là 20]{\bfseries \fontsize{12pt}{0pt}\selectfont  Phổ của tín hiệu mô phỏng bằng phần cứng với độ rộng PCM là 20}
+    \label{psd_sin_1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=14cm]{Images/Chuong4/tb/sim/psd_sin_1_1.png}
+    \caption[ Phổ của tín hiệu mô phỏng bằng phần mềm]{\bfseries \fontsize{12pt}{0pt}\selectfont  Phổ của tín hiệu mô phỏng bằng phần mềm }
+    \label{psd_sin_1_1}
+\end{figure}
+
+Chúng ta có thể dễ dàng nhận thấy (hình \ref{psd_sin_1}, \ref{psd_sin_1_1}), độ suy hao giảm khoảng 8 dB ở thiết kế phần cứng so với mô phỏng phần mềm. Tuy nhiên nó vẫn nằm gần khoảng giá trị 89 dB, điều này đã đáp ứng được yêu cầu thiết kế của dải dừng. Tuy nhiên ở các thành phần tín hiệu nhiễu trong dải dừng có vẻ tăng đột ngột và độ chính xác so với phần mềm không cao.
+
+Ở dải thông, thiết kế đã đáp ứng được trong khoảng tần số 0 - 6kHz, tuy nhiên có 1 số thành phần tần số khác có độ chính xác không cao so với phần mềm. Ở tần số 6 kHz đã có sự chuyển đến tần số 10 kHz, vì vậy đã đáp ứng được yêu cầu dải chuyển tiếp.
+
+Từ điểm 10 kHz trở đi dải dừng ổn định nhưng với độ suy hao cao hơn nhiều so với độ suy hao bằng mô phỏng phần mềm.
+
+Những sai số đó gây ra bởi độ rộng của PCM lấy mẫu, số bit bị cắt bỏ sau mỗi tầng lọc để giảm tài nguyên. Để kiểm tra về tác nhân gây sai số, chúng ta tăng độ rộng của PCM lên 24 bit và chạy lại mô phỏng.
+
+Về biểu đồ thời gian (hình \ref{sin_2}) không có gì khác biệt so với mô phỏng với phần mềm và trường hợp độ rộng PCM là 20 bit. Chúng ta sẽ xem xét rõ hơn ở miền tần số.
+
+Hình \ref{psd_sin_2} mô tả biều đồ mật độ công suất của tín hiệu PCM đầu ra với trường hợp độ rộng bit là 24 bit. Độ suy hao đã bám sát giá trị 89 dB với độ chênh lệch là 0.077 dB. Các thành phần tín hiệu ở các tần số khác được hiện thị rõ ràng hơn so với trường hợp 20 bit. Dải chuyển tiếp có độ sâu hơn. Hình dạng của mật độ công suất đã gần như giống với tín hiệu được mô phỏng bằng phần mềm.
+
+Chúng ta có thể tăng độ rộng bit của PCM lên để đạt được các thông số tốt hơn và giống với phần mềm. Tuy nhiên điều đó gây tốn tài nguyên. Với số bit là 24 thì đã hoàn toàn đáp ứng được với thiết kế. Thật vậy, ở dạng âm thanh chất lượng cao thì độ rộng của PCM thường là 24.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=14cm]{Images/Chuong4/tb/sim/sin_2.png}
+    \caption[Miền thời gian của tín hiệu mô phỏng trên phần mềm với độ rộng PCM là 24]{\bfseries \fontsize{12pt}{0pt}\selectfont  Miền thời gian của tín hiệu mô phỏng trên phần mềm với độ rộng PCM là 24}
+    \label{sin_2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=14cm]{Images/Chuong4/tb/sim/psd_sin_2.png}
+    \caption[Phổ của tín hiệu mô phỏng bằng phần cứng với độ rộng PCM là 24]{\bfseries \fontsize{12pt}{0pt}\selectfont  Phổ của tín hiệu mô phỏng bằng phần cứng với độ rộng PCM là 24 }
+    \label{psd_sin_2}
+\end{figure}
+
+\paragraph{Tín hiệu từ tệp âm thanh có sẵn}
+
+Có một cách khác để kiểm tra tín hiệu âm thanh thu được thực tế hơn đó là nghe bằng tai. Khi được số hóa, tín hiệu âm thanh sẽ được lưu trữ dưới dạng tệp ".wav, .mp3, \ldots" Từ các tệp này chúng ta có thể nghe lại ở mọi thiết bị và mọi thời điểm. Với tín hiệu chất lượng cao - độ phân dải là 24 bit, tần số lấy mẫu là 48 kHz nó sẽ được lưu dưới dạng tệp wav.
+
+Vận dụng các đặc điểm đó, chúng ta sẽ tiến hành đọc dữ liệu ở tệp và sau đó điều chế Sigma-Delta để thu được tín hiệu PDM. Tín hiệu này sau đó sẽ được đưa vào testbench để chạy mô phỏng.
+
+Tiến hành mô phỏng với tệp nhạc có cả nhạc nền và giọng hát.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=14cm]{Images/Chuong4/tb/wav/vldd2_2.png}
+    \caption[Biểu đồ miền thời gian của âm thanh gốc]{\bfseries \fontsize{12pt}{0pt}\selectfont Biểu đồ miền thời gian của âm thanh gốc}
+    \label{vldd2_2}
+\end{figure}
+
+Hình \ref{vldd2_2} là biều đồ biểu thị 1 phần nhỏ tín hiệu gốc của tệp đề cập ở trên. Sau khi đi qua bộ chuyển đổi bằng phần cứng (hình \ref{vldd2_0}) và bộ chuyển đổi sử dụng tính toán bằng phần mềm (hình \ref{vldd2_1}), ta thấy được sự khác biệt giữa các biểu đồ. Tín hiệu gốc dường nhưng đã mất đi một phần tín hiệu nào đó khiến nó bị biến dạng. Tuy nhiên biểu đồ giữa mô phỏng bằng phần cứng và phần mềm lại được xem là giống nhau. Để hiểu rõ chi tiết hơn, chúng ta nên xem các tín hiệu trên biểu diễn trên miền tần số.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=14cm]{Images/Chuong4/tb/wav/vldd2_0.png}
+    \caption[Biểu đồ miền thời gian của âm thanh sau khi đi qua bộ chuyển đổi]{\bfseries \fontsize{12pt}{0pt}\selectfont  Biểu đồ miền thời gian của âm thanh sau khi đi qua bộ chuyển đổi }
+    \label{vldd2_0}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=14cm]{Images/Chuong4/tb/wav/vldd2_1.png}
+    \caption[Biểu đồ miền thời gian của âm thanh sau sau khi chuyển đổi bằng phần mềm]{\bfseries \fontsize{12pt}{0pt}\selectfont  Biểu đồ miền thời gian của âm thanh sau sau khi chuyển đổi bằng phần mềm}
+    \label{vldd2_1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=14cm]{Images/Chuong4/tb/wav/vldd2_psd_2.png}
+    \caption[Biểu đồ phổ của tín hiệu âm thanh gốc]{\bfseries \fontsize{12pt}{0pt}\selectfont Biểu đồ phổ của tín hiệu âm thanh gốc}
+    \label{vldd2_psd_2}
+\end{figure}
+
+Hình \ref{vldd2_psd_2} mô tả mật độ phổ công suất của tín hiệu gốc. Chúng ta có thể thấy tín hiệu sẽ có đủ dải từ 0 - 24 kHz. Sau khi đưa qua mô phỏng tín hiệu đã bị lọc bỏ hết thành phần từ 6 - 24 kHz, điều này khiến ở miền thời gian tín hiệu sau khi chuyển đổi bị biến dạng. Hình \ref{vldd2_psd_0} và \ref{vldd2_psd_1} lần lượt là phổ của tín hiệu âm thanh sau khi đi qua mô phỏng phần cứng và phần mềm. Chúng ta có thể thấy ở dải thông, các thành phần tín hiệu ở dải tần số khá là tương tự nhau. Nó chỉ khác biệt là khi chuyển xuống dải dừng, độ suy hao của phần cứng sẽ chênh lệch với phần mềm khoảng 9 dB. Như đã đề cập ở phần trước thì độ chênh lệnh này không ảnh hưởng so với yêu cầu thiết kế là 89 dB.
+
+Khi nghe lại 2 tệp âm thanh trước và sau khi chuyển đổi bằng phần cứng, chúng ta có nhận xét sau đây: âm thanh sau khi chuyển đổi dường đi mất đi sự chi tiết, tươi sáng và sắc bén. 
+
+Vì bộ chuyển đổi sẽ loại bỏ đi các thành phần ở tần số 6 - 24 kHz, thật trùng hợp vì đây cũng là dải tần số \textbf{Treble} (6 kHz - 20 kHz) của âm thanh. Mà dải này đảm nhận vai trò tăng độ chi tiết cho âm thanh, do đó tín hiệu nghe được bị mất cảm xúc cũng là điều hoàn toàn đúng.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=14cm]{Images/Chuong4/tb/wav/vldd2_psd_0.png}
+    \caption[Biểu đồ phổ của âm thanh sau khi chuyển đổi bằng phần cứng]{\bfseries \fontsize{12pt}{0pt}\selectfont  Biểu đồ phổ của âm thanh sau khi chuyển đổi bằng phần cứng}
+    \label{vldd2_psd_0}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=14cm]{Images/Chuong4/tb/wav/vldd2_psd_1.png}
+    \caption[Biểu đồ phổ của âm thanh sau sau khi chuyển đổi bằng phần mềm]{\bfseries \fontsize{12pt}{0pt}\selectfont  Biểu đồ phổ của âm thanh sau sau khi chuyển đổi bằng phần mềm}
+    \label{vldd2_psd_1}
+\end{figure}
+
+\subsection{Kết luận chương}
+
+\hyperref[chuong4]{Chương 5} đã giải quyết được vấn đề thiết kế bộ chuyển đổi nhiều giai đoạn với ngôn ngữ mô tả phần cứng SystemVerilog. Kết quả kiểm thử cho thấy thiết kế có sai số so với việc tính toán bằng phần mềm nhưng vẫn đáp ứng được với các yêu cầu thiết kế đặt ra. Trong chương tiếp theo, thiết kế này sẽ được tổng hợp và triển khai lên FPGA để kiếm chứng tính đúng đắn trong điều kiện thực tế.
 
 \newpage

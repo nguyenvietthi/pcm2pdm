@@ -41,9 +41,9 @@ Từ đó, chúng ta tóm tắt các yêu cầu thiết kế như bảng \ref{sp
 \end{table}
 
 \subsection{Thiết kế bộ chuyển đổi PDM sang PCM}
-Khi chúng ta quan sát phổ của tín hiệu PDM, các nhiễu lượng tử sẽ được dồn sang ở tần số cao, còn phần cần lấy thông tin sẽ ở trong một khoảng tẩn số thấp nhất định. Cho nên, bộ chuyển đổi sẽ chỉ cần 2 bước cơ bản (hình \ref{pdm2pcm_top}):
+Khi chúng ta quan sát phổ của tín hiệu PDM, các nhiễu lượng tử sẽ được dồn sang ở tần số cao, còn phần cần lấy thông tin sẽ ở trong một khoảng tần số thấp nhất định. Cho nên, bộ chuyển đổi sẽ chỉ cần 2 bước cơ bản (hình \ref{pdm2pcm_top}):
 \begin{enumerate}
-    \item Gửi tín hiệu PDM thông qua một bộ lọc thông thấp. Nó sẽ loại bỏ tất cả các nhiều ở tần số cao.
+    \item Gửi tín hiệu PDM thông qua một bộ lọc thông thấp. Nó sẽ loại bỏ tất cả các nhiễu ở tần số cao.
     \item Sử dụng kỹ thuật Decimation (hạ tần) để các mẫu được lấy mẫu với tỷ lệ thấp hơn. Việc sử dụng bộ lọc thông thấp từ bước 1 cũng sẽ giúp tránh được hiện tượng chồng phổ.
 \end{enumerate}
 
@@ -55,7 +55,7 @@ Khi chúng ta quan sát phổ của tín hiệu PDM, các nhiễu lượng tử 
 \end{figure}
 Ở trong đề tài này, chúng ta sẽ thiết kế bộ lọc "Equiripple" bằng thuật toán \textbf{Parks-McClellan} \cite{rao2018digital}. Trong thư viện \textit{Numpy} đã có sẵn chức năng \textit{remez} để thiết kế các bộ lọc theo thông số được đặt ra, việc triển khai sẻ sử dụng ngôn ngữ \textit{Python}.
 \subsubsection{Ý tưởng thiết kế đơn giản} \label{dongian}
-Không thực sự cần một kiến trúc bộ lọc phức tạp để chuyển đổi PDM sang PCM, chúng ta chỉ cần 1 bộ lọc thông thấp duy nhất là có thể đáp ứng được các thông số ở trên.
+Không thực sự cần một kiến trúc bộ lọc phức tạp để chuyển đổi PDM sang PCM, chúng ta chỉ cần 1 bộ lọc thông thấp duy nhất là đã có thể đáp ứng được các thông số ở trên.
 
 Bộ lọc thông thấp sẽ có các thông số như sau: 
 \begin{itemize}
@@ -79,7 +79,7 @@ Sau tiến hành chạy thuật toán \textit{remez}, chúng ta có bộ lọc c
     \label{filter_the_damn_thing_impulse}
 \end{figure}
 
-Bộ trên có độ suy hao dải dừng là 89.035 dB, độ gợn sóng 0.01415 dB hoàn toàn thỏa mãn với yêu cầu thiết kế. Nhưng có một vấn đề, đó là số taps lớn dẫn đến phép nhân trong 1 giây khá lớn ($48000 \times 2216 = 106M \text{ phép}/s$). Trong thiết kế phần cứng, điều đó đồng nghĩa chúng ta phải dùng đến 2216 bộ nhân, điều đó gây nên hao phí tài nguyên nghiêm trọng.
+Bộ trên có độ suy hao dải dừng là 89.035 dB, độ gợn sóng 0.01415 dB hoàn toàn thỏa mãn với yêu cầu thiết kế. Nhưng có một vấn đề, đó là số taps lớn dẫn đến phép nhân trong 1 giây khá lớn ($48000 \times 2216 = 106M \text{ phép}/s$). Trong thiết kế phần cứng, đồng nghĩa chúng ta phải dùng đến 2216 bộ nhân, điều đó gây nên hao phí tài nguyên nghiêm trọng.
 
 \textbf{Kết luận}: việc sửa dụng một bộ lọc thông thấp duy nhất không được cho là khả thi. Phần sau sẽ trình bày kiểu thiết kế sử dụng nhiều bộ lọc tối ưu và xử lý ở nhiều miền tần số.
 
@@ -105,11 +105,11 @@ Lý do cho sự sắp xếp này là để phù hợp ràng buộc thiết kế 
     \item Việc sử dụng 2 bộ lọc CIC và Half Band vẫn chưa đủ điều kiện để lọc triệt để tín hiệu cần thu, dẫn đến việc phải sử dụng bộ FIR sau cùng. Nhưng bộ lọc này chạy ở tần số thấp và tài nguyên là không đáng kể.
 \end{itemize}
 \paragraph{Cấu hình bộ lọc CIC}
-Vì bộ lọc CIC không sử dụng bất kỳ bộ nhân nào, các thông số của bộ lọc chỉ phụ thuộc vào 2 tham số là số tầng và kích thước cửa số. Tuy nhiên, cácbộ lọc CIC có độ gợn của dải thông trở nên ngày càng tồi tệ hơn với tần số tăng và số lượng các tầng tăng.
+Vì bộ lọc CIC không sử dụng bất kỳ bộ nhân nào, các thông số của bộ lọc chỉ phụ thuộc vào 2 tham số là số tầng và kích thước cửa số. Tuy nhiên, các bộ lọc CIC có độ gợn của dải thông trở nên ngày càng tồi tệ hơn với tần số tăng và số lượng các tầng tăng.
 
-Do yêu cầu thiết kế có hệ số decimation là 48, do đó có 9 tỷ lệ có thể chọn cho CIC: 2 3 4 6 8 12 16 24 48.
+Do yêu cầu thiết kế có hệ số decimation là 48, do đó có 9 tỷ lệ có thể được chọn cho CIC: 2 3 4 6 8 12 16 24 48.
 
-Hình \ref{cic_ratios_overview} mô tả đáp ứng tần số của vộ lọc CIC với tất cả các tỷ lệ decimation nói trên và 5 tầng. Gạch nối màu đỏ biểu thị ranh giới 6 kHz cần thu tín hiệu, chúng ta tiếp tục phân tích bằng cách phóng to (hình \ref{cic_ratios_zoom}). Dễ dành nhận ra ở dải tần 0 - 6 kHz và độ gợn sóng 0.1 dB, tỷ lệ Decimation từ 16 trở đi vi phạm yêu cầu thiết kế đặt ra. Chúng ta có thể khắc phục điều đó bằng cách tăng số tầng của bộ lọc nhưng sẽ có một rắc rối đó là sẽ làm giảm độ suy hao của dải dừng.
+Hình \ref{cic_ratios_overview} mô tả đáp ứng tần số của bộ lọc CIC với tất cả các tỷ lệ decimation nói trên và 5 tầng. Gạch nối màu đỏ biểu thị ranh giới 6 kHz cần thu tín hiệu, chúng ta tiếp tục phân tích bằng cách phóng to (hình \ref{cic_ratios_zoom}). Dễ dành nhận ra ở dải tần 0 - 6 kHz và độ gợn sóng 0.1 dB, tỷ lệ Decimation từ 16 trở đi vi phạm yêu cầu thiết kế đặt ra. Điều đó có thể khắc phục bằng cách tăng số tầng của bộ lọc nhưng sẽ có một rắc rối đó là sẽ làm giảm độ suy hao của dải dừng.
 
 \begin{figure}[H]
     \centering
@@ -127,15 +127,15 @@ Hình \ref{cic_ratios_overview} mô tả đáp ứng tần số của vộ lọc
 
 Để đơn giản, chúng ta sẽ phải giới hạn tỷ lệ decimation số lượng các tầng sao cho độ gợn dải thông không vượt quá một giá trị tối đa nhất định. Ở đây sẽ chọn độ gợn tối đa là 0.05 dB.
 
-Để tìm ra thông số CIC thỏa mãn cả yêu cầu về dải thông và dải dừng, chúng ta sẽ tập trung vào bảng \ref{abc}. Chúng ta nên chọn số tầng thấp nhất có thể để giảm được số lượng độ rộng của thanh ghi và các bộ cộng. Từ đó có thể đáp ứng được vấn đề về tài nguyên của hệ thống số.
+Để tìm ra thông số CIC thỏa mãn cả yêu cầu về dải thông và dải dừng, chúng ta sẽ tập trung vào bảng \ref{abc}. Nên chọn số tầng thấp nhất có thể để giảm được số lượng độ rộng của thanh ghi và các bộ cộng. Từ đó có thể đáp ứng được vấn đề về tài nguyên của hệ thống số.
 
- \noindent Từ bảng \ref{abc}, chúng ta có thể đưa ra các phương án sau:
+ \noindent Từ bảng \ref{abc}, các phương án sau được đưa ra:
 \begin{itemize}
     \item Tỷ lệ Decimation 6x và số tầng 3: phương án này yêu cầu thêm 3 bộ lọc Half Band và 1 bộ lọc FIR cuối để đáp ứng được các thông số cuối cùng.
     \item Tỷ lệ Decimation 8x và số tầng 4: phương án này yêu cần cần thêm tỷ lệ Decimation phía sau là 6x, đồng nghĩa với dùng 1 bộ lọc Half Band và 1 bộ lọc FIR cuối kèm theo 1 bộ decimation 3x.
     \item Tỷ lệ Decimation 12x và số tầng 4: mặc dùng phương án này chưa đáp ứng được độ gợn sóng của dải thông (0.056 db, vượt 0.006 dB so với yêu cầu), nhưng chênh lệch này rất nhỏ. Với phương án này yêu cầu thêm 2 bộ lọc Half Band và 1 bộ lọc FIR. \label{choose}
 \end{itemize}
-
+\vspace{2.5cm}
 \begin{table}[H]
     \centering
     \caption[Độ gợn sóng và độ suy hao của dải dừng của bộ lọc CIC ở nhiều cấu hình khác nhau (dB)]{\bfseries\fontsize{12pt}{0pt}\selectfont Độ gợn sóng và độ suy hao của dải dừng của bộ lọc CIC ở nhiều cấu hình khác nhau (dB)}
@@ -249,9 +249,9 @@ Hình \ref{cic_ratios_overview} mô tả đáp ứng tần số của vộ lọc
 \end{table}
 Khi các thuộc tính của bộ lọc CIC đã được quyết định, thiết kế bộ lọc Half Band và FIR sẽ được chạy thuật toán Parks-McClellan/Remez để đưa ra các hệ số bộ lọc chính xác. Từ đó, chúng ta có thể đưa ra số phép nhân xảy ra trong 1 giây, mô tả như bảng \ref{phepnhan}. Dễ dàng nhận ra phương án 3 là phương án tối ưu nhất.
 
-Giờ thì chúng ta có thể thấy sự khác biệt giữa 2 kiến trúc đơn giản (mục \ref{dongian}) và sử dụng nhiều bộ lọc trên nhiều miền tần số khác nhau. Với 3504k phép nhân trên 1 giây so với 106M phép nhân trong 1 giây, nó đã cải thiện hơn 30 lần.
+Giờ thì chúng ta có thể thấy rõ sự khác biệt giữa 2 kiến trúc đơn giản (mục \ref{dongian}) và sử dụng nhiều bộ lọc trên nhiều miền tần số khác nhau. Với 3504k phép nhân trên 1 giây so với 106M phép nhân trong 1 giây, nó được cải thiện hơn 30 lần.
 \subsubsection{Thiết kế bộ lọc Half Band và FIR}
-Với phương án \hyperref[choose]{đã chọn ở trên}, chúng ta có sơ đồ khối tổng quát của thiết kế như hình \ref{pipeline_new}.
+Với phương án \hyperref[choose]{đã được chọn ở trên}, chúng ta có sơ đồ khối tổng quát của thiết kế như hình \ref{pipeline_new}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=11cm]{Images/Chuong3/pipeline_new_top.png}
@@ -285,7 +285,9 @@ Với phương án \hyperref[choose]{đã chọn ở trên}, chúng ta có sơ �
     Độ suy hao của dải dừng: 89 dB
 \end{enumerate}
 
- \noindent Phổ của từng giai đoạn mô tả như hình \ref{t1}, \ref{t2}, \ref{t3}, \ref{t4}.
+ \noindent Phổ của từng giai đoạn mô tả như hình 
+ \ref{t1}, \ref{t2}, \ref{t3}, \ref{t4}.
+ \vspace{2.3cm}
  \begin{figure}[H]
     \centering
     \includegraphics[width=11cm]{Images/Chuong3/1.png}
@@ -312,20 +314,21 @@ Với phương án \hyperref[choose]{đã chọn ở trên}, chúng ta có sơ �
 \end{figure}
 
 Sau khi chạy thuật toán \textbf{Parks-McClellan/Remez} với các thông số đã nên ở trên, ta có đồ thị đáp ứng tần số, đáp ứng xung và số lượng taps của từng bộ lọc như hình \ref{a}, \ref{b}, \ref{c}, \ref{d}.  
-
+\vspace{1.5cm}
 \begin{figure}[H]
     \centering
     \includesvg[width=15.5cm]{Images/Chuong3/CIC.svg}
     \caption[Đáp ứng tần số và đáp ứng xung của bộ lọc CIC]{\bfseries \fontsize{12pt}{0pt}\selectfont Đáp ứng tần số và đáp ứng xung của bộ lọc CIC}
     \label{a}
 \end{figure}
-
+\vspace{1.5cm}
 \begin{figure}[H]
     \centering
     \includesvg[width=15.5cm]{Images/Chuong3/HB1.svg}
     \caption[Đáp ứng tần số và đáp ứng xung của bộ lọc Half Band (1)]{\bfseries \fontsize{12pt}{0pt}\selectfont Đáp ứng tần số và đáp ứng xung của bộ lọc Half Band (1)}
     \label{b}
 \end{figure}
+\vspace{1.5cm}
 \begin{figure}[H]
     \centering
     \includesvg[width=15.5cm]{Images/Chuong3/HB2.svg}

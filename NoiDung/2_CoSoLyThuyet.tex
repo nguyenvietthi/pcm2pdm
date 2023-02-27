@@ -3,12 +3,12 @@
 \setcounter{section}{2}
 \setcounter{figure}{0}
 \setcounter{table}{0}
-Chương này sẽ trình bày tổng quan về hệ thống xử lý âm thanh số. Các khái niệm, cơ sở lý thuyết về bộ chuyển đổi tương tự số (Sigma-Delta), các kỹ thuật xử lý tín hiệu trên nhiều miền tần số, các bộ lọc tiết kiệm tài nguyên có thể ứng dụng và triển khai trên phần cứng, \ldots sẽ được lần lượt làm rõ trong chương này. Các cơ sở lý thuyết được trình bày dựa trên quá trình tìm hiểu tổng hợp các nguồn tài liệu có tính xác minh cao được liệt kê dưới phần tài liệu tham khảo.
+Chương này sẽ trình bày tổng quan về hệ thống xử lý âm thanh số. Các khái niệm, cơ sở lý thuyết về bộ chuyển đổi tương tự số (Sigma-Delta), các kỹ thuật xử lý tín hiệu trên nhiều miền tần số, các bộ lọc tiết kiệm tài nguyên có thể ứng dụng và triển khai trên phần cứng, \ldots sẽ được lần lượt làm rõ trong chương này. Các kiến thức nền tảng được trình bày dựa trên quá trình tìm hiểu tổng hợp các nguồn tài liệu có tính xác minh cao được liệt kê dưới phần tài liệu tham khảo.
 
 \subsection{ Lý thuyết điều chế Sigma Delta và Pulse Density Modulation}
-Tín hiệu âm thanh là một dạng tín hiệu điện tử được tạo ra bởi dao động cơ học của màng nhạy cảm âm thanh như loa hay micrô. Khi âm thanh được tạo ra, nó là các dao động cơ học của các đối tượng trong không gian xung quanh, chẳng hạn như giọng nói, nhạc cụ, tiếng động, và âm thanh môi trường tự nhiên. Các dao động này được chuyển đổi thành tín hiệu điện tử bằng các thiết bị thu âm, chẳng hạn như micro hoặc đầu đọc đĩa, sau đó được xử lý để tạo ra một tín hiệu âm thanh tương ứng.
+Tín hiệu âm thanh là một dạng tín hiệu điện tử được tạo ra bởi dao động cơ học của màng nhạy cảm âm thanh ví dụ như loa hay micrô. Khi âm thanh được tạo ra, nó là các dao động cơ học của các đối tượng trong không gian xung quanh, chẳng hạn như giọng nói, nhạc cụ, tiếng động, và âm thanh môi trường tự nhiên. Các dao động này được chuyển đổi thành tín hiệu điện tử bằng các thiết bị thu âm, điển hình là micro hoặc đầu đọc đĩa, sau đó được xử lý để tạo ra một tín hiệu âm thanh tương ứng.
 
-Trong một hệ thống xử lí tín hiệu âm thanh số (hình \ref{hinh21}), âm thanh ban đầu là dạng tín hiệu tương tự  được đưa qua bộ chuyển đổi tương tự số (ADC) để số hóa dưới dạng tín hiệu số. Tín hiệu số tiếp tục được xử lý qua bộ xử lý tín hiệu số để đáp ứng được các yêu cầu cần thiết, sau đó đưa về tín hiệu tương tự để phát thông qua bộ biến đổi số tương tự (DAC). 
+Trong một hệ thống xử lí tín hiệu âm thanh số (hình \ref{hinh21}), âm thanh ban đầu là dạng tín hiệu tương tự  được đưa qua bộ chuyển đổi tương tự số (ADC) để số hóa dưới dạng tín hiệu số. Tín hiệu đó tiếp tục được xử lý qua bộ xử lý tín hiệu số để đáp ứng được các yêu cầu cần thiết, sau đó đưa về tín hiệu tương tự để phát thông qua bộ biến đổi số tương tự (DAC). 
 
 \begin{figure}[!ht]
     \centering
@@ -18,11 +18,11 @@ Trong một hệ thống xử lí tín hiệu âm thanh số (hình \ref{hinh21}
     \label{hinh21}
 \end{figure}
 
-Quá trình số hóa gồm 3 bước theo thứ tự sau: lấy mẫu, lượng tử và mã hóa. Trong đó, lấy mẫu là lấy các giá trị của tín hiệu tại các thời điểm rời rạc. Do đó, lấy mẫu còn gọi là rời rạc hóa. Lượng tử hóa là làm gần đúng giá trị của tín hiệu tại thời điểm lấy mẫu với các mức lượng tử (giá trị rời rạc). Lượng tử hóa được xác định bởi độ chính xác của máy tính. Mã hóa là biểu diễn một số theo hệ thống nhị phân mà máy tính có thể đọc được\cite{xulytinhieusobook}. Ba quá trình trên sẽ được tích hợp và thực hiện trên bộ ADC.
+Quá trình số hóa gồm 3 bước theo thứ tự sau: lấy mẫu, lượng tử và mã hóa. Trong đó, lấy mẫu là lấy các giá trị của tín hiệu tại các thời điểm rời rạc. Do đó, lấy mẫu còn gọi là rời rạc hóa. Tiếp theo, lượng tử hóa là làm gần đúng giá trị của tín hiệu tại thời điểm lấy mẫu với các mức lượng tử (giá trị rời rạc). Lượng tử hóa được xác định bởi độ chính xác của máy tính. Cuối cùng, mã hóa là biểu diễn một số theo hệ thống nhị phân mà máy tính có thể đọc được\cite{xulytinhieusobook}. Ba quá trình trên sẽ được tích hợp và thực hiện trên bộ ADC.
 
 Bộ chuyển đổi tương tự số có 3 kiến trúc phổ biến hiện tại đang được sử dụng là 
 Sigma Delta ADC, Successive Approximation ADC (SAR ADC) và Pipelined ADC.
-Mỗi kiến trúc có các đặc điểm khác nhau – một số tốt hơn trong việc hỗ trợ độ chính xác của độ phân giải cao, trong khi những kiến trúc khác hỗ trợ tốt hơn cho tốc độ lấy mẫu cao (bảng \ref{bang21}). Cho nên mỗi kiến trúc sẽ được sửa dụng trong các ứng dụng khác nhau.
+Mỗi kiến trúc có các đặc điểm khác nhau – một số tốt hơn trong việc hỗ trợ độ chính xác của độ phân giải cao, trong khi những kiến trúc khác hỗ trợ tốt hơn cho tốc độ lấy mẫu cao (bảng \ref{bang21}). Cho nên mỗi kiến trúc sẽ được sử dụng trong các ứng dụng khác nhau.
 \begin{table}[h!]
 \centering
 \caption[So sánh giữa các kiến trúc ADC]{\bfseries\fontsize{12pt}{0pt}\selectfont So sánh giữa các kiến trúc ADC}
@@ -37,10 +37,10 @@ Mỗi kiến trúc có các đặc điểm khác nhau – một số tốt hơn 
 \label{bang21}
 \end{table}
 
-Vì dải âm thanh nghe trong ngưỡng nghe có tần số không cao (20 – 20000 Hz) nằm trong khả năng lấy mẫu của bộ điều chế Delta Sigma và trong các ứng dụng âm thanh được mã hóa trong khoảng từ 16 – 24 bit do đó kiến trúc Delta Sigmal sẽ phù hợp cho việc số hóa âm thanh hơn các kiến trúc còn lại.
+Vì dải âm thanh nghe trong ngưỡng nghe có tần số không cao (20 – 20000 Hz) nằm trong khả năng lấy mẫu của bộ điều chế Delta Sigma và trong các ứng dụng âm thanh được mã hóa trong khoảng từ 16 – 24 bit. Do đó, kiến trúc Delta Sigmal sẽ phù hợp cho việc số hóa âm thanh hơn các kiến trúc còn lại.
 
 Một thiết bị điển hình sử dụng kiến trúc Sigma Delta (SD) là MEMS Microphone, 
-(MicroelectromechanicalSystem Microphone) thiết bị này có thể tìm thấy phổ biến trên các điện thoại di động, các máy ghi âm hoặc các thiết bị thu thanh không sử yêu cầu về chất lượng âm thanh quá cao nhưng giá thành rẻ và phù hợp với yêu cầu sử dụng. Tín hiệu thu được trên MEMS Microphone có dạng tín hiệu Pulse Density Modulation (PDM), là dạng 1 bit và truyền với tần số cao, giao thức truyền tương ứng có tên là PDM Interface. Một số MEMS Microphone sử dụng giao thức truyền âm thanh là I2S nhưng chỉ là số ít, phần lớn sử dụng PDM.
+(MicroelectromechanicalSystem Microphone) thiết bị này có thể được tìm thấy phổ biến trên các điện thoại di động, các máy ghi âm hoặc các thiết bị thu thanh không sử yêu cầu về chất lượng âm thanh quá cao nhưng giá thành rẻ và phù hợp với yêu cầu sử dụng. Tín hiệu thu được trên MEMS Microphone có dạng tín hiệu Pulse Density Modulation (PDM), là dạng 1 bit và truyền với tần số cao, giao thức truyền tương ứng có tên là PDM Interface. Một số MEMS Microphone sử dụng giao thức truyền âm thanh là I2S nhưng chỉ là số ít, phần lớn sử dụng PDM.
 \begin{figure}[!ht]
     \centering
     \includesvg[width=13cm]{Images/Chuong2/sinewave_to_pdm.svg}
@@ -53,12 +53,12 @@ Hình \ref{hinh22} cho ta thấy được tín hiệu sóng Sin (màu đỏ) đ�
 
 Điều chế mật độ xung (Pulse Density Modulation) là một phương pháp biểu diễn tín hiệu số bằng cách thay đổi mật độ xung (pulse density) của tín hiệu xung điện. PDM được sử dụng để mô tả các tín hiệu âm thanh và được sử dụng trong các ứng dụng âm thanh số, chẳng hạn như hệ thống âm thanh trên ô tô, thiết bị di động, hệ thống truyền thông v.v.
 
-Trong PDM, tín hiệu âm thanh được biểu diễn bằng một chuỗi các xung điện, mà mỗi xung có độ rộng như nhau nhưng với mật độ xung khác nhau tại các thời điểm khác nhau (hình \ref{hinh22}). Trong đó, mật độ xung được thể hiện bằng số lượng xung được phát ra trong một khoảng thời gian cố định. Có thể thu được tín hiệu PDM từ bộ chuyển đổi tương tự số Sigma-Delta, quá trình này sẽ được trình bày ở các phần sau.
+Trong PDM, tín hiệu âm thanh được biểu diễn bằng một chuỗi các xung điện, mỗi xung có độ rộng như nhau nhưng với mật độ xung khác nhau tại các thời điểm khác nhau (hình \ref{hinh22}). Trong đó, mật độ xung được thể hiện bằng số lượng xung được phát ra trong một khoảng thời gian cố định. Có thể thu được tín hiệu PDM từ bộ chuyển đổi tương tự số Sigma-Delta, quá trình này sẽ được trình bày ở các phần sau.
 
 \subsubsection{Bộ chuyển đổi tương tự số Sigma-Delta}
 Bộ chuyển đổi Sigma-Delta ($\Sigma\Delta$ Converter) cơ bản là một hệ thống lấy mẫu 1 bit. Tín hiệu tương tự đầu vào cần phải tương đối chậm để bộ chuyển đổi có thể lấy mẫu tín hiệu đó nhiều lần. Một kỹ thuật được gọi là lấy mẫu quá mức (oversampling) - tốc độ lấy mẫu (sample rate) nhanh hơn hàng trăm lần so với kết quả số được thu ở đầu ra. Mỗi mẫu được tích lũy theo thời gian và được lấy trung bình với các tín hiệu đầu vào khác thông qua bộ lọc số (digital filter) và bộ lọc giảm mẫu số (decimation filter).\cite{8227915}
 
-Các thành phần chính của bộ chuyển đổi Sigma-Delta bao gồm bộ điều chế Sigma-Delta, bộ lọc kỹ thuật số và bộ lọc decimation. Trong đó, decimation filters là các bộ lọc số được sử dụng để giảm mẫu số của tín hiệu số, giảm tần số lấy mẫu của tín hiệu. Decimation là quá trình giảm mẫu số của tín hiệu số, điều này thường được thực hiện để giảm tải cho bộ xử lý hoặc để giảm băng thông tín hiệu. 
+Các thành phần chính của bộ chuyển đổi Sigma-Delta bao gồm bộ điều chế Sigma-Delta, bộ lọc kỹ thuật số và bộ lọc decimation. Trong đó, decimation filters là các bộ lọc số được sử dụng để giảm mẫu số của tín hiệu số cũng như giảm tần số lấy mẫu của tín hiệu. Decimation là quá trình giảm mẫu số của tín hiệu số, điều này thường được thực hiện để giảm tải cho bộ xử lý hoặc để giảm băng thông tín hiệu. 
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=12cm]{Images/Chuong2/DAC-SD.png}
@@ -69,7 +69,7 @@ Các thành phần chính của bộ chuyển đổi Sigma-Delta bao gồm bộ 
 Bộ điều chế Sigma-Delta được thể hiện trong hình \ref{hinh23}, nó lấy thô tín hiệu đầu vào ở tốc độ rất cao thành luồng 1 bit. Sau đó, bộ lọc kỹ thuật số và bộ lọc decimation lấy dữ liệu lấy mẫu này và chuyển đổi thành tín hiệu số có tần số thấp hơn và đồng thời có độ phân giải cao. Trong một bộ chuyển đổi thì sẽ tốc độ lấy mẫu $f_S$ (sample rate) và tốc độ đầu ra dữ liệu $f_D$ (data rate).
 
 \subsubsection{Điều chế Sigma-Delta}
-Bộ điều chế Sigma-Delta là trái tim của bộ Sigma-Delta ADC. Nó có thể đáp ứng để số hóa tín hiệu đầu vào tương tự và giảm nhiễu ở tần số thấp hơn. Trong giai đoạn này, kiến trúc thực hiện một chức năng gọi là định hình nhiễu (noise shaping) để đẩy nhiễu tần số thấp lên các tần số cao hơn ở những nơi nó nằm ngoài dải tần quan tâm. Định dạng nhiễu là một trong những lý do khiến bộ chuyển đổi Sigma-Delta rất phù hợp cho các phép đo tần số thấp, độ chính xác cao. \cite{Baker2011HowDA}
+Bộ điều chế Sigma-Delta là "trái tim" của bộ Sigma-Delta ADC. Nó có thể đáp ứng để số hóa tín hiệu đầu vào tương tự và giảm nhiễu ở tần số thấp hơn. Trong giai đoạn này, kiến trúc thực hiện một chức năng gọi là định hình nhiễu (noise shaping) để đẩy nhiễu tần số thấp lên các tần số cao hơn ở những nơi nó nằm ngoài dải tần quan tâm. Định dạng nhiễu là một trong những lý do khiến bộ chuyển đổi Sigma-Delta rất phù hợp cho các phép đo tần số thấp, độ chính xác cao. \cite{Baker2011HowDA}
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=13cm]{Images/Chuong2/kientruc_1st.png}
@@ -90,7 +90,7 @@ Bộ điều biến Sigma-Delta thể hiện trong hình \ref{hinh24} thu đư�
 Theo cách này, hoạt động lượng tử hóa của bộ điều biến Sigma-Delta được tạo ra ở tốc độ lấy mẫu cao bằng với tốc độ của đồng hồ hệ thống. Giống như tất cả các bộ lượng tử hóa, bộ điều chế Sigma-Delta tạo ra một luồng các giá trị kỹ thuật số biểu thị điện áp 
 của đầu vào, trong trường hợp này là luồng 1 bit. Do đó, tỷ lệ giữa số 1 và 0 biểu thị điện áp tương tự đầu vào. Không giống như hầu hết các bộ lượng tử hóa, bộ điều chế Sigmal-Delta bao gồm một bộ tích phân, có tác dụng định hình nhiễu lượng tử hóa thành các tần số cao hơn. Do đó, phổ của nhiễu ở đầu ra của bộ điều biến không bằng phẳng.
 
-Trong miền thời gian, điện áp đầu vào tương tự và đầu ra của bộ khuếch đại khác nhau. Điện áp tại $x_2$ được đưa vào bộ tích phân, đầu ra tiến triển theo hướng âm hoặc dương. Độ dốc và hướng của tín hiệu tại $x_3$ phụ thuộc vào dấu và độ lớn của điện áp tại $x_2$. Tại thời điểm điện áp tại $x_3$ bằng với điện áp tham chiếu của bộ so sánh, đầu ra của bộ so sánh chuyển từ âm sang dương hoặc dương sang âm, tùy thuộc vào trạng thái ban đầu của nó. Giá trị đầu ra của bộ so sánh, $x_4$, được đặt xung nhịp trở lại vào DAC 1 bit, cũng như đưa đầu ra $y_i$ cho bộ lọc số. Tại thời điểm đầu ra của bộ so sánh chuyển từ cao xuống thấp hoặc ngược lại, DAC 1 bit sẽ phản hồi bằng cách thay đổi điện áp đầu ra tương tự của bộ khuếch đại chênh lệch. Điều này tạo ra một điện áp đầu ra khác ở $x_2$, làm cho bộ tích phân tiến triển theo hướng ngược lại. Tín hiệu đầu ra miền thời gian này là biểu diễn sóng xung của tín hiệu đầu vào ở tốc độ lấy mẫu ($f_S$).
+Trong miền thời gian, điện áp đầu vào tương tự và đầu ra của bộ khuếch đại là khác nhau. Điện áp tại $x_2$ được đưa vào bộ tích phân, đầu ra tiến triển theo hướng âm hoặc dương. Độ dốc và hướng của tín hiệu tại $x_3$ phụ thuộc vào dấu và độ lớn của điện áp tại $x_2$. Tại thời điểm điện áp tại $x_3$ bằng với điện áp tham chiếu của bộ so sánh, đầu ra của bộ so sánh chuyển từ âm sang dương hoặc dương sang âm, tùy thuộc vào trạng thái ban đầu của nó. Giá trị đầu ra của bộ so sánh, $x_4$, được đặt xung nhịp trở lại vào DAC 1 bit, cũng như đưa đầu ra $y_i$ cho bộ lọc số. Tại thời điểm đầu ra của bộ so sánh chuyển từ cao xuống thấp hoặc ngược lại, DAC 1 bit sẽ phản hồi bằng cách thay đổi điện áp đầu ra tương tự của bộ khuếch đại chênh lệch. Điều này tạo ra một điện áp đầu ra khác ở $x_2$, làm cho bộ tích phân tiến triển theo hướng ngược lại. Tín hiệu đầu ra miền thời gian này là biểu diễn sóng xung của tín hiệu đầu vào ở tốc độ lấy mẫu ($f_S$).
 
 \begin{equation}\label{pt21}
     y_i = x_{i - 1} + (e_i - e_{i - 1})
@@ -132,7 +132,7 @@ Số bit trên mẫu (độ phân giải) là 1 thông số ảnh hưởng đế
     \caption[Sóng sin được lượng tử hóa với 8 mức]{\bfseries \fontsize{12pt}{0pt}\selectfont Sóng sin được lượng tử hóa với 8 mức}
     \label{h_quantization_noise_8}
 \end{figure}
-Trong biểu đồ hình \ref{h_quantization_noise_8}, sóng hình sin được lượng tử hóa thành 8 mức riêng biệt (3 bit). Cách rõ ràng để giảm tiếng ồn lượng tử hóa rõ ràng là tăng số lượng bit. Ở mức 256 (8 bit), hầu như không nhìn thấy nhiễu trên biểu đồ tuyến tính (hình \ref{h_quantization_noise_256}).
+Trong biểu đồ hình \ref{h_quantization_noise_8}, sóng hình sin được lượng tử hóa thành 8 mức riêng biệt (3 bit). Cách rõ ràng để giảm tiếng ồn lượng tử hóa là tăng số lượng bit. Ở mức 256 (8 bit), hầu như không nhìn thấy nhiễu trên biểu đồ tuyến tính (hình \ref{h_quantization_noise_256}).
 
 \begin{figure}[!ht]
     \centering
@@ -143,9 +143,9 @@ Trong biểu đồ hình \ref{h_quantization_noise_8}, sóng hình sin được 
 
 Âm thanh cấp độ CD sử dụng âm thanh 16 bit. Âm thanh chuyên nghiệp thường sử dụng 24 bit. Tuy nhiên, có thể đánh đổi số bit lấy tốc độ xung nhịp.
 
-Với tín hiệu PDM như đã trình bày ở trên, dạng tín hiệu đầu ra là 1 bit biểu thị 2 giá trị, khi dùng 1 bit để lấy mẫu tín hiệu âm thanh thì phần nhiễu lượng tử là rất lớn, tín hiệu PDM là dạng tín hiệu có nhiễu lượng tử lớn. 
+Với tín hiệu PDM như đã trình bày ở trên, dạng tín hiệu đầu ra là 1 bit biểu thị 2 giá trị, khi dùng 1 bit để lấy mẫu tín hiệu âm thanh thì phần nhiễu lượng tử là rất lớn, tín hiệu PDM là một trong số đó.
 
-Hình \ref{hinh22} là một ví dụ về sóng hình sin PCM 16kHz với tốc độ lấy mẫu 48kHz được chuyển đổi thành PDM với bộ chuyển đổi Sigma-Delta bậc một và tỷ lệ oversampling 16.
+Hình \ref{hinh22} là một ví dụ về sóng hình sin PCM 16kHz với tốc độ lấy mẫu 48kHz được chuyển đổi thành PDM bằng bộ chuyển đổi Sigma-Delta bậc một và tỷ lệ oversampling 16.
 
 Chỉ tăng tốc độ lấy mẫu quá mức (oversampling) và giảm số lượng bit đầu ra trong bộ chuyển đổi A/D không tự động giảm nhiễu lượng tử hóa. Trong thực tế, tiếng ồn là không thể tránh khỏi. Tuy nhiên, có thể đẩy nhiễu này vào các thành phần tần số nằm ngoài dải tần của tín hiệu đầu vào ban đầu, sau đó dùng bộ lọc thông thấp sẽ dễ dàng khôi phục được tín hiệu ban đầu.
 \begin{figure}[!ht]
@@ -183,20 +183,20 @@ Hình \ref{sinewave_pdm_psd} mô tả mật độ phổ công suất của tín 
     \caption[Mật độ phổ công suất của tín hiệu PDM ở các Oversampling khác nhau]{\bfseries \fontsize{12pt}{0pt}\selectfont Mật độ phổ công suất của tín hiệu PDM ở các Oversampling khác nhau}
     \label{sinewave_pdm_psd_different_osr}
 \end{figure}
-Như đã trình bày ở trên, việc sử dụng mạch tích phân nhiều lần thay vì chỉ một lần là một cách tuyệt vời để giảm nhiễu lượng tử hóa trong dải của bộ điều chế.
+Như đã trình bày ở trên, việc sử dụng mạch tích phân nhiều lần thay vì chỉ một lần là một cách cực kỳ hiệu quả để giảm nhiễu lượng tử hóa trong dải của bộ điều chế.
 
 
 Ở hình \ref{sinewave_to_pdm_different_orders}, hầu như không sự khác biệt nào để phân biệt tín hiệu khi tăng số bậc của bộ điều chế Sigma-Delta. 
 
-Nhưng trong miền tần số sẽ có những thay đổi rõ rệt. Mặc dùng tý lệ Oversamling không đổi nhưng $SNR$ vẫn tăng từ $35dB$ lên $50.2dB$ (hình \ref{sinewave_pdm_psd_different_orders}).  Việc tăng số bậc sẽ không tối ưu vì khi ở một bậc nào đó chỉ số $SNR$ sẽ ngừng tăng, đối với trường hợp trên thì $SNR$ tối đa là $51dB$.
+Nhưng ở trường hợp này trong miền tần số sẽ có những thay đổi rõ rệt. Mặc dùng tỷ lệ Oversamling không đổi nhưng $SNR$ vẫn tăng từ $35dB$ lên $50.2dB$ (hình \ref{sinewave_pdm_psd_different_orders}).  Việc tăng số bậc sẽ không tối ưu vì khi ở một bậc nào đó chỉ số $SNR$ sẽ ngừng tăng, đối với trường hợp trên thì $SNR$ tối đa là $51dB$.
 
-Mặc dù bộ chuyển đổi Sigma-Delta bậc cao sẽ có kiến trúc phức tạp hơn và tại một số thời điểm chúng trở nên khó giữ ổn định nhưng đã giải quyết được vấn đề nhiễu lượng tử ở vùng cần lấy thông tin. Hầu hết các micrô PDM hiện đại đều sử dụng bộ chuyển đổi Sigma-Delta bậc 4.
+Mặc dù bộ chuyển đổi Sigma-Delta bậc cao sẽ có kiến trúc phức tạp hơn và tại một số thời điểm chúng trở nên khó giữ ổn định nhưng chúng đã giải quyết được vấn đề nhiễu lượng tử ở vùng cần lấy thông tin. Hầu hết các micrô PDM hiện đại đều sử dụng bộ chuyển đổi Sigma-Delta bậc 4.
 
 
 \paragraph{Tăng tỷ lệ oversampling} \label{inc_sam}
 Tác động của oversampling sẽ làm tăng tỉ số $SNR$ trong dải tần tín hiệu cần thu.
 
-Việc tăng tỷ lệ oversampling từ 16 lên 64, lần này sự thây đổi của tín hiệu PDM thay đổi rõ rệt ở miền thời gian (hình \ref{sinewave_to_pdm_different_osr}), mật độ tín hiệu đầu ra sẽ dày hơn so với ban đầu.
+Việc tăng tỷ lệ oversampling từ 16 lên 64, lần này tín hiệu PDM thay đổi rõ rệt ở miền thời gian (hình \ref{sinewave_to_pdm_different_osr}), mật độ tín hiệu đầu ra cũng sẽ dày hơn so với ban đầu.
 
 Hệ số $SNR$ tăng lên đáng kể, từ $50.2dB$ ở 16x lên $102.8dB$ ở 64x (hình \ref{sinewave_pdm_psd_different_osr}).
 
@@ -206,7 +206,7 @@ Từ mục \ref{inc_order} và \ref{inc_sam}, việc sử dụng bộ điều ch
 Trong một hệ thống xử lý tín hiệu hay điều khiển số, có thể có
 một số thiết bị có vận tốc xử lý khác nhau. Như vậy, để có thể kết nối
 các thiết bị, cần có phương pháp thay đổi vận tốc xử lý nhằm đồng
-bộ hóa hệ thống. Vì ở trong phạm vi của đề tài nên ở đây tôi chỉ giới thiệu về kỹ thuật hạ tốc (Down-Sampling).
+bộ hóa hệ thống. Vì ở trong phạm vi của đề tài nên ở trong bài báo cáo chỉ đề cập đến kỹ thuật hạ tốc (Down-Sampling).
 \subsubsection{Giới thiệu về định lý Nyquist–Shannon}
 Định lý lấy mẫu Nyquist-Shannon là một định lý được sử dụng trong lĩnh vực lý thuyết thông tin, đặc biệt là trong viễn thông và xử lý tín hiệu.
 \begin{theorem}\label{dlnq} % Định lý
@@ -218,7 +218,7 @@ Từ định lý \ref{dlnq}, tần số lấy mẫu phải thoả mãn điều k
 \subsubsection{Hạ tốc: Giảm mẫu theo hệ số nguyên - Down-Sampling} \label{downsample}
 Cho $x_a(t)$ là một tín hiệu tương tự được lấy mẫu với chu kỳ $T$
 để cho tín hiệu số $x(n)$. Với điều kiện tần số lấy mẫu đã thỏa điều kiện lấy
-mẫu Nyquist thì từ tín hiệu $x(n)$ có thể tái tạo lại tín hiệu $x_a(t)$ chính xác nhất. Để xét trường hợp tổng quát, ta sẽ hạ tốc bởi một số nguyên $M$, tức tăng chu kỳ vận tốc lấy mẫu $T$ thành $T^\prime=MT$, để có tín hiệu số $x_{\downarrow M}(n)$. Nếu vận tốc lấy mẫu $F^\prime_S$ không thỏa điều kiện lấy mẫu Nyquist, rất có thể sẽ có hiện tượng chồng phổ xảy ra, đây là điều rất cần chú ý. \cite{xulytinhieusobook}\cite{rao2018digital}
+mẫu Nyquist thì từ tín hiệu $x(n)$ có thể tái tạo lại tín hiệu $x_a(t)$ chính xác nhất. Để xét trường hợp tổng quát, ta sẽ hạ tốc bởi một số nguyên $M$, tức tăng chu kỳ vận tốc lấy mẫu $T$ thành $T^\prime=MT$, để có tín hiệu số $x_{\downarrow M}(n)$. Nếu vận tốc lấy mẫu $F^\prime_S$ không thỏa điều kiện lấy mẫu Nyquist, rất có thể sẽ có hiện tượng chồng phổ xảy ra, và đây là điều rất cần chú ý. \cite{xulytinhieusobook}\cite{rao2018digital}
 
 \begin{figure}[H]
     \centering
@@ -226,7 +226,7 @@ mẫu Nyquist thì từ tín hiệu $x(n)$ có thể tái tạo lại tín hiệ
     \caption[Sơ đồ khối của phép hạ tốc]{\bfseries \fontsize{12pt}{0pt}\selectfont Sơ đồ khối của phép hạ tốc}
     \label{downsampling-top}
 \end{figure}
-Thao tác lấy mẫu được triển khai bằng xác định một trình mới cho $x_{\downarrow M}(n)$ trong đó mọi mẫu thứ $M$ của đầu vào được giữ lại và $M-1$ mẫu còn lại sẽ được loại bỏ. Tức là $x_{\downarrow M}(n)$ thu được bằng cách lấy mẫu với chu kỳ $T^\prime$ của $x_a(n)$ được biểu diễn như phương trình \ref{pt22}. Hình \ref{downsampling-top} dùng để mô tả phép toán hạ tốc.
+Thao tác lấy mẫu được triển khai bằng xác định một trình tự mới cho $x_{\downarrow M}(n)$ trong đó mọi mẫu thứ $M$ của đầu vào được giữ lại và $M-1$ mẫu còn lại sẽ được loại bỏ. Tức là $x_{\downarrow M}(n)$ thu được bằng cách lấy mẫu với chu kỳ $T^\prime$ của $x_a(n)$ được biểu diễn như phương trình \ref{pt22}. Hình \ref{downsampling-top} dùng để mô tả phép toán hạ tốc.
 
 \begin{equation} \label{pt22}
      x_{\downarrow M}(n) = x_a(nM)
@@ -255,8 +255,7 @@ Trong các trường hợp M lớn sao cho $Mv_p > 0.5$ thì thì vận tốc l�
     \label{filter_downsample}
 \end{figure}
 
-Nếu tín hiệu số gốc $x(n)$ có dải thông nhỏ hơn tần số cắt $0,5/M$ thì bộ lọc không tác động đến tín hiệu. Tuy nhiên, nếu $x(n)$ có dải thông lớn hơn tần số cắt thì bộ lọc loại phần phổ nằm ngoài tần số cắt. Kết quả này cho thấy,
-lúc hạ tốc ta chấp nhận mất một ít thông tin và kết quả này là điều hiển nhiên với quá trình hạ tốc.
+Nếu tín hiệu số gốc $x(n)$ có dải thông nhỏ hơn tần số cắt $0,5/M$ thì bộ lọc không tác động đến tín hiệu. Tuy nhiên, nếu $x(n)$ có dải thông lớn hơn tần số cắt thì bộ lọc loại phần phổ nằm ngoài tần số cắt. Từ hình trên cho thấy, lúc hạ tốc ta chấp nhận mất một ít thông tin và kết quả này là điều hiển nhiên với quá trình hạ tốc.
 
  Hình \ref{decimation_without_filtering-no_decimation} mô tả phổ của tín hiệu có 3 sóng hình sin ở 100Hz, 1000Hz và 2800Hz và một số nhiễu được thêm vào, được lấy mẫu ở 10kHz. Sóng hình sin ở 100Hz và 1000Hz có biên độ thấp hơn nhiều so với sóng hình sin ở 2800Hz. 
 
@@ -277,7 +276,7 @@ Các tín hiệu ở vùng 1250Hz đến 5000Hz không mất đi mà chúng di c
 \end{figure}
  
 \subsection{Các bộ lọc tiết kiệm tài nguyên sử dụng trong xử lí số tín hiệu trên nhiều miền tần số}
-Như đã thảo luận trong mục \ref{xulynhieumientanso}, trong xử lí số tín hiệu trên nhiều miền tần số ta cần sử dụng các bộ lọc để lọc các thanh phần tần số bị sẽ bị chồng phổ khi tiến hành Down-Sampling. Việc áp dụng lên thiết kế số, bắt buộc chúng ta phải lựa chọn các bộ lọc tối ưu để tiết kiệm tài nguyên nhiều nhất có thế. Mục này sẽ giới thiệu các bộ lọc được sử dụng trong đề tài.
+Mục \ref{xulynhieumientanso} đã đề cập rằng, trong xử lí số tín hiệu trên nhiều miền tần số ta cần sử dụng các bộ lọc để loại bỏ các thành phần tần số sẽ bị chồng phổ khi tiến hành Down-Sampling. Và khi áp dụng lên thiết kế số, bắt buộc chúng ta phải lựa chọn các bộ lọc tối ưu để tiết kiệm tài nguyên nhiều nhất có thế. Mục này sẽ giới thiệu các bộ lọc được sử dụng trong đề tài.
 \subsubsection{Giới thiệu về bộ lọc thông thấp}
 Như đã trình bày ở phần \ref{downsample}, để tránh bị chồng phổ khi Down-Sampling thì lúc đưa tín hiệu vào, thì tín hiệu đó sẽ được xử lý qua một bộ lọc thông thấp.
 
@@ -315,7 +314,7 @@ Trong đó:
 
 Các $x[n-i]$ trong thuật ngữ còn gọi là "taps". 
 
-Đáp ứng xung của bộ lọc như được xác định là khác không trong một khoảng thời gian hữu hạn. Bao gồm các số không, đáp ứng xung là chuỗi vô hạn (phương trình \ref{duxfir}).
+Đáp ứng xung của bộ lọc được xác định là khác 0 trong một khoảng thời gian hữu hạn. Bao gồm các số 0, đáp ứng xung là chuỗi vô hạn (phương trình \ref{duxfir}).
 \begin{equation}\label{duxfir}
     h[n] = \sum ^{N}_{i=0}b_i\delta[n-i]=\left\{\begin{matrix}b_n,& 0 \leq n \leq N
     \\&
@@ -323,7 +322,7 @@ Các $x[n-i]$ trong thuật ngữ còn gọi là "taps".
 \end{matrix}\right.
 \end{equation}
 
-Các ưu điểm của bộ lọc FIR:
+Các ưu điểm của bộ lọc FIR có thể kể đến bao gồm:
 \begin{itemize}
 \item Tính ổn định: Bộ lọc FIR là ổn định vì nó không có phản hồi nội tại, điều này đảm bảo rằng đầu ra không bị dao động hoặc không hội tụ.
 \item Tính ngắt mạnh: Bộ lọc FIR có tính chất ngắt mạnh, có thể đạt được bằng cách đặt các trọng số của bộ lọc bằng 0.
@@ -331,25 +330,26 @@ Các ưu điểm của bộ lọc FIR:
 \item Khả năng đáp ứng yêu cầu chính xác về tần số: Bộ lọc FIR có thể được thiết kế để đáp ứng các yêu cầu chính xác về tần số, nhờ vào tính chất phản hồi xung hữu hạn của nó. Tuy nhiên, độ chính xác này phụ thuộc vào số lượng và bậc của bộ lọc.
 \item Có thể được thực hiện bằng cách sử dụng cấu trúc song song: Bộ lọc FIR có thể được thực hiện bằng cách sử dụng cấu trúc song song, điều này có nghĩa là các phép tính có thể được thực hiện song song trên nhiều mẫu đầu vào cùng một lúc, giúp tăng tốc độ xử lý.
 \end{itemize}
+
 Bộ lọc FIR được thiết kế bằng cách tìm các hệ số và thứ tự bộ lọc đáp ứng các thông số kỹ thuật nhất định, có thể trong miền thời gian hoặc miền tần số (phổ biến nhất). Các bộ lọc phù hợp thực hiện mối tương quan chéo giữa tín hiệu đầu vào và dạng xung đã biết. Tích chập FIR là mối tương quan chéo giữa tín hiệu đầu vào và bản sao đảo ngược thời gian của đáp ứng xung. Do đó, đáp ứng xung của bộ lọc phù hợp được "thiết kế" bằng cách lấy mẫu dạng xung đã biết và sử dụng các mẫu đó theo thứ tự ngược lại làm hệ số của bộ lọc. \cite{signalsystem}
 
 Các phương pháp thiết kế phố biến hiện nay như phương pháp thiết kế cửa số, lấy mẫu tần số, Parks–McClellan,  bằng thuật toán DFT, 	\ldots Do phạm vi đề tài nên các phương pháp này sẽ được trình bày và nói rõ chi tiết ở \cite{TAN2014xiii}.
 
 \subsubsection{Bộ lọc CIC -  Cascaded Integrator Comb} \label{cic_filter_ref}
-Khi nghiên cứu chủ đề chuyển đổi PDM sang PCM, hầu như không thể bỏ qua về bộ lọc lược tích hợp xếp tầng (CIC), chúng cực kỳ nhẹ về mặt tài nguyên, nhờ một số thủ thuật và chuyển đổi. Mục này sẽ trình bày cái nhìn tổng quan về bộ lọc trung bình động và cách tối ưu bộ lọc trung bình động sang bộ lọc CIC.
+Khi nghiên cứu chủ đề chuyển đổi PDM sang PCM, chúng ta không thể bỏ qua về bộ lọc lược tích hợp xếp tầng (CIC), bởi vì chúng cực kỳ nhẹ về mặt tài nguyên, nhờ một số thủ thuật và chuyển đổi. Mục này sẽ trình bày cái nhìn tổng quan về bộ lọc trung bình động và cách tối ưu bộ lọc trung bình động sang bộ lọc CIC.
 \paragraph{Bộ lọc trung bình động - Moving Average Filters}\label{maf}
-Các bộ lọc FIR điển hình có độ dài nhất định hoặc các tap và mỗi tap yêu cầu một phép nhân và một phép cộng. Các hệ số nhân ở đó để định hình bộ lọc sao cho nó có các đặc tính dải thông, dải chuyển tiếp và dải triệt mong muốn. Việc áp dụng FIR nhiều tap lên phần cứng có thể tiêu tốn rất nhiều tài nguyên và điều đó không hiệu quả. Vì vậy chúng ta cần triển khai các bộ lọc loại bỏ các phép toán phức tạp. Khi đó bộ lọc đơn giản nhất là bộ lọc trung bình động - Moving Average Filters. Bộ lọc thực hiện cực kỳ đơn giản, nó tính tổng của N mẫu đến cùng và chia nó cho N.
+Các bộ lọc FIR điển hình có độ dài nhất định hoặc các "taps" và mỗi tap yêu cầu một phép nhân và một phép cộng. Các hệ số nhân ở đó để định hình bộ lọc sao cho nó có các đặc tính dải thông, dải chuyển tiếp và dải triệt mong muốn. Việc áp dụng FIR nhiều tap lên phần cứng có thể tiêu tốn rất nhiều tài nguyên và điều đó không hiệu quả. Vì vậy chúng ta cần triển khai các bộ lọc loại bỏ các phép toán phức tạp. Khi đó lựa chọn đơn giản nhất là bộ lọc trung bình động - Moving Average Filters. Bộ lọc thực hiện cực kỳ đơn giản, nó tính tổng của N mẫu đến cùng và chia nó cho N.
 \begin{figure}[H]
     \centering
     \includesvg[width=13cm]{Images/Chuong2/moving_average_filter_overview_linear.svg}
     \caption[Đáp ứng tần số của bộ lọc trung bình động ở các cấu hình khác nhau - theo đơn vị tuyến tính]{\bfseries \fontsize{12pt}{0pt}\selectfont Đáp ứng tần số của bộ lọc trung bình động ở các cấu hình khác nhau - theo đơn vị tuyến tính}
     \label{moving_average_filter_overview_linear}
 \end{figure}
-Bộ lọc trung bình động có lẽ là một trong những bộ lọc phổ biến nhất trong xử lý tín hiệu số. Nó cực kỳ đơn giản để hiểu và triển khai, chúng đối xứng nên có đáp ứng pha tuyến tính và đây cũng là bộ lọc tối ưu để giảm nhiễu trắng. (Đó là bởi vì nhiễu trắng không tác động đến mẫu này hay mẫu khác, nó ảnh hưởng đến bất kỳ mẫu nào với cơ hội như nhau. Và do đó, không có cách nào bạn có thể điều chỉnh hệ số này hoặc hệ số kia của các hệ số bộ lọc theo một số cách ưu tiên.)
+Bộ lọc trung bình động có lẽ là một trong những bộ lọc phổ biến nhất trong xử lý tín hiệu số. Nó không hề khó để hiểu và triển khai, chúng đối xứng nên có đáp ứng pha tuyến tính và đây cũng là bộ lọc tối ưu để giảm nhiễu trắng. (Đó là bởi vì nhiễu trắng không tác động đến mẫu này hay mẫu khác, nó ảnh hưởng đến bất kỳ mẫu nào với cơ hội như nhau. Và do đó, không có cách nào bạn có thể điều chỉnh hệ số này hoặc hệ số kia của các hệ số bộ lọc theo một số cách ưu tiên.)
 
-Các bộ lọc trung bình động cũng có một số nhược điểm lớn: chúng có độ suy giảm lớn trong dải thông, chúng có tốc độ chuyển từ dải thông sang dải dừng rất chậm, chúng có hành vi trong miền thời gian không tốt (đổ chuông) và sự suy giảm băng tần dừng cũng rất thấp. Chúng ta có thể khắc phục sự suy giảm dải triệt thấp bằng cách xếp tầng nhiều bộ lọc nối tiếp nhau, nhưng điều đó cũng làm cho sự suy giảm dải thông trở nên tồi tệ hơn.
+Các bộ lọc trung bình động cũng có một số nhược điểm lớn: chúng có độ suy giảm lớn trong dải thông, chúng có tốc độ chuyển từ dải thông sang dải dừng rất chậm, chúng có hành vi trong miền thời gian không tốt (đổ chuông) và sự suy giảm băng tần dừng cũng rất thấp. Tuy nhiên, chúng ta có thể khắc phục sự suy giảm dải triệt thấp bằng cách xếp tầng nhiều bộ lọc nối tiếp nhau, mặc dù điều đó cũng làm cho sự suy giảm dải thông trở nên tồi tệ hơn.
 
-Vì các hệ số bộ lọc là cố định và không đổi nên chỉ có 2 tham số để xử lý: kích thước của hộp lấy mẫu và thứ tự, số lượng bộ lọc được xếp tầng.
+Vì các hệ số bộ lọc là cố định và không đổi nên chỉ có 2 tham số để xử lý: kích thước của hộp lấy mẫu và thứ tự và số lượng bộ lọc được xếp tầng.
 \begin{figure}[H]
     \centering
     \includesvg[width=13cm]{Images/Chuong2/moving_average_filter_overview.svg}
@@ -361,7 +361,7 @@ Vì đáp ứng xung của bộ lọc là hình hộp chữ nhật nên đáp �
 \paragraph{Từ bộ lọc trung bình động đến bộ lọc CIC}
 Từ kiến trúc bộ lọc trung bình, tác giả Hogenauer đã đưa ra kiến một kiến trúc có tên là Cascaded Integrator Comb (CIC) sử dụng trong xử lí số tín hiệu trên nhiều miền tần số\cite{CIC}.
 
-Bắt đầu với bộ lọc trung bình động có độ dài bằng 4 có kiến trúc được mô tả như hình \ref{cic_1}.
+Bắt đầu với bộ lọc trung bình động với độ dài bằng 4 có kiến trúc được mô tả như hình \ref{cic_1}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=8cm]{Images/Chuong2/cic/cic_1.png}
@@ -369,9 +369,9 @@ Bắt đầu với bộ lọc trung bình động có độ dài bằng 4 có ki
     \label{cic_1}
 \end{figure}
 
-Việc thực hiện trên trung bình 4 mẫu, yêu cầu 3 phần tử trễ và 3 bộ cộng. Việc chia ban đầu cho 4 là để đảm bảo rằng bộ lọc có mức tăng đơn vị. Ở các bước sau để thuận tiện, chúng ta sẽ loại bỏ yếu tố đó.
+Việc thực hiện trên trung bình 4 mẫu, yêu cầu 3 phần tử trễ và 3 bộ cộng. Và hành động chia ban đầu cho 4 là để đảm bảo rằng bộ lọc có mức tăng đơn vị. Ở các bước sau để thuận tiện, chúng ta sẽ loại bỏ yếu tố đó.
 
-Như đã trình bày ở phần trên, không có số nhân trong thiết kế này, nhưng 3 bộ cộng hơi khó chấp nhận, đặc biệt vì con số đó sẽ tăng lên tương ứng đối với các bộ lọc trung bình động có độ dài dài hơn.
+Như đã đề cập ở phần trên, không có số nhân trong thiết kế này, nhưng 3 bộ cộng hơi khó có thể được chấp nhận, đặc biệt vì con số đó sẽ tăng lên tương ứng đối với các bộ lọc trung bình động có độ dài dài hơn.
 
 \begin{equation}\label{cic_pt1}
   \begin{aligned}
@@ -385,6 +385,7 @@ Từ phương trình \ref{cic_pt1}, ta có công thức tổng quát như \ref{c
 \begin{equation} \label{cic_pt2}
     y(n) = y(n-1) + x(n) - x(n-4)
 \end{equation}
+
 Phương trình ban đầu đã được chuyển đổi thành một phép toán đệ quy trong đó đầu ra của chu kỳ trước được sử dụng lại cho đầu ra tiếp theo. Phần cứng sẽ có kiến trúc như hình \ref{cic_3}. Phần có đường trễ và bộ trừ được gọi là “comb”, phần đệ quy phản hồi đầu ra trước đó được gọi là "integrator".
 \begin{figure}[H]
     \centering
@@ -441,7 +442,7 @@ Bây giờ có thể sắp xếp lại các khối ở trên và nhóm các bộ
     \caption[Kiến trúc mới của bộ lọc trung bình động sau khi đổi vị trí của các khối]{\bfseries \fontsize{12pt}{0pt}\selectfont Kiến trúc mới của bộ lọc trung bình động sau khi đổi vị trí của các khối}
     \label{cic_5}
 \end{figure}
-Bộ "integrator" luôn có chính xác 1 thanh ghi độ trễ, trong khi "comb" có nhiều độ trễ bằng số lượng mẫu của đường trung bình động. Nếu bộ lọc trung bình động yêu cầu độ dài cao đồng nghĩa với việc xếp nhiều bộ lọc đó lại với nhau, thì đó vẫn là rất nhiều thanh ghi độ trễ.
+Bộ "integrator" luôn có chính xác 1 thanh ghi độ trễ, trong khi "comb" có nhiều độ trễ bằng số lượng mẫu của đường trung bình động. Nếu bộ lọc trung bình động yêu cầu độ dài cao đồng nghĩa với việc xếp nhiều bộ lọc đó lại với nhau, từ đó vẫn có rất nhiều thanh ghi độ trễ.
 
 \begin{figure}[H]
     \centering
@@ -449,7 +450,7 @@ Bộ "integrator" luôn có chính xác 1 thanh ghi độ trễ, trong khi "comb
     \caption[Kiến trúc mới của bộ lọc trung bình động với decimation]{\bfseries \fontsize{12pt}{0pt}\selectfont Kiến trúc mới của bộ lọc trung bình động với decimation}
     \label{cic_6}
 \end{figure}
-Nhưng khi sử dụng cùng kỹ thuật hạ tốc (decimation), trong ví dụ trên, chúng ta phải loại đi 3 mẫu trong 4 mẫu và tốc độ đầu ra $y^\prime(n)$, bằng $1/4$ tốc độ của đầu vào $x(n)$. Mô tả ở hình \ref{cic_6}.
+Nhưng khi sử dụng cùng kỹ thuật hạ tốc (decimation), áp dụng vào trong ví dụ trên, chúng ta phải loại đi 3 mẫu trong 4 mẫu và tốc độ đầu ra $y^\prime(n)$, bằng $1/4$ tốc độ của đầu vào $x(n)$. Mô tả ở hình \ref{cic_6}.
 
 \begin{figure}[H]
     \centering
@@ -473,11 +474,11 @@ Bây giờ chúng ta đã biết tại sao các bộ lọc trung bình động l
 
 Tuy nhiên, các nhược điểm của các bộ lọc trung bình động đã được đề cập ở mục \ref{maf}, độ suy giảm dải dừng kém và độ suy giảm dải thông không phẳng không thể biến mất.
 
-Trên thực tế, trong bộ lọc CIC decimation, độ dài của bộ lọc trung bình động phải là bội số nguyên của tỷ lệ hạ tần - decimation ratio. Trong hầu hết các trường hợp, tỷ lệ đó là 1. Do đó, cách duy nhất để tác động đến sự suy giảm của dải triệt là tăng số lượng bộ "comb" và "integrator", nhưng điều đó cũng làm tăng sự suy giảm của dải thông.
+Trên thực tế, trong bộ lọc CIC decimation, độ dài của bộ lọc trung bình động phải là bội số nguyên của tỷ lệ hạ tần - decimation ratio. Trong hầu hết các trường hợp, tỷ lệ đó là 1. Do đó, cách duy nhất để tác động đến sự suy giảm của dải triệt là tăng số lượng bộ "comb" và "integrator", tuy nhiên điều đó cũng làm tăng sự suy giảm của dải thông.
 
 \textbf{Kích thước của các phần tử trễ trong bộ lọc CIC}
 
-Nếu các phần tử trễ của bộ lọc CIC không đủ lớn, bộ lọcsẽ bị tràn làm sai đầu ra. Cách dễ nhất để tránh lỗi này là cung cấp cho tất cả bộ trễ cùng một kích thước. Việc tính độ dài bit của các bộ trễ thể hiện như công thức \ref{bitcic}.
+Nếu các phần tử trễ của bộ lọc CIC không đủ lớn, bộ lọc sẽ bị tràn làm sai đầu ra. Cách dễ nhất để tránh lỗi này là cung cấp cho tất cả bộ trễ cùng một kích thước. Việc tính độ dài bit của các bộ trễ thể hiện như công thức \ref{bitcic}.
 
 \begin{equation} \label{bitcic}
     n_r = I + [M \times log_2(N \times R)] (bits)
@@ -551,7 +552,7 @@ Trong phần mềm, các phép tính toán truyền thống với số dấu ph�
 
 Biểu diễn fixed-point như công thức \ref{fbct}, trong đó: $x$ là số thực. Tiến hành nhân $2^N$ để chuẩn hóa $x_b$ thành số nguyên. Điều đó đồng nghĩa chúng ta phải chia cho $2^N$ để được giá trị thực hoặc chỉ cần dịch đi $N$ vị trí.
 \subsection{Giới thiệu về MEMS - MicroelectromechanicalSystem Microphone} \label{micro}
-MEMS Microphone (MicroelectromechanicalSystem Microphone) thiết bị này có thể tìm thấy phổ biến trên các điện thoại di động, các máy ghi âm hoặc các thiết bị thu thanh không sử yêu cầu về chất lượng âm thanh quá cao nhưng giá thành rẻ và phù hợp với yêu cầu sử dụng.
+MEMS Microphone (MicroelectromechanicalSystem Microphone) thiết bị này có thể được tìm thấy phổ biến trên các điện thoại di động, các máy ghi âm hoặc các thiết bị thu thanh không sử yêu cầu về chất lượng âm thanh quá cao nhưng giá thành rẻ và phù hợp với yêu cầu sử dụng.
 Ở đây, chúng ta sẽ phân tích thiết bị \textbf{MP34DT01-M} của hãng \textbf{ST}.
 Về cơ bản chúng ta chỉ cần chú ý những thống số ở trên bảng \ref{datasheet}.
 \begin{table}[h!] 
