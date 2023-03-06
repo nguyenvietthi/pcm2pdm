@@ -7,7 +7,7 @@
 Chương này sẽ trình bày chi tiết về quá trình sử dụng Design Compiler để tổng hợp mạch điện tử số, từ các bước chuẩn bị thiết kế đến các bước tối ưu hóa và đánh giá mạch. Cuối cùng, để đảm bảo thiết kế chạy ổn định trong thiết bị thực tế thì chúng ta triển khai hệ thống đã thiết kế ở chương trước lên kit FPGA, ở đây sẽ sử dụng kit Zedboard của hãng Xilinx.
 
 \subsection{Tổng hợp và phân tích timing}
-Design Compiler là một công cụ tổng hợp logic, cho phép tổng hợp các mạch điện tử số từ ngôn ngữ Verilog hoặc VHDL sang mạch RTL (Register-Transfer Level) và sau đó là mạch gate-level để có thể được triển khai trên FPGA hoặc ASIC. 
+Design Compiler là một công cụ tổng hợp logic, cho phép tổng hợp các mạch điện tử số từ ngôn ngữ Verilog hoặc VHDL sang mạch RTL (Register-Transfer Level) và sau đó là mạch gate-level để có thể được triển khai trên ASIC hoặc FPGA. 
 
 Thiết kế được tổng hợp với thư viện standard cell \textbf{dti\_tm28hpcp\_l30\_stdcells\_7t\_rev1p0p1} của \textbf{Dolphin Technology VietNam Center} bằng phần mềm \textbf{Design Compiler}. Chúng ta có các báo cáo sau:
 \subsubsection{Tài nguyên sử dụng}
@@ -80,6 +80,7 @@ Báo cáo về mặt timing sẽ được mô tả ở hình \ref{syn_t}. Ta th�
 
 Báo cáo về mặt công suất chỉ ra các thông số về mặt tiêu thụ năng nương, như năng 
 lượng chuyển mạch, dòng dò, năng lượng bản thân cho các cell hoạt động. Báo cáo được mô tả như hình \ref{syn_power}.
+
 \subsection{Triển khai thiết kế xuống FPGA}
 Sau khi hoàn thành mô phỏng và tổng hợp, đảm bảo thiết kế hoạt động đúng chức 
 năng yêu cầu. Để đảm bảo bảo thiết kế hoạt động ổn định trong các thiết bị thực tế thì chúng ta sẽ triển khai thiết kế xuống FPGA.
@@ -104,7 +105,7 @@ Với các tính năng và khả năng linh hoạt của nó, Zedboard là một
 
 \subsubsection{Thiết kế bộ bao để triển khai trên hệ thống SOC} \label{wrapper_cha}
 
-Để triển khai thiết kế lên hệ thống SOC, chúng ta cần sử dụng một bộ điều khiển để xử lý và đọc dữ liệu của đầu ra PCM, sau đó lưu vào một vùng nhớ có địa chỉ cố định. Từ địa chỉ đó vi xử lý mới có thể đọc dữ liệu về và làm những bước tiếp theo. Hình \ref{wrapper} mô tả kiến trúc của bộ bao (pdm2pcm\_warpper) nó sử dụng chuẩn giao tiếp APB (Advanced Peripheral Bus) -  1 chuẩn giao tiếp rất phổ biến trong hệ thống SOC dùng để giao tiếp với ngoại vi.
+Để triển khai thiết kế lên hệ thống SOC (System On Chip), chúng ta cần sử dụng một bộ điều khiển để xử lý và đọc dữ liệu của đầu ra PCM, sau đó lưu vào một vùng nhớ có địa chỉ cố định. Từ địa chỉ đó vi xử lý mới có thể đọc dữ liệu về và làm những bước tiếp theo. Hình \ref{wrapper} mô tả kiến trúc của bộ bao (pdm2pcm\_warpper) nó sử dụng chuẩn giao tiếp APB (Advanced Peripheral Bus) -  1 chuẩn giao tiếp rất phổ biến trong hệ thống SOC dùng để giao tiếp với ngoại vi.
 
 \begin{figure}[H]
     \centering

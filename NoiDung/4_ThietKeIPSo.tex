@@ -4,7 +4,7 @@
 \setcounter{subsection}{0}
 \setcounter{figure}{0}
 \setcounter{table}{0}
-Trong chương này, mô hình hệ thống chuyển đổi PDM sang PCM sử dụng nhiều giai đoạn đề cập ở \hyperref[chuong3]{chương 3} được thiết kế và kiểm thử ở mức Register Transfer Logic (RTL). Ngôn ngữ mô tả phần cứng SystemVerilog được sử dụng để xây dựng thiết kế cũng như testbench. Bản thiết kế cuối cùng được mô phỏng, kiểm thử trên phần mềm Mentor Questasim và môi trường \textbf{Python}.
+Trong chương này, mô hình hệ thống chuyển đổi PDM sang PCM sử dụng nhiều giai đoạn đề cập ở \hyperref[chuong3]{chương 3} được thiết kế và kiểm thử ở mức RTL (Register Transfer Logic). Ngôn ngữ mô tả phần cứng SystemVerilog được sử dụng để xây dựng thiết kế cũng như testbench. Bản thiết kế cuối cùng được mô phỏng, kiểm thử trên phần mềm Mentor Questasim và môi trường \textbf{Python}.
 \subsection{Thiết kế}
 Với yêu cầu của hệ thống số là tối ưu diện tích và công suất. Ở thiết kế này sẽ sử dụng kỹ thuật tăng tần số làm sao để một bộ nhân hoặc bộ cộng có thể thực hiện nhiều phép toán trong 1 khoảng thời gian. Với các yêu cầu như mục \ref{spec_muc}, chúng ta tiến hành thiết kế như sau.
 \subsubsection{Vấn đề về tính toán fixed-point cho các hệ số của bộ lọc} \label{fix-fil}
@@ -563,6 +563,28 @@ Vì bộ chuyển đổi sẽ loại bỏ đi các thành phần ở tần số 
     \caption[Biểu đồ phổ của âm thanh sau sau khi chuyển đổi bằng phần mềm]{\bfseries \fontsize{12pt}{0pt}\selectfont  Biểu đồ phổ của âm thanh sau sau khi chuyển đổi bằng phần mềm}
     \label{vldd2_psd_1}
 \end{figure}
+
+Tiến hành mô phỏng với tệp nhạc chỉ có giọng người.
+
+Quan sát hình \ref{vocal_psd}, tín hiệu đầu vào gốc chỉ ổn định đến tần số 10 kHz, đồng nghĩa với việc giọng nói không thu đủ dài tần (giọng của người có giọng tầm). Tín hiệu sau qua bộ chuyển đổi có phổ đã đáp ứng được yêu cầu thiết kế đã đặt ra từ trước.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=13cm]{Images/Chuong4/tb/wav/vocal_psd.png}
+    \caption[Biểu đồ phổ của âm thanh chỉ giọng nói trước và sau mô phỏng]{\bfseries \fontsize{12pt}{0pt}\selectfont  Biểu đồ phổ của âm thanh chỉ giọng nói trước và sau mô phỏng}
+    \label{vocal_psd}
+\end{figure}
+
+Hình \ref{vocal} mô tả tín hiệu trước và sau chuyển đổi trên miền thời gian. Vì dải tần bị cắt trên tín hiệu gốc có cường độ không cao nên hầu như không có sự khác nhau giữa các biểu đồ. Thật vậy, lúc nghe lại kết quả, không có sự khác biệt giữa trước và sau.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=13cm]{Images/Chuong4/tb/wav/vocal.png}
+    \caption[Biểu đồ thời gian của âm thanh chỉ giọng nói trước và sau mô phỏng]{\bfseries \fontsize{12pt}{0pt}\selectfont Biểu đồ thời của âm thanh chỉ giọng nói trước và sau mô phỏng}
+    \label{vocal}
+\end{figure}
+
+
 
 \subsection{Kết luận chương}
 

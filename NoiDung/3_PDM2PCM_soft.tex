@@ -5,42 +5,43 @@
 \setcounter{figure}{0}
 \setcounter{table}{0}
 Ở \hyperref[chuong2]{chương 2}, chúng ta đã trình bày thảo luận về bộ chuyển đổi Sigma-Delta, phổ của tín hiệu PDM từ micro, các bộ lọc khác nhau và cách tìm ra các hệ số phù hợp cho các bộ lọc đó. Chương này mô tả các yêu cầu thiết kế, cách kết hợp tất cả lại với nhau, tạo ra bộ chuyển đổi PDM sang PCM nhiều giai đoạn và kiểm thử thiết kế bằng ngôn ngữ \textit{Python}.
-\subsection{Yêu cầu thiết kế} \label{spec_muc}
-Qua những gì đã giới thiệu về MEMS ở mục \ref{micro}, chúng ta đưa ra những yêu cầu thiết kế sau:
-\begin{itemize}
-    \item Tốc độ lấy mẫu ở đầu ra (PCM) là 48 kHz.\\
-    Tốc độ lấy mẫu 48 kHz là tốc độ phổ biến dùng cho các âm thanh chất lượng cao
-    \item Tốc độ lấy mẫu PDM là 2.304 MHz.\\
-    Micrô hỗ trợ tốc độ xung nhịp PDM trong khoảng từ 1 đến 3,25 MHz. Có các bộ lọc rất hiệu quả cho phép Decimation 2x, vì vậy nên chọn một tỷ lệ decimation là một số chia hết cho lũy thừa của 2. Tỷ lệ 48x được cho là phù hợp nhất.
-    \item Băng thông từ 0 đến 6kHz.\\
-    Với việc âm thanh thu được chỉ ổn định trong tần số 100Hz đến 5kHz, điểm chuyển tiếp ở vị trí 6kHz là một điểm phù hợp.
-    \item Dải dừng bắt đầu ở 10kHz: vì ở trên tần số 10kHz, micro không có hành vi gì.
-    \item SNR của tín hiệu đầu ra là 87 dB: Giảm so với Dynamic Range 1 dB
-    \item Độ gợn sóng là 0.1 dB: yêu cầu cần thiết đối với âm thanh chất lượng cao.
-\end{itemize}
-Độ suy hao của dải dừng sẽ được tính theo công thức \ref{stopband} \cite{pdm2pcm}.
-\begin{equation} \label{stopband}
-    A_{stop band} = -3dB - 10log_{10}{(10^{-\displaystyle\frac{SNR_{after}}{10}}-10^{-\displaystyle\frac{SNR_{before}}{10}})}
-\end{equation}
-Từ đó, chúng ta tóm tắt các yêu cầu thiết kế như bảng \ref{spec}.
-\begin{table}[H]
+\subsection{Tổng quan về hệ thống xử lý âm thanh số sử dụng MEMS Microphone}
+Hình \ref{audio_top} mô tả một hệ thông xử lý âm thanh cơ bản sử dụng PDM MEMS microphone. Tín hiệu tương tự sau khi thu bằng micro sẽ được điều chế thành tín hiệu số dạng PDM - biểu diễn bằng 1 bit và tốc độ lấy mẫu cao. Để phân tích và tái tạo lại âm thanh thu được chúng ta phải đưa tín hiệu đó vào một hệ thống xử lý âm thanh số. Bộ PDM2PCM có vai trò chuyển đổi tín hiệu PDM sang PCM, sau đó bộ DSP sẽ điều chỉnh, cân bằng lại để nâng cao hiệu suất. Để âm thanh được phát trực tiếp ra loa, tín hiệu phải được đưa về dạng tương tự thông qua bộ chuyển đổi số tương tự (Audio-Codec) và bộ khuếch đại tín hiệu.
+\begin{figure}[H]
     \centering
-    \caption[Các yêu cầu thiết kế của hệ thống]{\bfseries\fontsize{12pt}{0pt}\selectfont Các yêu cầu thiết kế của hệ thống}
-    \begin{tabular}{|l|c|c|}
-        \hline
-        \multicolumn{1}{|c|}{\textbf{Yêu cầu}}                                  & \textbf{Thông tin} & \textbf{Đơn vị} \\ \hline
-        \begin{tabular}[c]{@{}l@{}}Tốc độ lấy mẫu đầu vào \\ (PDM)\end{tabular} & 2304               & MHz             \\ \hline
-        \begin{tabular}[c]{@{}l@{}}Tốc độ lấy mẫu đầu ra\\ (PCM)\end{tabular}   & 48                 & kHz             \\ \hline
-        Hệ số decimation                                                        & 48                 & lần             \\ \hline
-        Dải thông                                                               & 0 - 6                & kHz             \\ \hline
-        Dải dừng                                                                & 10                  & kHz             \\ \hline
-        Độ gợn sóng dải thông         & 0.1                & dB              \\ \hline
-        Độ suy hao của dài dừng                                                 & 89                 & dB              \\ \hline
-    \end{tabular}
-    \label{spec}
-\end{table}
+    \includegraphics[width=14cm]{Images/Chuong3/MoDau/audio_top.png}
+    \caption[Sơ đồ tổng quát của bộ chuyển đổi]{\bfseries \fontsize{12pt}{0pt}\selectfont Mô hình xử lý âm thanh số sử dụng MEMS Microphone}
+    \label{audio_top}
+\end{figure}
 
-\subsection{Thiết kế bộ chuyển đổi PDM sang PCM}
+Ngoài cách xử lý trực tiếp như trên, tín hiệu PCM sau khi được chuyển đổi có thể lưu trữ lại, dễ dàng truyển tải và xử lý bằng phần mềm chuyên biệt trên máy tính.
+
+\subsection{Bộ chuyển đổi đã thương mại hóa}
+\noindent\textbf{Analog Devices - ADAU7112} \label{adauref}
+
+IC ADAU7112 có chức năng chuyển đổi các luồng bít PDM âm thanh nổi thành 1 một luồng PCM. Nguồn dữ liệu PDM đầu vào có thể từ 2 microphone (trái, phải) hoặc các nguồn PDM khác. Dữ liệu PCM được đưa ra trên một cổng giao diện âm thanh nối tiếp là I2S (Inter-IC Serial) hoặc TDM (Time Domain Multiplexed). \cite{adau7112}
+
+Hình \ref{adau7112_f} mô tả sơ đồ khối của ADAU7112. Tín hiệu PDM được đưa vào \textbf{PDM\_DAT} cũng với clock lấy mẫu (\textbf{PDM\_CLK}). Tín hiệu sau đó đưa qua bộ lọc Decimation để trích suất ra tín hiệu dạng PCM với tỷ lệ 64x. Giao thức I2S/TDM giúp đưa PCM dạng song song thành tín hiệu dạng nối tiếp để truyền tín hiệu âm thanh cho các mạch tích hợp khác thông qua cổng (\textbf{BCLK}, \textbf{FSYNC}, \textbf{SDATA}).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=12cm]{Images/Chuong3/MoDau/adau7112.png}
+    \caption[Sơ đồ tổng quát của bộ chuyển đổi]{\bfseries \fontsize{12pt}{0pt}\selectfont Sơ đồ khối của ADAU7112}
+    \label{adau7112_f}
+\end{figure}
+
+Sau đây là các thông số kỹ thuật của ADAU7112:
+\begin{itemize}
+    \item Số kênh PDM đầu vào: 2 kênh
+    \item Tự động tạo clock PDM
+    \item Tỷ số Decimation (PDM sang PCM): 64x
+    \item Độ rộng của PCM: 24 bit
+    \item Tốc độ lấy mẫu đầu vào (PDM): 3.072 MHz - 6.144 MHz
+    \item Tốc độ lấy mẫu đầu ra: 9 kH - 96 kHz
+    \item Độ suy hao giải dừng: 75 dB
+    \item Điện áp hoạt động: 1.70 - 3.63 V
+\end{itemize}
+\subsection{Mô hình bộ chuyển đổi PDM sang PCM}
 Khi chúng ta quan sát phổ của tín hiệu PDM, các nhiễu lượng tử sẽ được dồn sang ở tần số cao, còn phần cần lấy thông tin sẽ ở trong một khoảng tần số thấp nhất định. Cho nên, bộ chuyển đổi sẽ chỉ cần 2 bước cơ bản (hình \ref{pdm2pcm_top}):
 \begin{enumerate}
     \item Gửi tín hiệu PDM thông qua một bộ lọc thông thấp. Nó sẽ loại bỏ tất cả các nhiễu ở tần số cao.
@@ -53,7 +54,86 @@ Khi chúng ta quan sát phổ của tín hiệu PDM, các nhiễu lượng tử 
     \caption[Sơ đồ tổng quát của bộ chuyển đổi]{\bfseries \fontsize{12pt}{0pt}\selectfont Sơ đồ tổng quát của bộ chuyển đổi}
     \label{pdm2pcm_top}
 \end{figure}
+
+Như vậy, việc thiết kế bộ chuyển đổi chỉ tập trung vào chọn các thông số (dải thông, dải dừng, độ gợn sóng, độ suy hao) của bộ lọc thông thấp và tỷ số Decimation phù hợp.
+
 Ở trong đề tài này, chúng ta sẽ thiết kế bộ lọc "Equiripple" bằng thuật toán \textbf{Parks-McClellan} \cite{rao2018digital}. Trong thư viện \textit{Numpy} đã có sẵn chức năng \textit{remez} để thiết kế các bộ lọc theo thông số được đặt ra, việc triển khai sẻ sử dụng ngôn ngữ \textit{Python}.
+\subsection{Từ thông số của Microphone đến yêu cầu thiết kế} \label{spec_muc}
+
+MEMS Microphone (MicroelectromechanicalSystem Microphone) - thiết bị này có thể được tìm thấy phổ biến trên các điện thoại di động, các máy ghi âm hoặc các thiết bị thu thanh không sử yêu cầu về chất lượng âm thanh quá cao nhưng giá thành rẻ và phù hợp với yêu cầu sử dụng.
+Ở đây, chúng ta sẽ phân tích thiết bị \textbf{MP34DT01-M} của hãng \textbf{ST}.
+Về cơ bản chúng ta chỉ cần chú ý những thống số ở trên bảng \ref{datasheet}.
+\begin{table}[h!] 
+\centering
+\caption[Các thông số kỹ thuật cần chú ý của MP34DT01-M ]{\bfseries\fontsize{12pt}{0pt}\selectfont Các thông số kỹ thuật cần chú ý của MP34DT01-M}
+\begin{tabular}{|l|l|l|l|l|l|l|}
+\hline
+Ký hiệu & Thông tin                                                        & Min. & Typ. & Max. & Đơn vị & Ghi chú \\ \hline
+AOP     & \begin{tabular}[c]{@{}l@{}}Điểm quá tải \\ âm thanh\end{tabular} &      & 120  &      & dBSPL  &         \\ \hline
+SNR & \begin{tabular}[c]{@{}l@{}}Tỷ số tín hiệu\\  trên nhiễu\end{tabular} &  & 61 &  & dB & \begin{tabular}[c]{@{}l@{}}Đo ở điều\\ kiện 1kHz,\\ áp suất 1Pa\end{tabular} \\ \hline
+Clock   & Tần số đầu vào                                                   & 1    & 2.4  & 3.25 & MHz    &         \\ \hline
+\end{tabular}
+\label{datasheet}
+\end{table}
+
+\noindent\textbf{Điểm quá tải âm thanh (AOP - Acoustic Overload Point)}: sóng hình sin 1kHz lớn nhất mà nó ít nhiều có thể ghi lại một cách đáng tin cậy.
+\begin{equation} \label{dynamic}
+    \text{Dynamic Range} = AOP - 94dBSPL + SNR
+\end{equation}
+
+\noindent\textbf{Dải động - Dynamic Range} được biểu diễn bằng công thức \ref{dynamic}. Với trường hợp của micro này, Dynamic Range$ = 120 -94 + 61 = 87dB$ và đây cũng là chính xác $SNR$ đầu ra của micro.
+
+Độ suy hao dải dừng của bộ lọc sẽ được tính theo công thức \ref{stopband} \cite{pdm2pcm} và bằng 89 dB.
+\begin{equation} \label{stopband}
+    A_{stop band} = -3dB - 10log_{10}{(10^{-\displaystyle\frac{SNR_{after}}{10}}-10^{-\displaystyle\frac{SNR_{before}}{10}})}
+\end{equation}
+
+\noindent \textbf{Nhận xét}: Với tốc độ lấy mẫu của đầu ra 48 kHz (âm thanh chất lượng cao) và hệ số Decimation của ADAU7122 (mục \ref{adauref}) là 64 thì tần số lẫy mẫu PDM sẽ là 3072 kHz (48 kHz $\times$ 64) thỏa mãn với yêu cầu dải tần số lấy mẫu PDM của microphone. Tuy nhiên về độ suy hao dải dừng sẽ không đáp ứng được với yêu cầu của bộ lọc (89 dB > 75 dB), cho nên việc sử dụng ADAU7122 cho ứng dụng này là không khả thi.
+
+Vì lý do trên chúng ta sẽ đề xuất một thiết kế đáp ứng được các thông số của microphone \textbf{MP34DT01-M} đã giới thiệu ở trên. Và đặc biệt, có thể thay đổi các tham số để phù hợp với mọi loại microphone cụ thể.
+
+Bộ chuyển đổi (bộ lọc Decimation) phải đáp ứng được những yêu cầu sau:
+\begin{itemize}
+    \item Tốc độ lấy mẫu ở đầu ra (PCM) là 48 kHz.\\
+    Tốc độ lấy mẫu 48 kHz là tốc độ phổ biến dùng cho các âm thanh chất lượng cao
+    \item Tốc độ lấy mẫu PDM là 2.304 MHz.\\
+    Micrô hỗ trợ tốc độ xung nhịp PDM trong khoảng từ 1 đến 3,25 MHz. Có các bộ lọc rất hiệu quả cho phép Decimation 2x, vì vậy nên chọn một tỷ lệ decimation là một số chia hết cho lũy thừa của 2. Tỷ lệ 48x được cho là phù hợp nhất.
+
+    \item Độ gợn sóng là 0.1 dB: yêu cầu cần thiết đối với âm thanh chất lượng cao.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=13cm]{Images/Chuong2/do_nhay.png}
+    \caption[Đáp ứng tần số của micro MP34DT01-M]{\bfseries \fontsize{12pt}{0pt}\selectfont Đáp ứng tần số của micro MP34DT01-M}
+    \label{do_nhay}
+\end{figure}
+
+    \item Dải thông từ 0 đến 6kHz.\\
+    Với việc âm thanh thu được chỉ ổn định trong tần số 100Hz đến 5kHz (hình \ref{do_nhay}), điểm chuyển tiếp ở vị trí 6kHz là một điểm phù hợp.
+    \item Dải dừng bắt đầu ở 10kHz: vì ở trên tần số 10kHz, micro không có hành vi gì (hình \ref{do_nhay}).
+
+\end{itemize}
+
+Từ đó, chúng ta tóm tắt các yêu cầu thiết kế như bảng \ref{spec}.
+\begin{table}[H]
+    \centering
+    \caption[Các yêu cầu thiết kế của hệ thống]{\bfseries\fontsize{12pt}{0pt}\selectfont Các yêu cầu thiết kế của hệ thống}
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \multicolumn{1}{|c|}{\textbf{Yêu cầu}}                                  & \textbf{Thông tin} & \textbf{Đơn vị} \\ \hline
+        \begin{tabular}[c]{@{}l@{}}Tốc độ lấy mẫu đầu vào \\ (PDM)\end{tabular} & 2304               & kHz             \\ \hline
+        \begin{tabular}[c]{@{}l@{}}Tốc độ lấy mẫu đầu ra\\ (PCM)\end{tabular}   & 48                 & kHz             \\ \hline
+        Hệ số decimation                                                        & 48                 & lần             \\ \hline
+        Dải thông                                                               & 0 - 6                & kHz             \\ \hline
+        Dải dừng                                                                & 10                  & kHz             \\ \hline
+        Độ gợn sóng dải thông         & 0.1                & dB              \\ \hline
+        Độ suy hao của dài dừng                                                 & 89                 & dB              \\ \hline
+    \end{tabular}
+    \label{spec}
+\end{table}
+
+\subsection{Thiết kế bộ chuyển đổi PDM sang PCM}
+
 \subsubsection{Ý tưởng thiết kế đơn giản} \label{dongian}
 Không thực sự cần một kiến trúc bộ lọc phức tạp để chuyển đổi PDM sang PCM, chúng ta chỉ cần 1 bộ lọc thông thấp duy nhất là đã có thể đáp ứng được các thông số ở trên.
 
