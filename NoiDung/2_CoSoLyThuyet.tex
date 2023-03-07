@@ -551,36 +551,6 @@ Trong phần mềm, các phép tính toán truyền thống với số dấu ph�
 \end{equation}
 
 Biểu diễn fixed-point như công thức \ref{fbct}, trong đó: $x$ là số thực. Tiến hành nhân $2^N$ để chuẩn hóa $x_b$ thành số nguyên. Điều đó đồng nghĩa chúng ta phải chia cho $2^N$ để được giá trị thực hoặc chỉ cần dịch đi $N$ vị trí.
-\subsection{Giới thiệu về MEMS - MicroelectromechanicalSystem Microphone} \label{micro}
-MEMS Microphone (MicroelectromechanicalSystem Microphone) thiết bị này có thể được tìm thấy phổ biến trên các điện thoại di động, các máy ghi âm hoặc các thiết bị thu thanh không sử yêu cầu về chất lượng âm thanh quá cao nhưng giá thành rẻ và phù hợp với yêu cầu sử dụng.
-Ở đây, chúng ta sẽ phân tích thiết bị \textbf{MP34DT01-M} của hãng \textbf{ST}.
-Về cơ bản chúng ta chỉ cần chú ý những thống số ở trên bảng \ref{datasheet}.
-\begin{table}[h!] 
-\centering
-\caption[Các thông số kỹ thuật cần chú ý của MP34DT01-M ]{\bfseries\fontsize{12pt}{0pt}\selectfont Các thông số kỹ thuật cần chú ý của MP34DT01-M}
-\begin{tabular}{|l|l|l|l|l|l|l|}
-\hline
-Ký hiệu & Thông tin                                                        & Min. & Typ. & Max. & Đơn vị & Ghi chú \\ \hline
-AOP     & \begin{tabular}[c]{@{}l@{}}Điểm quá tải \\ âm thanh\end{tabular} &      & 120  &      & dBSPL  &         \\ \hline
-SNR & \begin{tabular}[c]{@{}l@{}}Tỷ số tín hiệu\\  trên nhiễu\end{tabular} &  & 61 &  & dB & \begin{tabular}[c]{@{}l@{}}Đo ở điều\\ kiện 1kHz,\\ áp suất 1Pa\end{tabular} \\ \hline
-Clock   & Tần số đầu vào                                                   & 1    & 2.4  & 3.25 & MHz    &         \\ \hline
-\end{tabular}
-\label{datasheet}
-\end{table}
-
-\textbf{Điểm quá tải âm thanh (AOP - Acoustic Overload Point)}: sóng hình sin 1kHz lớn nhất mà nó ít nhiều có thể ghi lại một cách đáng tin cậy.
-\begin{equation} \label{dynamic}
-    \text{Dynamic Range} = AOP - 94dBSPL + SNR
-\end{equation}
-\textbf{Dải động - Dynamic Range} được biểu diễn bằng công thức \ref{dynamic}. Với trường hợp của micro này, Dynamic Range$ = 120 -94 + 61 = 87dB$ và đây cũng là chính xác $SNR$ đầu ra của micro.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=13cm]{Images/Chuong2/do_nhay.png}
-    \caption[Đáp ứng tần số của micro MP34DT01-M]{\bfseries \fontsize{12pt}{0pt}\selectfont Đáp ứng tần số của micro MP34DT01-M}
-    \label{do_nhay}
-\end{figure}
-Theo hình \ref{do_nhay}, ta có nhận xét: đáp ứng tần số chỉ bằng phẳng trong khoảng từ 100Hz đến 5kHz, sau đó nó bắt đầu tăng lên và không có dữ liệu nào trên 10kHz.
 \subsection{Kết luận chương}
 Qua \hyperref[chuong2]{chương 2}, chúng ta đã có đủ các thành phần cần thiết để tiến hành thiết kế bộ chuyển đổi PDM sang PCM bằng thiết kế số. Trong chương tiếp theo, chúng ta sẽ tập hợp các lý thuyết đã trình bày ở trên và triển khai một cách cụ thể.
 \newpage

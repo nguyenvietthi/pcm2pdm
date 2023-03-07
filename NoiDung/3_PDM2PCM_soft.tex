@@ -41,7 +41,7 @@ Sau đây là các thông số kỹ thuật của ADAU7112:
     \item Độ suy hao giải dừng: 75 dB
     \item Điện áp hoạt động: 1.70 - 3.63 V
 \end{itemize}
-\subsection{Mô hình bộ chuyển đổi PDM sang PCM}
+\subsection{Mô hình bộ chuyển đổi PDM sang PCM} \label{mohinhpdm2pcm}
 Khi chúng ta quan sát phổ của tín hiệu PDM, các nhiễu lượng tử sẽ được dồn sang ở tần số cao, còn phần cần lấy thông tin sẽ ở trong một khoảng tần số thấp nhất định. Cho nên, bộ chuyển đổi sẽ chỉ cần 2 bước cơ bản (hình \ref{pdm2pcm_top}):
 \begin{enumerate}
     \item Gửi tín hiệu PDM thông qua một bộ lọc thông thấp. Nó sẽ loại bỏ tất cả các nhiễu ở tần số cao.
@@ -57,7 +57,7 @@ Khi chúng ta quan sát phổ của tín hiệu PDM, các nhiễu lượng tử 
 
 Như vậy, việc thiết kế bộ chuyển đổi chỉ tập trung vào chọn các thông số (dải thông, dải dừng, độ gợn sóng, độ suy hao) của bộ lọc thông thấp và tỷ số Decimation phù hợp.
 
-Ở trong đề tài này, chúng ta sẽ thiết kế bộ lọc "Equiripple" bằng thuật toán \textbf{Parks-McClellan} \cite{rao2018digital}. Trong thư viện \textit{Numpy} đã có sẵn chức năng \textit{remez} để thiết kế các bộ lọc theo thông số được đặt ra, việc triển khai sẻ sử dụng ngôn ngữ \textit{Python}.
+
 \subsection{Từ thông số của Microphone đến yêu cầu thiết kế} \label{spec_muc}
 
 MEMS Microphone (MicroelectromechanicalSystem Microphone) - thiết bị này có thể được tìm thấy phổ biến trên các điện thoại di động, các máy ghi âm hoặc các thiết bị thu thanh không sử yêu cầu về chất lượng âm thanh quá cao nhưng giá thành rẻ và phù hợp với yêu cầu sử dụng.
@@ -132,8 +132,44 @@ Từ đó, chúng ta tóm tắt các yêu cầu thiết kế như bảng \ref{sp
     \label{spec}
 \end{table}
 
-\subsection{Thiết kế bộ chuyển đổi PDM sang PCM}
 
+\subsection{Thiết kế bộ lọc sử dụng hàm "remez" của Numpy}
+
+Ở trong đề tài này, chúng ta sẽ thiết kế bộ lọc "Equiripple FIR" bằng thuật toán \textbf{Parks-McClellan} \cite{rao2018digital}. Trong thư viện \textit{Numpy} đã có sẵn hàm chức năng \textit{remez} để thiết kế các bộ lọc theo thông số được đặt ra, việc triển khai sẽ sử dụng ngôn ngữ \textit{Python}.
+
+Dưới đây là mô tả của hàm remez:
+\begin{table}[H]
+\begin{tabular}{|l|}
+\hline
+\begin{tabular}[c]{@{}l@{}} \texttt{
+\fontsize{10pt}{0pt}\selectfont def remez (numtaps, bands, desired, weight=None, Hz=None, type='bandpass', maxiter=25, }\\      \hspace{1.6cm} \texttt{
+\fontsize{10pt}{0pt}\selectfont grid\_density=16, fs=None)}\end{tabular} \\ \hline
+\end{tabular}
+\end{table}
+
+\noindent Trong đó, chúng ta cần chú ý những tham số sau: 
+\begin{itemize}
+    \item numtaps: số lượng hệ số của bộ lọc số.
+    \item bands: danh sách chứa các đoạn tần số cần chú ý của bộ lọc số (dải thông, dải dừng).
+    \item desired: danh sách chứa các giá trị mục tiêu mà bộ lọc số cần đạt được tại các đoạn tần số được chỉ định với 1 là dải thông và 0 là dải dừng.
+    \item weight (tùy chọn): danh sách trọng số tương ứng với các đoạn tần số được chỉ định.
+\end{itemize}
+
+Hàm sẽ trả về mảng chứa các đáp ứng xung của bộ lọc và các thông số như độ suy hao dải dừng và độ gợn sóng. Tuy nhiên, 2 thông số trên sẽ phụ thuộc vào số lượng "taps" (hiện tại đang được xác định bằng tay). Việc sử dụng nhiều "taps" sẽ giúp bộ lọc đạt được các thông số đặt ra hoàn hảo hơn và ngược lại. Tuy nhiên để triển khai lên phần cứng, chúng ta cần tối ưu bộ lọc làm sao cho số "taps" nhỏ nhất mà vẫn đảm bảo được các chi tiêu đã đề ra trước đó.
+
+\noindent \textbf{Tìm số lượng taps tối ưu cho bộ lọc} \label{toiuu}
+
+Lần lượt tăng N từ giá trị 1, sau đó đưa các tham số vào hàm \textbf{remez}, nó sẽ trả về độ suy hao của dải dừng và độ gợn sóng của dải thông. Lần lượt so sánh nó với yêu cầu đầu ra đã đặt ra. Đến khi hàm trả về kết quả lớn hơn hoặc bằng với yêu cầu thiết kế thì N ở vị trí này là số "taps" tối ưu nhất cho bộ lọc.
+\begin{figure}[H]
+    \centering
+    \includesvg[width=14cm]{Images/Chuong3/MoDau/test_fir.svg}
+    \caption[Biểu đồ của độ suy hao dải thông và độ gợn sóng ứng theo số lượng taps]{\bfseries \fontsize{12pt}{0pt}\selectfont Biểu đồ của độ suy hao dải thông và độ gợn sóng ứng theo số lượng taps}
+    \label{tapsss}
+\end{figure}
+
+Hình \ref{tapsss} mô tả biểu đồ về suy hao dải dừng và độ gợn sóng ứng với số lượng taps ứng với trường hợp độ suy hao dải dừng 89 dB, độ gợn sóng 0.04 dB, dải dừng 10 - 24 kHz, dải thông 0 - 10 kHz. Chúng ta có thể thấy ở số lượng taps là 50 thì bộ lọc đáp ứng vừa đủ tất cả các yêu cầu.
+\subsection{Thiết kế bộ chuyển đổi  PDM sang PCM}
+Các thiết kế được đề xuất sẽ bám sát vào mô hình của bộ chuyển đổi đã trình bày ở mục \ref{mohinhpdm2pcm}.
 \subsubsection{Ý tưởng thiết kế đơn giản} \label{dongian}
 Không thực sự cần một kiến trúc bộ lọc phức tạp để chuyển đổi PDM sang PCM, chúng ta chỉ cần 1 bộ lọc thông thấp duy nhất là đã có thể đáp ứng được các thông số ở trên.
 
@@ -161,7 +197,7 @@ Sau tiến hành chạy thuật toán \textit{remez}, chúng ta có bộ lọc c
 
 Bộ trên có độ suy hao dải dừng là 89.035 dB, độ gợn sóng 0.01415 dB hoàn toàn thỏa mãn với yêu cầu thiết kế. Nhưng có một vấn đề, đó là số taps lớn dẫn đến phép nhân trong 1 giây khá lớn ($48000 \times 2216 = 106M \text{ phép}/s$). Trong thiết kế phần cứng, đồng nghĩa chúng ta phải dùng đến 2216 bộ nhân, điều đó gây nên hao phí tài nguyên nghiêm trọng.
 
-\textbf{Kết luận}: việc sửa dụng một bộ lọc thông thấp duy nhất không được cho là khả thi. Phần sau sẽ trình bày kiểu thiết kế sử dụng nhiều bộ lọc tối ưu và xử lý ở nhiều miền tần số.
+\textbf{Kết luận}: việc sửa dụng một bộ lọc thông thấp duy nhất không được cho là khả thi gây hao phí tài nguyên phần cứng. Phần sau sẽ trình bày kiểu thiết kế sử dụng nhiều bộ lọc tối ưu và xử lý ở nhiều miền tần số.
 
 \subsubsection{Thiết kế bộ chuyển đổi nhiều giai đoạn sử dụng hạ tần (Decimation)}
 Có rất nhiều kiến trúc đường ống để khử tín hiệu mẫu ở tốc độ cao xuống thấp \cite{pipelie1} - \cite{pipelie2}, về cơ bản sẽ được rút gọn thành các khối như hình \ref{pipeline_top}:
@@ -184,7 +220,7 @@ Lý do cho sự sắp xếp này là để phù hợp ràng buộc thiết kế 
     \item Bộ lọc hand Band chỉ yêu cầu khoảng 50\% phép nhân so với bộ lọc FIR tương đương.
     \item Việc sử dụng 2 bộ lọc CIC và Half Band vẫn chưa đủ điều kiện để lọc triệt để tín hiệu cần thu, dẫn đến việc phải sử dụng bộ FIR sau cùng. Nhưng bộ lọc này chạy ở tần số thấp và tài nguyên là không đáng kể.
 \end{itemize}
-\paragraph{Cấu hình bộ lọc CIC}
+\paragraph{Lựa chọn các tham số bộ lọc CIC}
 Vì bộ lọc CIC không sử dụng bất kỳ bộ nhân nào, các thông số của bộ lọc chỉ phụ thuộc vào 2 tham số là số tầng và kích thước cửa số. Tuy nhiên, các bộ lọc CIC có độ gợn của dải thông trở nên ngày càng tồi tệ hơn với tần số tăng và số lượng các tầng tăng.
 
 Do yêu cầu thiết kế có hệ số decimation là 48, do đó có 9 tỷ lệ có thể được chọn cho CIC: 2 3 4 6 8 12 16 24 48.
@@ -205,17 +241,20 @@ Hình \ref{cic_ratios_overview} mô tả đáp ứng tần số của bộ lọc
     \label{cic_ratios_zoom}
 \end{figure}
 
-Để đơn giản, chúng ta sẽ phải giới hạn tỷ lệ decimation số lượng các tầng sao cho độ gợn dải thông không vượt quá một giá trị tối đa nhất định. Ở đây sẽ chọn độ gợn tối đa là 0.05 dB.
+Để đơn giản, chúng ta sẽ phải giới hạn tỷ lệ decimation và số lượng các tầng sao cho độ gợn dải thông không vượt quá một giá trị tối đa nhất định. Ở đây sẽ chọn độ gợn tối đa là 0.05 dB như vậy các bộ lọc phía sau phải đáp ứng được 0.05 dB còn lại (1 - 0.05 = 0.05 dB).
 
 Để tìm ra thông số CIC thỏa mãn cả yêu cầu về dải thông và dải dừng, chúng ta sẽ tập trung vào bảng \ref{abc}. Nên chọn số tầng thấp nhất có thể để giảm được số lượng độ rộng của thanh ghi và các bộ cộng. Từ đó có thể đáp ứng được vấn đề về tài nguyên của hệ thống số.
 
- \noindent Từ bảng \ref{abc}, các phương án sau được đưa ra:
-\begin{itemize}
-    \item Tỷ lệ Decimation 6x và số tầng 3: phương án này yêu cầu thêm 3 bộ lọc Half Band và 1 bộ lọc FIR cuối để đáp ứng được các thông số cuối cùng.
-    \item Tỷ lệ Decimation 8x và số tầng 4: phương án này yêu cần cần thêm tỷ lệ Decimation phía sau là 6x, đồng nghĩa với dùng 1 bộ lọc Half Band và 1 bộ lọc FIR cuối kèm theo 1 bộ decimation 3x.
-    \item Tỷ lệ Decimation 12x và số tầng 4: mặc dùng phương án này chưa đáp ứng được độ gợn sóng của dải thông (0.056 db, vượt 0.006 dB so với yêu cầu), nhưng chênh lệch này rất nhỏ. Với phương án này yêu cầu thêm 2 bộ lọc Half Band và 1 bộ lọc FIR. \label{choose}
-\end{itemize}
-\vspace{2.5cm}
+ \noindent Quan sát bảng \ref{abc}, các \textbf{phương án} sau được đưa ra:
+\begin{enumerate}
+    \item \textbf{Tỷ lệ Decimation 6x và số tầng 3}: phương án này yêu cầu thêm 3 bộ lọc Half Band và 1 bộ lọc FIR cuối để đáp ứng được các thông số cuối cùng.
+    \item \textbf{Tỷ lệ Decimation 8x và số tầng 4}: phương án này yêu cần cần thêm tỷ lệ Decimation phía sau là 6x, đồng nghĩa với dùng 1 bộ lọc Half Band và 1 bộ lọc FIR cuối kèm theo 1 bộ decimation 3x.
+    \item \textbf{Tỷ lệ Decimation 12x và số tầng 4}: mặc dùng phương án này chưa đáp ứng được độ gợn sóng của dải thông (0.056 db, vượt 0.006 dB so với yêu cầu), nhưng chênh lệch này rất nhỏ. Với phương án này yêu cầu thêm 2 bộ lọc Half Band và 1 bộ lọc FIR. \label{choose}
+\end{enumerate}
+
+Các phương án có tỷ lệ Decimation từ 4 trở xuống hoàn toàn có thể đáp ứng được thiết kế. Tuy nhiên, việc chọn như thế sẽ gây nên hệ số decimation cho các bộ lọc phía sau lớn, đồng nghĩa với việc phải sử dụng nhiều bộ lọc Half Band gây tốn nhiều tài nguyên. Trái với phương châm của thiết kế là sử dụng bộ CIC với thông số tối ưu nhất để các bộ lọc sau đơn giản nhất có thể.
+
+\vspace{2cm}
 \begin{table}[H]
     \centering
     \caption[Độ gợn sóng và độ suy hao của dải dừng của bộ lọc CIC ở nhiều cấu hình khác nhau (dB)]{\bfseries\fontsize{12pt}{0pt}\selectfont Độ gợn sóng và độ suy hao của dải dừng của bộ lọc CIC ở nhiều cấu hình khác nhau (dB)}
@@ -327,11 +366,13 @@ Hình \ref{cic_ratios_overview} mô tả đáp ứng tần số của bộ lọc
 \end{tabular}
 \label{phepnhan}
 \end{table}
-Khi các thuộc tính của bộ lọc CIC đã được quyết định, thiết kế bộ lọc Half Band và FIR sẽ được chạy thuật toán Parks-McClellan/Remez để đưa ra các hệ số bộ lọc chính xác. Từ đó, chúng ta có thể đưa ra số phép nhân xảy ra trong 1 giây, mô tả như bảng \ref{phepnhan}. Dễ dàng nhận ra phương án 3 là phương án tối ưu nhất.
+Khi các thuộc tính của bộ lọc CIC đã được quyết định, thiết kế bộ lọc Half Band và FIR sẽ được chạy thuật toán Parks-McClellan/Remez và tối ưu (mục \ref{toiuu}) để đưa ra các hệ số bộ lọc chính xác. Từ đó, chúng ta có thể đưa ra số phép nhân xảy ra trong 1 giây, mô tả như bảng \ref{phepnhan}. Dễ dàng nhận ra \textbf{phương án 3} là phương án tối ưu nhất.
 
 Giờ thì chúng ta có thể thấy rõ sự khác biệt giữa 2 kiến trúc đơn giản (mục \ref{dongian}) và sử dụng nhiều bộ lọc trên nhiều miền tần số khác nhau. Với 3504k phép nhân trên 1 giây so với 106M phép nhân trong 1 giây, nó được cải thiện hơn 30 lần.
-\subsubsection{Thiết kế bộ lọc Half Band và FIR}
-Với phương án \hyperref[choose]{đã được chọn ở trên}, chúng ta có sơ đồ khối tổng quát của thiết kế như hình \ref{pipeline_new}.
+\paragraph{Thiết kế bộ lọc Half Band và FIR} \label{design_fir}
+Với phương án \hyperref[choose]{đã được chọn ở trên} (CIC 4 tầng, tỷ lệ Decimation 12x) thì hệ số Decimation chỉ còn lại là 4, điều đó đồng nghĩ với việc chúng ta chỉ cần sử dụng thêm 2 bộ lọc Half Band với tỷ lệ Decimation mỗi bộ lọc là 2 và một bộ lọc FIR ở tầng cuối cùng. 
+
+Chúng ta có sơ đồ khối tổng quát của thiết kế như hình \ref{pipeline_new}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=11cm]{Images/Chuong3/pipeline_new_top.png}
@@ -340,24 +381,24 @@ Với phương án \hyperref[choose]{đã được chọn ở trên}, chúng ta 
 \end{figure}
  \noindent Các bộ lọc sẽ phải đạt các thông số thiết kế tối thiểu như sau:
 \begin{enumerate}
-    \item Bộ lọc CIC: \\
+    \item \textbf{Bộ lọc CIC}: \\
     Hệ số Decimation: 12\\
     Số tầng: 4\\
     Độ gợn sóng của dải thông: $A_{CIC} =$ 0.0564 dB\\
     Tần số lấy mẫu: 2304 kHz
-    \item Bộ lọc Half Band (1):\\
+    \item \textbf{Bộ lọc Half Band (1)}:\\
     Tần số lấy mẫu: 192 kHz\\
     Dải thông: 0 - 10 kHz\\
     Điểm dừng: 86 kHz\\
     Độ gợn sóng của dải thông: $A_{HB1} = 0.1 - A_{CIC}$\\
     Độ suy hao của dải dừng: 89 dB
-    \item Bộ lọc Half Band (2):\\
+    \item \textbf{Bộ lọc Half Band (2)}:\\
     Tần số lấy mẫu: 96 kHz\\
     Dải thông: 0 - 10 kHz\\
     Điểm dừng: 38 kHz\\
     Độ gợn sóng của dải thông: $A_{HB2} = 0.1 - A_{CIC} - A_{HB1}$\\
     Độ suy hao của dải dừng: 89 dB
-    \item Bộ lọc FIR:\\
+    \item \textbf{Bộ lọc FIR}:\\
     Tần số lấy mẫu: 48 kHz\\
     Dải thông: 0 - 6 kHz\\
     Điểm dừng: 10 kHz\\
@@ -365,9 +406,9 @@ Với phương án \hyperref[choose]{đã được chọn ở trên}, chúng ta 
     Độ suy hao của dải dừng: 89 dB
 \end{enumerate}
 
- \noindent Phổ của từng giai đoạn mô tả như hình 
- \ref{t1}, \ref{t2}, \ref{t3}, \ref{t4}.
- \vspace{2.3cm}
+ Phổ của từng giai đoạn mô tả như hình 
+ \ref{t1}, \ref{t2}, \ref{t3}, \ref{t4} với phần màu xanh là phần tín hiệu cần lấy và phần màu vàng là phần tần số nhiễu phải được loại bỏ.
+ \vspace{1.5cm}
  \begin{figure}[H]
     \centering
     \includegraphics[width=11cm]{Images/Chuong3/1.png}
@@ -393,7 +434,7 @@ Với phương án \hyperref[choose]{đã được chọn ở trên}, chúng ta 
     \label{t4}
 \end{figure}
 
-Sau khi chạy thuật toán \textbf{Parks-McClellan/Remez} với các thông số đã nên ở trên, ta có đồ thị đáp ứng tần số, đáp ứng xung và số lượng taps của từng bộ lọc như hình \ref{a}, \ref{b}, \ref{c}, \ref{d}.  
+Sau khi chạy thuật toán \textbf{Parks-McClellan/Remez} và tối ưu (mục \ref{toiuu}) với các thông số đã nên ở trên, ta có đồ thị đáp ứng tần số, đáp ứng xung và số lượng taps của từng bộ lọc như hình \ref{a}, \ref{b}, \ref{c}, \ref{d}.  
 \vspace{1.5cm}
 \begin{figure}[H]
     \centering
@@ -421,6 +462,9 @@ Sau khi chạy thuật toán \textbf{Parks-McClellan/Remez} với các thông s�
     \caption[Đáp ứng tần số và đáp ứng xung của bộ lọc FIR]{\bfseries \fontsize{12pt}{0pt}\selectfont Đáp ứng tần số và đáp ứng xung của bộ lọc FIR}
     \label{d}
 \end{figure}
+
+\noindent \textbf{Nhận xét}: Với tổng số taps bây giờ là 81 (11 + 19 + 51) tương ứng với 81 bộ nhân tối ưu rất nhiều so với 2116 bộ nhân đối với trường hợp đơn giản đã trình bày ở mục \ref{dongian}, tức là giảm hơn 26 lần.
+Việc triển khai thiết kế này trên phần cứng sẽ giảm được tài nguyên đáng kể.
 \subsection{Mô phỏng và kiểm tra hệ thống}
 Việc mô phỏng lại hệ thống sẽ triển khai bằng ngôn ngữ \textbf{Python}, sử dụng thư viện \textbf{Numpy} và \textbf{Scipy}.
 
@@ -430,27 +474,27 @@ Quá trình mô phỏng sẽ được thực hiện như sau: Tín hiệu đầu
 
 \textbf{Kiểm tra}:
 
-Cho đầu vào là tín hiệu 3 thành phần gồm 3 sóng sin có tần số lần lượt 4 kHz, 13 kHz, 22 kHz như phương trình \ref{3sin}.
+Cho đầu vào là tín hiệu chứa các thành phần gồm các sóng sin trong dải tần từ 0 -24 kHz, mỗi thành phần tần số sẽ cách nhau 0.01 kHz và được biểu diễn như phương trình \ref{3sin}.
 \begin{equation} \label{3sin}
-    x(t) = \frac{0.4}{3} (sin(2\pi \times 4000\times t) + sin(2\pi \times 13000\times t) + sin(2\pi \times 22000\times t))
+    x(t) = \frac{0.5}{2400}\sum^{2400}_{f = 1}sin(2\pi \times 100 \times f \times t)
 \end{equation}
 
-Tín hiệu này, sau đó sẽ đưa qua bộ điều chế Sigma-Delta. Chúng ta thu được tín hiệu ở miền thời gian và tần số như hình \ref{sd1} và \ref{sd2}.
+
 \begin{figure}[H]
     \centering
     \includesvg[width=16.5cm]{Images/Chuong3/test/pdm_1.svg}
     \caption[Tín hiệu trên miền thời gian sau khi qua bộ điều chế]{\bfseries \fontsize{12pt}{0pt}\selectfont Tín hiệu trên miền thời gian sau khi qua bộ điều chế}
     \label{sd1}
 \end{figure}
-
+Tín hiệu này, sau đó sẽ đưa qua bộ điều chế Sigma-Delta. Chúng ta thu được tín hiệu ở miền thời gian và tần số như hình \ref{sd1} và \ref{sd2}.
 \begin{figure}[H]
     \centering
-    \includesvg[width=16.5cm]{Images/Chuong3/test/psd_1.svg}
+    \includesvg[width=16.5cm]{Images/Chuong3/test/psd_3.svg}
     \caption[Phổ mật độ công suất của tín hiệu PDM]{\bfseries \fontsize{12pt}{0pt}\selectfont Phổ mật độ công suất của tín hiệu PDM}
     \label{sd2}
 \end{figure}
 
-Hình \ref{sd1} mô tả tín hiệu đầu vào là đường màu đỏ và đường xanh là tín hiệu PDM sau khi được điều chế. Điều chúng cần quan tâm ở đây là phổ của tín hiệu PDM (\ref{sd2}). Chúng ta có thể dễ dàng quan sát được, 3 đường thẳng có độ lớn bất thường đó là tín hiệu chính tương ứng với 3 tần số được nêu trên. Nhiễu lượng tử được đẩy sang miền tần số cao (miền không cần quan tâm) và 1 phần cực kỳ nhỏ ở dải 0 - 24 kHz (có thể quan sát rõ ràng ở hình \ref{sd3}). Ở vùng cần thu tín hiệu, SNR lớn hơn 100 dB, điều này đã đáp ứng được với thông của micro MEMS.
+Hình \ref{sd1} mô tả tín hiệu đầu vào là đường màu đỏ và đường xanh là tín hiệu PDM sau khi được điều chế. Điều chúng ta cần quan tâm ở đây là phổ của tín hiệu PDM (\ref{sd2}). Chúng ta có thể dễ dàng quan sát được, khu vực hình chữ nhật ở đầu tiên (đến đường nét đứt màu xanh lá cây) là tín hiệu các sóng sin từ 0 - 24 kHz  (có thể quan sát rõ ràng ở hình \ref{sd3}), đây là khu vực chúng ta cần quan tâm. Nhiễu lượng tử được đẩy sang miền tần số cao tách biệt với khu vực tần số chứa thông tin.
 
 \begin{figure}[H]
     \centering
@@ -459,7 +503,9 @@ Hình \ref{sd1} mô tả tín hiệu đầu vào là đường màu đỏ và đ
     \label{sd3}
 \end{figure}
 
-Tiến hành mô phỏng, thu được tín hiệu ở bộ lọc FIR cuối cùng có biểu đồ ở miền thời gian như hình \ref{pcm_o}. Ở khoảng thời gian đầu, tín hiệu có vẻ bằng phẳng, đó là khoảng thời gian để nạp các tín hiệu cho các taps. Có vẻ các thành phần tần số 13 kHz và 23 kHz đã được loại bỏ. Để quan sát kỹ hơn, hãy quan sát biểu đồ mật độ công suất của tín hiệu PCM đầu ra.
+Vì biên độ các sóng sin đưa vào là bằng nhau. Nên chúng ta có thể do độ suy hao trước và sau khi mô phỏng ở từng dải tần để làm điều kiện nhận xét yêu cầu thiết kế (độ suy hao giải dừng, độ gợn sóng dải thông).
+
+Tiến hành mô phỏng, thu được tín hiệu ở bộ lọc FIR cuối cùng có biểu đồ ở miền thời gian như hình \ref{pcm_o}. Về miền thời gian, chúng ta sẽ rất khó để nhận xét được thiết kế đã đáp ứng được yêu cầu đặt ra hay chưa. Vì vậy, để nhận xét kỹ hơn, hãy quan sát biểu đồ mật độ công suất của tín hiệu PCM đầu ra.
 \begin{figure}[H]
     \centering
     \includesvg[width=14cm]{Images/Chuong3/test/pcm_o.svg}
@@ -467,16 +513,18 @@ Tiến hành mô phỏng, thu được tín hiệu ở bộ lọc FIR cuối cù
     \label{pcm_o}
 \end{figure}
 
-Hình \ref{psd_pcm} mô tả phổ của tín hiệu đầu ra của hệ thống. Có thể thấy bắt đầu từ điểm 6 kHz các thành tần số bắt đầu suy giảm mạnh. Chúng ta quan sát tần số có cường độ cao nhất trong miền 0 - 6 kHz, ban đầu (hình \ref{sd3}) là -17.5 dB và sau đó là -17.551 dB (hình \ref{psd_pcm}). Độ chênh lệch 0.051 đã đáp ứng đúng thông số độ gợn sóng của dải thông yêu cầu.
-
-Đối với độ suy giảm của dải dừng, ở 2 vị trí 13 kHz và 23 kHz ban đầu có cường độ là -17.5 dB ngang với tín hiệu ở tần số 6 kHz cần thu. Sau khi đưa qua hệ thống, chúng giảm chỉ còn -114.404 dB, trong khi hệ thống chỉ yêu cầu độ suy hao là 89 dB. Các thành phần tần số không muốn được xem đã được loại bỏ. Phổ cũng bắt đầu suy giảm ổn định ở vị trí 10 kHz.
+Hình \ref{psd_pcm} mô tả phổ của tín hiệu đầu ra của hệ thống. Có thể thấy, bắt đầu từ điểm 6 kHz các thành tần số bắt đầu suy giảm mạnh. Độ suy hao của các cách thành phần tần số trong trong miền 0 - 6 kHz ổn định ở mức -73.7193 dB (hình \ref{psd_pcm}). Quay về với phổ PDM ban đầu (hình \ref{sd3}), độ suy hao là -73.6202 dB. Độ chênh lệch 0.0991 dB đã đáp ứng đúng thông số độ gợn sóng của dải thông yêu cầu (0.1 dB). 
 \begin{figure}[H]
     \centering
     \includesvg[width=16.5cm]{Images/Chuong3/test/psd_pcm.svg}
     \caption[Phổ của tín hiệu thu được (PCM)]{\bfseries \fontsize{12pt}{0pt}\selectfont Phổ của tín hiệu thu được (PCM)}
     \label{psd_pcm}
 \end{figure}
-\textbf{Kết luận}: Hệ thống đã hoạt động đúng với yêu cầu thiết kế đã đặt ra.
+
+Ở điểm 10 kHz, đồ thị bắt đầu biến thiên nhỏ hơn. Cho nên đây là điểm bắt đầu của dải dừng và kết thúc dải thông. Ở dải tần số này (10 kHz - 24 kHz), độ suy hao cao nhất là 164.8165 dB. Nó chênh lệch so với suy hao ban đầu của PDM đầu vào là 91.1963 dB (164.8165 dB - 73.6202 dB) và đây được coi là độ suy hao của dải dừng, trong khi hệ thống chỉ yêu cầu độ suy hao dải dừng là 89 dB.
+
+\textbf{Kết luận}: Hệ thống đã hoạt động đúng với yêu cầu thiết kế đã đặt ra. Các thành phần tần số không muốn được xem đã được loại bỏ. Tín hiệu trong khoảng tần số từ 0 - 6 kHz đã được lọc chính xác.
+
 
 \subsection{Kết luận chương}
 

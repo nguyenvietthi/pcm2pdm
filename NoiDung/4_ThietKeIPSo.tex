@@ -10,26 +10,53 @@ Với yêu cầu của hệ thống số là tối ưu diện tích và công su
 \subsubsection{Vấn đề về tính toán fixed-point cho các hệ số của bộ lọc} \label{fix-fil}
 Trong phần mềm, các phép tính toán truyền thống với số dấu phẩy động đều thực hiện
 trên GPU hay CPU. Nhưng khi đưa lên phần cứng, việc triển khai dấu phẩy động cực kỳ phức tạp và tốn tài nguyên. Do đó chúng ta cần chuyển đổi các hệ số của các bộ lọc sang dấu phẩy tĩnh, song song với đó phải đảm bảo các yêu cầu đã đặt ra của hệ thống.
+
+Từ các hệ số của từng bộ lọc đã tìm được ở mục \ref{design_fir}, chúng ta tiến hành nhân $2^N$ với N tăng dần từ 6 để chuyển chúng về số nguyên. Từ đây, tiếp tục dịch hệ số nguyên đó sang phải N lần và đưa vào hàm \textbf{freqz} - một hàm trong thư viện \textbf{scipy} để tính toán độ suy hao dải dừng và độ gợn sóng của dải thông của các bộ lọc sau khi sử dụng fixed-point. N sẽ tiếp tục tăng dần cho tới khi các thông số thỏa mãn yêu cầu thiết kế đã được đặt ra. 
+
 \begin{figure}[H]
     \centering
-    \includesvg[width=16.5cm]{Images/Chuong4/hb1.svg}
+    \includegraphics[width=11cm]{Images/Chuong4/plot/hb1.png}
+    \caption[Độ suy hao dải dừng và độ gợn sóng của bộ lọc HB1 ứng với N khác nhau]{\bfseries \fontsize{12pt}{0pt}\selectfont Độ suy hao dải dừng và độ gợn sóng của bộ lọc HB1 ứng với N khác nhau}
+    \label{hb111}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=11.5cm]{Images/Chuong4/plot/hb2.png}
+    \caption[Độ suy hao dải dừng và độ gợn sóng của bộ lọc HB2 ứng với N khác nhau]{\bfseries \fontsize{12pt}{0pt}\selectfont Độ suy hao dải dừng và độ gợn sóng của bộ lọc HB2 ứng với các trường hợp N khác nhau}
+    \label{hb222}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=11.5cm]{Images/Chuong4/plot/fir.png}
+    \caption[Độ suy hao dải dừng và độ gợn sóng của bộ lọc FIR ứng với N khác nhau]{\bfseries \fontsize{12pt}{0pt}\selectfont Độ suy hao dải dừng và độ gợn sóng của bộ lọc FIR ứng với N khác nhau}
+    \label{firrr}
+\end{figure}
+Từ đó, chúng ta có các biểu đồ mô tả độ suy hao dải dừng và độ gợn sóng trong từng trường hợp N khác nhau của từng bộ lọc lần lượt như hình \ref{hb111}, \ref{hb222}, \ref{firrr}. Nhận thấy với N bằng 18 thì 2 bộ lọc Half Band (1) và Half Band (2) đã đủ điều kiện. Tuy nhiên, đối với bộ lọc FIR thì N là 20, do vậy, chúng ta sẽ lấy chiều dài của toàn hệ thống là 20 để thuận tiện cho việc lưu trữ cũng như trích xuất dữ liệu. Không những thế, khi tăng N thì hệ số của HB1 và HB2 sẽ dần tiệm cận với hệ số gốc hơn.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=17.5cm]{Images/Chuong4/hb1.png}
     \caption[Đáp ứng tần số của bộ lọc Half band (1) trước và sau khi sử dụng fixed-point]{\bfseries \fontsize{12pt}{0pt}\selectfont Đáp ứng tần số của bộ lọc Half band (1) trước và sau khi sử dụng fixed-point}
     \label{hb1_d}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includesvg[width=16.5cm]{Images/Chuong4/hb2.svg}
+    \includegraphics[width=17.5cm]{Images/Chuong4/hb2.png}
     \caption[Đáp ứng tần số của bộ lọc Half band (2) trước và sau khi sử dụng fixed-point]{\bfseries \fontsize{12pt}{0pt}\selectfont Đáp ứng tần số của bộ lọc Half band (2) trước và sau khi sử dụng fixed-point}
     \label{hb2_d}
 \end{figure}
-Thực hiện nhân với tất cả các hệ số của bộ lọc với $2^N$ với N chạy từ 0 đến khi nào thỏa mãn được các điều kiện đặt ra. Khi ở giá trị N = 20, chúng ta thu đáp ứng tần số của các bộ lọc lần lượt như hình \ref{hb1_d}, \ref{hb2_d}, \ref{fir_d}.
+Chúng ta thu đáp ứng tần số của các bộ lọc sau khi quá trình fixed-point lần lượt như hình \ref{hb1_d}, \ref{hb2_d}, \ref{fir_d}.
 \begin{figure}[H]
     \centering
-    \includesvg[width=17cm]{Images/Chuong4/fir.svg}
+    \includegraphics[width=17.5cm]{Images/Chuong4/fir.png}
     \caption[Đáp ứng tần số của bộ lọc FIR trước và sau khi sử dụng fixed-point]{\bfseries \fontsize{12pt}{0pt}\selectfont Đáp ứng tần số của bộ lọc FIR trước và sau khi sử dụng fixed-point}
     \label{fir_d}
 \end{figure}
+
+
+
 Theo quan sát, bộ lọc chỉ biến thiên lớn ở thông số suy giảm dải dừng, còn độ gợn sóng và các thông số còn lại hầu như không thay đổi. Độ suy giảm dải dừng giảm từ 0.794 dB đối với FIR, 3 và 5 dB với 2 bộ lọc còn lại, tuy nhiên độ suy giảm đó vẫn lớn hơn 89 dB (yêu cầu của hệ thống).
 
 \textbf{Kết luận}: Chúng ta sẽ sử dụng tất cả hệ số nhân với $2^{20}$ để ép thành số nguyên (hệ thập phân).
@@ -38,13 +65,11 @@ Bộ chuyển đổi PDM sang PCM nhiều giai đoạn sử dụng Decimation (d
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=10cm]{Images/Chuong4/top.png}
+    \includegraphics[width=9.5cm]{Images/Chuong4/top.png}
     \caption[Sơ đồ tổng quát của bộ PCM2PDM]{\bfseries \fontsize{12pt}{0pt}\selectfont Sơ đồ tổng quát của bộ PCM2PDM}
     \label{top_pdm2pcm}
 \end{figure}
-Các chân của bộ chuyển đổi sẽ được trình bày chi tiết ở bảng \ref{top_signal}.
-
-Bảng \ref{hangso} mô tả các hẳng số được sử dụng trong thiết kế.
+Các chân của bộ chuyển đổi sẽ được trình bày chi tiết ở bảng \ref{top_signal}. Bảng \ref{hangso} mô tả các hằng số được sử dụng trong thiết kế.
 
 \begin{table}[H]
     \centering
@@ -61,6 +86,10 @@ pcm\_clk          & ra               & 1                    & \begin{tabular}[c]
 \end{tabular}
     \label{top_signal}
 \end{table}
+
+Điều đặc biệt của thiết kế là các tham số của các bộ lọc sẽ được sinh ra từ các tính toán trên phần mềm sử dụng \textbf{Python}. Đồng nghĩa với việc, chúng ta chỉ cần điền các thông số yêu cầu ví dụ như \textbf{Dải thông}, \textbf{Dải dừng}, \textbf{Độ suy hao dải dừng}, \textbf{Độ gợn sóng của dải thông} vào phần mềm. Nó sẽ tự động tính toán và nạp các hệ số bộ lọc, tối ưu các độ rộng bit của mỗi sau bộ lọc và sau đó sẽ nạp vào RTL code. Từ đây, chúng ta có thể thiết kế bộ lọc cho bất kỳ thiết bị microphone nào. Ở trong thiết kế này, chúng ta sẽ chỉ tập trung và tối ưu thiết kế cho thiết bị\textbf{MP34DT01-M}.
+
+
 \begin{table}[H]
     \centering
     \caption[Hằng số thiết kế]{\bfseries\fontsize{12pt}{0pt}\selectfont Hằng số thiết kế}
@@ -79,7 +108,7 @@ HB2\_SIZE   & 19 & Số lượng taps của bộ lọc HB2    \\ \hline
 Sơ đồ tổng quan của kiến trúc được mô tả như hình \ref{arc_top}.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=13cm]{Images/Chuong4/arc_top.png}
+    \includegraphics[width=12cm]{Images/Chuong4/arc_top.png}
     \caption[Kiến trúc của bộ PCM2PDM]{\bfseries \fontsize{12pt}{0pt}\selectfont Kiến trúc của bộ PCM2PDM}
     \label{arc_top}
 \end{figure}
@@ -90,6 +119,7 @@ Chức năng của từng khối :
     \item \textbf{dti\_cic\_decimator} là một bộ lọc CIC với hệ số decimation 12x và 4 tầng.
     \item \textbf{dti\_hb\_fir\_filter} là một nhóm gồm 2 bộ lọc Half Band và 1 bộ lọc FIR với tổng hệ số Decimation là 4. Vai trò của chúng là lấy mẫu xuống và bù tín hiệu.
 \end{itemize}
+
 \subsubsection{Thiết kế chi tiết từng khối}
 \paragraph{dti\_frequency\_divider}
 \textbf{dti\_frequency\_divider} có chức năng chia tần số từ clock đầu vào thành clock có tần số bé hơn với tỷ lệ DECIMATION là tỷ lệ chia tần. Đồng thời tạo ra tín hiệu báo hiệu quá trình đổi tần.
@@ -98,7 +128,7 @@ Sơ đồ chân vào ra của khối được mô tả ở hình \ref{frequency}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=8cm]{Images/Chuong4/frequency/frequency.png}
+    \includegraphics[width=7.5cm]{Images/Chuong4/frequency/frequency.png}
     \caption[Sơ đồ khối của dti\_frequency\_divider]{\bfseries \fontsize{12pt}{0pt}\selectfont Sơ đồ khối của dti\_frequency\_divider}
     \label{frequency}
 \end{figure}
@@ -128,7 +158,7 @@ sample\_clk & ra  & 1 & Clock đã được hạ tần                 \\ \hline
 Kiến trúc của khối được mô tả ở hình \ref{frequency_a}, quá trình hoạt động tương ứng được biểu diễn như hình \ref{frequency_tt}, bộ đếm thực hiện đếm bắt đầu đếm từ giá trị 0, đến nửa DECIMITION là đổi chiều giá trị của sample\_clk đồng nghĩa với việc tạo ra clock với độ lớn nhỏ hơn DECIMTION với tần số vào. Ở giá trị bộ đếm bằng 0, tín hiệu start được kích hoạt.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=14cm]{Images/Chuong4/frequency/frequency_timing.png}
+    \includegraphics[width=13.5cm]{Images/Chuong4/frequency/frequency_timing.png}
     \caption[Biểu đồ thời gian của dti\_frequency\_divider]{\bfseries \fontsize{12pt}{0pt}\selectfont Biểu đồ thời gian của dti\_frequency\_divider}
     \label{frequency_tt}
 \end{figure}
@@ -137,7 +167,7 @@ Kiến trúc của khối được mô tả ở hình \ref{frequency_a}, quá tr
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=14cm]{Images/Chuong4/frequency/frequency_arc.png}
+    \includegraphics[width=15cm]{Images/Chuong4/frequency/frequency_arc.png}
     \caption[Kiến trúc của dti\_frequency\_divider]{\bfseries \fontsize{12pt}{0pt}\selectfont Kiến trúc của dti\_frequency\_divider}
     \label{frequency_a}
 \end{figure}
@@ -147,10 +177,19 @@ Kiến trúc của khối được mô tả ở hình \ref{frequency_a}, quá tr
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=8cm]{Images/Chuong4/frequency/top_frequency.png}
+    \includegraphics[width=7cm]{Images/Chuong4/frequency/top_frequency.png}
     \caption[Sơ đồ khối của dti\_top\_frequency\_divider]{\bfseries \fontsize{12pt}{0pt}\selectfont Sơ đồ khối của dti\_top\_frequency\_divider}
     \label{top_frequency}
 \end{figure}
+Kiến trúc của dti\_top\_frequency\_divider gồm 4 bộ dti\_top\_frequency\_divider như hình \ref{top_frequency_arc}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=15cm]{Images/Chuong4/frequency/top_frequency_arc.png}
+    \caption[Kiến trúc của dti\_top\_frequency\_divider]{\bfseries \fontsize{12pt}{0pt}\selectfont Kiến trúc của dti\_top\_frequency\_divider}
+    \label{top_frequency_arc}
+\end{figure}
+
+
 \begin{table}[H]
     \centering
     \caption[Mô tả chân vào ra của dti\_top\_frequency\_divider]{\bfseries\fontsize{12pt}{0pt}\selectfont Mô tả chân vào ra của dti\_top\_frequency\_divider}
@@ -193,14 +232,7 @@ pcm\_clk &
     \label{top_frequency_signal}
 \end{table}
 
-  Bảng \ref{top_frequency_signal} cho miêu tả chức năng của các chân vào ra của khối. Kiến trúc của dti\_top\_frequency\_divider gồm 4 bộ dti\_top\_frequency\_divider như hình \ref{top_frequency_arc}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=15cm]{Images/Chuong4/frequency/top_frequency_arc.png}
-    \caption[Kiến trúc của dti\_top\_frequency\_divider]{\bfseries \fontsize{12pt}{0pt}\selectfont Kiến trúc của dti\_top\_frequency\_divider}
-    \label{top_frequency_arc}
-\end{figure}
+  Bảng \ref{top_frequency_signal} cho miêu tả chức năng của các chân vào ra của khối. 
 
 \paragraph{dti\_cic\_decimator}
  Như đã trình bày ở mục \ref{cic_filter_ref}, với thiết kế bộ lọc CIC 4 tầng và hệ số Decimation 12x thì chúng ta cần đến 4 bộ cộng và 4 bộ trừ. Chúng ta có thể tăng tần số xử lý lên 4 lần, lúc này chỉ cần sử dụng 1 bộ cộng và 1 bộ trừ, điều này làm giảm tài nguyên phần cứng một cách đáng kể.
