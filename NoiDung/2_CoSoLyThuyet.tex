@@ -186,7 +186,7 @@ Hình \ref{sinewave_pdm_psd} mô tả mật độ phổ công suất của tín 
 Như đã trình bày ở trên, việc sử dụng mạch tích phân nhiều lần thay vì chỉ một lần là một cách cực kỳ hiệu quả để giảm nhiễu lượng tử hóa trong dải của bộ điều chế.
 
 
-Ở hình \ref{sinewave_to_pdm_different_orders}, hầu như không sự khác biệt nào để phân biệt tín hiệu khi tăng số bậc của bộ điều chế Sigma-Delta. 
+Ở hình \ref{sinewave_to_pdm_different_orders}, không sự khác biệt nào để phân biệt tín hiệu khi tăng số bậc của bộ điều chế Sigma-Delta. 
 
 Nhưng ở trường hợp này trong miền tần số sẽ có những thay đổi rõ rệt. Mặc dùng tỷ lệ Oversamling không đổi nhưng $SNR$ vẫn tăng từ $35dB$ lên $50.2dB$ (hình \ref{sinewave_pdm_psd_different_orders}).  Việc tăng số bậc sẽ không tối ưu vì khi ở một bậc nào đó chỉ số $SNR$ sẽ ngừng tăng, đối với trường hợp trên thì $SNR$ tối đa là $51dB$.
 
@@ -369,88 +369,9 @@ Bắt đầu với bộ lọc trung bình động với độ dài bằng 4 có 
     \label{cic_1}
 \end{figure}
 
-Việc thực hiện trên trung bình 4 mẫu, yêu cầu 3 phần tử trễ và 3 bộ cộng. Và hành động chia ban đầu cho 4 là để đảm bảo rằng bộ lọc có mức tăng đơn vị. Ở các bước sau để thuận tiện, chúng ta sẽ loại bỏ yếu tố đó.
+Việc thực hiện trên trung bình 4 mẫu, yêu cầu 3 phần tử trễ và 3 bộ cộng. Và hành động chia ban đầu cho 4 là để đảm bảo rằng bộ lọc có mức tăng đơn vị. 
 
-Như đã đề cập ở phần trên, không có số nhân trong thiết kế này, nhưng 3 bộ cộng hơi khó có thể được chấp nhận, đặc biệt vì con số đó sẽ tăng lên tương ứng đối với các bộ lọc trung bình động có độ dài dài hơn.
-
-\begin{equation}\label{cic_pt1}
-  \begin{aligned}
-        y(3) &= x(3) + x(2) + x(1) + x(0)\\
-        y(4) &=  x(4) + x(3) + x(2) + x(1)\\
-        \Rightarrow y(4) &=  y(3) + x(4) -x(0)\\
-\end{aligned}  
-\end{equation}
-
-Từ phương trình \ref{cic_pt1}, ta có công thức tổng quát như \ref{cic_pt2}.
-\begin{equation} \label{cic_pt2}
-    y(n) = y(n-1) + x(n) - x(n-4)
-\end{equation}
-
-Phương trình ban đầu đã được chuyển đổi thành một phép toán đệ quy trong đó đầu ra của chu kỳ trước được sử dụng lại cho đầu ra tiếp theo. Phần cứng sẽ có kiến trúc như hình \ref{cic_3}. Phần có đường trễ và bộ trừ được gọi là “comb”, phần đệ quy phản hồi đầu ra trước đó được gọi là "integrator".
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=11cm]{Images/Chuong2/cic/cic_3.png}
-    \caption[Kiến trúc của bộ lọc trung bình động sau khi thêm đệ quy]{\bfseries \fontsize{12pt}{0pt}\selectfont Kiến trúc của bộ lọc trung bình động sau khi thêm đệ quy}
-    \label{cic_3}
-\end{figure}
-
-Lúc này, kiến trúc đã thêm 2 thanh ghi độ trễ và một bộ trừ, nhưng đã tiết kiệm được rất nhiều bộ cộng. Và 2 thanh ghi trễ này là chi phí một lần để chuyển đổi sang cấu hình đệ quy. Lúc này, chúng ta có thể thay đổi vị "comb" và "integrator" với nhau (hình \ref{cic_2}). Trong trường hợp này, thay vì đầu ra có đệ quy thì bây giờ tích lũy $x$ và trừ đi phân tích lũy sau đó.
-
-Ta có:
-\begin{equation} \label{cic_pt3}
-    a(n) = x(n) + a(n-1)
-\end{equation}
-
-Khi đó đầu ra sẽ biểu diễn theo công thức \ref{cic_pt4}.
-\begin{equation} \label{cic_pt4}
-    y(n) = a(n) - a(n-4)
-\end{equation}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=11cm]{Images/Chuong2/cic/cic_2.png}
-    \caption[Kiến trúc của bộ lọc trung bình động sau khi thay đổi vị trí]{\bfseries \fontsize{12pt}{0pt}\selectfont Kiến trúc của bộ lọc trung bình động sau khi thay đổi vị trí}
-    \label{cic_2}
-\end{figure}
-
-Đầu ra $y$ vẫn là tổng của 4 đầu vào cuối cùng, chứng minh ở phương trình \ref{cic_pt5}.
-\begin{equation} \label{cic_pt5}
-\begin{aligned}
-    y(n) &= a(n) - a(n-4)\\
-    &= x(n) + a(n-1) - a(n-4)\\
-    &= x(n) + x(n-1) + a(n-2) - a(n-4)\\
-    &= x(n) + x(n-1) + x(n-2) + a(n-3) - a(n-4)\\
-    &= x(n) + x(n-1) + x(n-2) + x(n-3) + a(n-4) - a(n-4)\\
-    &= x(n) + x(n-1) + x(n-2) + x(n-3) \\
-\end{aligned}
-\end{equation}
-Việc liên tục tích $x$ vào $a$ cuối cùng sẽ dẫn đến tràn $a$. Tuy nhiên, khi tính toán đúng các bit các thanh ghi độ trễ, phần "comb" sẽ tự động chống lại sự tràn này, khi đó kết quả sẽ đúng.
-
-Để tăng độ suy giảm, chúng ta có thể xếp tầng nhiều bộ lọc trung bình động, như hình \ref{cic_4}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=14cm]{Images/Chuong2/cic/cic_4.png}
-    \caption[Kiến trúc mới của bộ lọc trung bình động]{\bfseries \fontsize{12pt}{0pt}\selectfont Kiến trúc mới của bộ lọc trung bình động}
-    \label{cic_4}
-\end{figure}
-Bây giờ có thể sắp xếp lại các khối ở trên và nhóm các bộ "integrator"  và "comb" lại với nhau mà không làm thay đổi kết quả toán học, như hình \ref{cic_5}
-
-\begin{figure}[ht!]
-    \centering
-    \includegraphics[width=14cm]{Images/Chuong2/cic/cic_5.png}
-    \caption[Kiến trúc mới của bộ lọc trung bình động sau khi đổi vị trí của các khối]{\bfseries \fontsize{12pt}{0pt}\selectfont Kiến trúc mới của bộ lọc trung bình động sau khi đổi vị trí của các khối}
-    \label{cic_5}
-\end{figure}
-Bộ "integrator" luôn có chính xác 1 thanh ghi độ trễ, trong khi "comb" có nhiều độ trễ bằng số lượng mẫu của đường trung bình động. Nếu bộ lọc trung bình động yêu cầu độ dài cao đồng nghĩa với việc xếp nhiều bộ lọc đó lại với nhau, từ đó vẫn có rất nhiều thanh ghi độ trễ.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=14cm]{Images/Chuong2/cic/cic_6.png}
-    \caption[Kiến trúc mới của bộ lọc trung bình động với decimation]{\bfseries \fontsize{12pt}{0pt}\selectfont Kiến trúc mới của bộ lọc trung bình động với decimation}
-    \label{cic_6}
-\end{figure}
-Nhưng khi sử dụng cùng kỹ thuật hạ tốc (decimation), áp dụng vào trong ví dụ trên, chúng ta phải loại đi 3 mẫu trong 4 mẫu và tốc độ đầu ra $y^\prime(n)$, bằng $1/4$ tốc độ của đầu vào $x(n)$. Mô tả ở hình \ref{cic_6}.
+Như đã đề cập ở phần trên, không có số nhân trong thiết kế này, nhưng 3 bộ cộng hơi khó có thể được chấp nhận, đặc biệt vì con số đó sẽ tăng lên tương ứng đối với các bộ lọc trung bình động có độ dài dài hơn. Từ \cite{cic_opt}, bộ lọc trung bình động đã được tối ưu và đưa ra kiến trúc CIC như hình \ref{cic_7}.
 
 \begin{figure}[H]
     \centering
@@ -458,9 +379,8 @@ Nhưng khi sử dụng cùng kỹ thuật hạ tốc (decimation), áp dụng v�
     \caption[Kiến trúc giản lược của bộ lọc trung bình động với decimation]{\bfseries \fontsize{12pt}{0pt}\selectfont Kiến trúc giản lược của bộ lọc trung bình động với decimation}
     \label{cic_7}
 \end{figure}
-Lúc này, chúng ta có thể di chuyển bộ hạ tần vào giữa. Việc này giúp giảm số phần tử trễ ở phần "comb" xuống bằng $1/N$. Với ví dụ trên, đã giảm số phần tử trễ của bộ "comb" xuống thành 1, mô tả như hình \ref{cic_7}.
 
-\textbf{Kết luận}: Khi sử dụng decination (hạ tần), bộ lọc trung bình động có thiết kế ban đầu bao gồm $N$ bộ trễ, $N-1$ bộ cộng chạy ở tần số mẫu đầu vào đã giảm xuống chỉ còn 2 bộ trễ, 1 bộ cộng, 1 bộ trừ và 1 nửa kiến trúc chạy với tốc độ lấy mẫu đầu ra. Thiết kế mới này được gọi là bộ lọc CIC - Cascaded Integrator Com.
+Khi sử dụng decination (hạ tần), bộ lọc trung bình động có thiết kế ban đầu bao gồm $N$ bộ trễ, $N-1$ bộ cộng chạy ở tần số mẫu đầu vào đã giảm xuống chỉ còn 2 bộ trễ, 1 bộ cộng, 1 bộ trừ và 1 nửa kiến trúc chạy với tốc độ lấy mẫu đầu ra. Thiết kế mới này được gọi là bộ lọc CIC - Cascaded Integrator Com.
 
 Đối với các bộ CIC nhiều tầng, chúng ta chỉ việc cần thêm các khối "comb" và "integrator" và nhóm chúng lại cùng một thứ tự. Hình \ref{cic_8} là ví dụ của một bộ lọc CIC decimation 3 tầng.
 \begin{figure}[H]
