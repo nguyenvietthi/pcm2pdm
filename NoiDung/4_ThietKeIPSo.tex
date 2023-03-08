@@ -87,7 +87,7 @@ pcm\_clk          & ra               & 1                    & \begin{tabular}[c]
     \label{top_signal}
 \end{table}
 
-Điều đặc biệt của thiết kế là các tham số của các bộ lọc sẽ được sinh ra từ các tính toán trên phần mềm sử dụng \textbf{Python}. Đồng nghĩa với việc, chúng ta chỉ cần điền các thông số yêu cầu ví dụ như \textbf{Dải thông}, \textbf{Dải dừng}, \textbf{Độ suy hao dải dừng}, \textbf{Độ gợn sóng của dải thông} vào phần mềm. Nó sẽ tự động tính toán và nạp các hệ số bộ lọc, tối ưu các độ rộng bit của mỗi sau bộ lọc và sau đó sẽ nạp vào RTL code. Từ đây, chúng ta có thể thiết kế bộ lọc cho bất kỳ thiết bị microphone nào. Ở trong thiết kế này, chúng ta sẽ chỉ tập trung và tối ưu thiết kế cho thiết bị\textbf{MP34DT01-M}.
+Điều đặc biệt của thiết kế là các tham số của các bộ lọc sẽ được sinh ra từ các tính toán trên phần mềm sử dụng \textbf{Python}. Đồng nghĩa với việc, chúng ta chỉ cần điền các thông số yêu cầu ví dụ như \textbf{Dải thông}, \textbf{Dải dừng}, \textbf{Độ suy hao dải dừng}, \textbf{Độ gợn sóng của dải thông} vào phần mềm. Nó sẽ tự động tính toán và nạp các hệ số bộ lọc, tối ưu các độ rộng bit của mỗi sau bộ lọc và sau đó sẽ nạp vào RTL code. Từ đây, chúng ta có thể thiết kế bộ lọc cho bất kỳ thiết bị microphone nào. Ở trong thiết kế này, chúng ta sẽ chỉ tập trung và tối ưu thiết kế cho thiết bị \textbf{MP34DT01-M}.
 
 
 \begin{table}[H]
@@ -471,71 +471,72 @@ Tín hiệu PDM được đọc từ tệp text thu được bộ điều chế 
 
 \subsubsection{Kết quả mô phỏng}
 \paragraph{Tín hiệu nhiều thành phần sin}
-Như ở trong \hyperref[chuong3]{chương 3}, tín hiệu 3 thành phần gồm 3 sóng sin có tần số lần lượt 4 kHz, 13 kHz, 22 kHz như phương trình \ref{3sin2}.
-\begin{equation} \label{3sin2}
-    x(t) = \frac{0.4}{3} (sin(2\pi \times 4000\times t) + sin(2\pi \times 13000\times t) + sin(2\pi \times 22000\times t))
+Như ở trong \hyperref[chuong3]{chương 3}, tín hiệu đầu vào chứa các thành phần gồm các sóng sin trong dải tần từ 0 - 24 kHz, mỗi thành phần tần số sẽ cách nhau 0.01 kHz và được biểu diễn như phương trình \ref{3sin}.
+\begin{equation} \label{3sin}
+    x(t) = \frac{0.5}{2400}\sum^{2400}_{f = 1}sin(2\pi \times 100 \times f \times t)
 \end{equation}
 
-Ban đầu chúng ta sẽ cấu hình độ rộng của PCM là 20.
+Do bộ lọc trên phần mềm đã được kiểm chứng ở chương 3 cho nên bây giờ chúng ta sẽ so sánh tín hiệu đầu ra của phần cứng so với phần mềm để đưa ra kết luận.
 
-Hình \ref{sin_1} và \ref{sin_1_1} miêu tả biểu đồ thời gian của tín hiệu PCM sau mô phỏng của cả phần cứng và phần mềm. Ở miền này hầu như chúng ta không thể nhận ra sự khác biệt. Các thần phần tần số 13 kHz, 22 kHz đã được loại bỏ chỉ còn sóng sin của tần số 4 kHz tồn tại.
 
-Để kết luận một cách rõ ràng hơn, chúng sẽ xem xét miền tần số của 2 tín hiệu. Hình \ref{psd_sin_1}, hình \ref{psd_sin_1_1} mô tả biểu đồ phổ mật độ công suất của 2 tín hiệu trên. Vì 2 thành phần tần số 13 kHz và 22 kHz nằm trong dải dừng (thành phần bị loại bỏ) và nó có biên độ bằng thành phần tần số 4 kHz (nằm trong dải thông), chúng ta có thể lấy độ chênh lệch của các thành phần tần số này trong miền tần số để kết luận về độ suy hao của dải dừng.
+Hình \ref{sin_1} và \ref{sin_1_h} miêu tả biểu đồ thời gian của tín hiệu PCM sau mô phỏng của cả phần cứng và phần mềm. Ở miền này chúng ta không thể nhận ra sự khác biệt giữa 2 tín hiệu. Vì vậy, để kết luận một cách rõ ràng hơn, chúng sẽ xem xét miền tần số của 2 tín hiệu. Hình \ref{sin_1_psd}, hình \ref{sin_1_psd_h} mô tả biểu đồ phổ mật độ công suất của 2 tín hiệu trên.
+
+Ta thấy, các điểm tần số chuyển tiếp giữa các vùng (dải thông, dải chuyển tiếp, dải dừng) giữa 2 tín hiệu là giống giống nhau. Tuy nhiên, khi chúng ta tập trung vào dải dừng, với phần mềm độ suy hao ở dải đó cao nhất là 146.721 dB, còn phần cứng là 134.789, chênh lệch nhau 11.932 dB. 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=14cm]{Images/Chuong4/tb/sim/sin_1.png}
-    \caption[Miền thời gian của tín hiệu mô phỏng bằng phần cứng với độ rộng PCM là 20]{\bfseries \fontsize{12pt}{0pt}\selectfont Miền thời gian của tín hiệu mô phỏng bằng phần cứng với độ rộng PCM là 20}
+    \includegraphics[width=12cm]{Images/Chuong4/tb/sim/sin_1.png}
+    \caption[Miền thời gian của tín hiệu mô phỏng bằng phần mềm]{\bfseries \fontsize{12pt}{0pt}\selectfont Miền thời gian của tín hiệu mô phỏng bằng phần mềm}
     \label{sin_1}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=14cm]{Images/Chuong4/tb/sim/sin_1_1.png}
-    \caption[Miền thời gian của tín hiệu mô phỏng trên phần mềm với độ rộng PCM là 20]{\bfseries \fontsize{12pt}{0pt}\selectfont Miền thời gian của tín hiệu mô phỏng trên phần mềm}
-    \label{sin_1_1}
+    \includegraphics[width=12cm]{Images/Chuong4/tb/sim/sin_1_h.png}
+    \caption[Miền thời gian của tín hiệu mô phỏng bằng phần cứng]{\bfseries \fontsize{12pt}{0pt}\selectfont Miền thời gian của tín hiệu mô phỏng bằng phần cứng}
+    \label{sin_1_h}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=14cm]{Images/Chuong4/tb/sim/psd_sin_1.png}
-    \caption[Phổ của tín hiệu mô phỏng bằng phần cứng với độ rộng PCM là 20]{\bfseries \fontsize{12pt}{0pt}\selectfont  Phổ của tín hiệu mô phỏng bằng phần cứng với độ rộng PCM là 20}
-    \label{psd_sin_1}
+    \includegraphics[width=12cm]{Images/Chuong4/tb/sim/sin_1_psd.png}
+    \caption[Miền thời gian của tín hiệu mô phỏng bằng phần cứng]{\bfseries \fontsize{12pt}{0pt}\selectfont Miền thời gian của tín hiệu mô phỏng bằng phần cứng}
+    \label{sin_1_psd}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=14cm]{Images/Chuong4/tb/sim/psd_sin_1_1.png}
-    \caption[ Phổ của tín hiệu mô phỏng bằng phần mềm]{\bfseries \fontsize{12pt}{0pt}\selectfont  Phổ của tín hiệu mô phỏng bằng phần mềm }
-    \label{psd_sin_1_1}
+    \includegraphics[width=12cm]{Images/Chuong4/tb/sim/sin_1_psd_h.png}
+    \caption[Miền thời gian của tín hiệu mô phỏng bằng phần cứng]{\bfseries \fontsize{12pt}{0pt}\selectfont Miền thời gian của tín hiệu mô phỏng bằng phần cứng}
+    \label{sin_1_psd_h}
 \end{figure}
+Nếu chúng ta lấy chuẩn của phần mềm độ suy hao dải dừng là 90.7 dB (hình \ref{d}) thì độ suy hao dải dừng của phần cứng chỉ đạt 78.768 dB, không đáp ứng được với chỉ tiêu thiết kế đặt ra là 89 dB. Những sai số đó gây ra bởi độ rộng của PCM lấy mẫu, số bit bị cắt bỏ sau mỗi tầng lọc để giảm tài nguyên và sử dụng tính toán fixed-point.
 
-Chúng ta có thể dễ dàng nhận thấy (hình \ref{psd_sin_1}, \ref{psd_sin_1_1}), độ suy hao giảm khoảng 8 dB ở thiết kế phần cứng so với mô phỏng phần mềm. Tuy nhiên nó vẫn nằm gần khoảng giá trị 89 dB, điều này đã đáp ứng được yêu cầu thiết kế của dải dừng. Tuy nhiên ở các thành phần tín hiệu nhiễu trong dải dừng có vẻ tăng đột ngột và độ chính xác so với phần mềm không cao.
-
-Ở dải thông, thiết kế đã đáp ứng được trong khoảng tần số 0 - 6kHz, tuy nhiên có 1 số thành phần tần số khác có độ chính xác không cao so với phần mềm. Ở tần số 6 kHz đã có sự chuyển đến tần số 10 kHz, vì vậy đã đáp ứng được yêu cầu dải chuyển tiếp.
-
-Từ điểm 10 kHz trở đi dải dừng ổn định nhưng với độ suy hao cao hơn nhiều so với độ suy hao bằng mô phỏng phần mềm.
-
-Những sai số đó gây ra bởi độ rộng của PCM lấy mẫu, số bit bị cắt bỏ sau mỗi tầng lọc để giảm tài nguyên. Để kiểm tra về tác nhân gây sai số, chúng ta tăng độ rộng của PCM lên 24 bit và chạy lại mô phỏng.
-
-Về biểu đồ thời gian (hình \ref{sin_2}) không có gì khác biệt so với mô phỏng với phần mềm và trường hợp độ rộng PCM là 20 bit. Chúng ta sẽ xem xét rõ hơn ở miền tần số.
-
-Hình \ref{psd_sin_2} mô tả biều đồ mật độ công suất của tín hiệu PCM đầu ra với trường hợp độ rộng bit là 24 bit. Độ suy hao đã bám sát giá trị 89 dB với độ chênh lệch là 0.077 dB. Các thành phần tín hiệu ở các tần số khác được hiện thị rõ ràng hơn so với trường hợp 20 bit. Dải chuyển tiếp có độ sâu hơn. Hình dạng của mật độ công suất đã gần như giống với tín hiệu được mô phỏng bằng phần mềm.
-
-Chúng ta có thể tăng độ rộng bit của PCM lên để đạt được các thông số tốt hơn và giống với phần mềm. Tuy nhiên điều đó gây tốn tài nguyên. Với số bit là 24 thì đã hoàn toàn đáp ứng được với thiết kế. Thật vậy, ở dạng âm thanh chất lượng cao thì độ rộng của PCM thường là 24.
+Lúc này điểm mạnh của thiết kế là linh động các bộ tham số khác nhau sẽ được phát huy. Lúc này chúng ta sẽ tăng tham số độ suy hao dải dừng lên 110 dB và đưa vào phần mềm để tính toán các "parameter" để đưa vào code RTL. Nó sẽ tự động đưa ra các tham số, các hệ số của bộ lọc để tối ưu nhất cho phần cứng. Hình \ref{filter_inc} mô tả đáp ứng xung của từng bộ lọc sau khi tăng độ suy hao dải dừng và sử dụng fixed-point.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=14cm]{Images/Chuong4/tb/sim/sin_2.png}
-    \caption[Miền thời gian của tín hiệu mô phỏng trên phần mềm với độ rộng PCM là 24]{\bfseries \fontsize{12pt}{0pt}\selectfont  Miền thời gian của tín hiệu mô phỏng trên phần mềm với độ rộng PCM là 24}
-    \label{sin_2}
+    \includegraphics[width=14cm]{Images/Chuong4/tb/sim/filter_inc.png}
+    \caption[Đáp ứng tần số của các bộ lọc sau  khi tăng độ suy hao dải dừng và fixed-point các hệ số]{\bfseries \fontsize{12pt}{0pt}\selectfont Đáp ứng tần số của các bộ lọc sau  khi tăng độ suy hao dải dừng và fixed-point các hệ số}
+    \label{filter_inc}
 \end{figure}
+Lúc này số "taps" của Half Band (1), Half Band (2), FIR sẽ lần lượt là 15, 23 và 57.            
+Tiến hành mô phỏng trên bộ lọc mới, chúng ta thu được tín hiệu trên miền thời gian như hình \ref{sin_2_h}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=14cm]{Images/Chuong4/tb/sim/psd_sin_2.png}
-    \caption[Phổ của tín hiệu mô phỏng bằng phần cứng với độ rộng PCM là 24]{\bfseries \fontsize{12pt}{0pt}\selectfont  Phổ của tín hiệu mô phỏng bằng phần cứng với độ rộng PCM là 24 }
-    \label{psd_sin_2}
+    \includegraphics[width=12cm]{Images/Chuong4/tb/sim/sin_2_h.png}
+    \caption[Miền thời gian của tín hiệu mô phỏng bằng phần cứng với độ suy hao mới]{\bfseries \fontsize{12pt}{0pt}\selectfont Miền thời gian của tín hiệu mô phỏng bằng phần cứng với độ suy hao mới}
+    \label{sin_2_h}
+\end{figure}
+
+Hình \ref{sin_2_psd_h} mô tả phổ của tín hiệu PCM với thiết kế độ suy hao mới. Lúc này nếu lấy độ suy hao dải cao nhất ở dải dừng ở thiết kế cũ làm tham chiếu (146.721 dB) thì với bộ lọc hiện tại (147.584 dB) độ suy hao của dải dừng đã tăng lên 91.565 dB (147.584 - 146.721 + 90.7). Điều này đã hoàn toàn đáp ứng được các yêu cầu thiết kế đưa ra.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=12cm]{Images/Chuong4/tb/sim/sin_2_psd_h.png}
+    \caption[Miền thời gian của tín hiệu mô phỏng bằng phần cứng với độ suy hao mới]{\bfseries \fontsize{12pt}{0pt}\selectfont Miền thời gian của tín hiệu mô phỏng bằng phần cứng với độ suy hao mới}
+    \label{sin_2_psd_h}
 \end{figure}
 
 \paragraph{Tín hiệu từ tệp âm thanh có sẵn}
@@ -553,8 +554,7 @@ Tiến hành mô phỏng với tệp nhạc có cả nhạc nền và giọng h�
     \label{vldd2_2}
 \end{figure}
 
-Hình \ref{vldd2_2} là biều đồ biểu thị 1 phần nhỏ tín hiệu gốc của tệp đề cập ở trên. Sau khi đi qua bộ chuyển đổi bằng phần cứng (hình \ref{vldd2_0}) và bộ chuyển đổi sử dụng tính toán bằng phần mềm (hình \ref{vldd2_1}), ta thấy được sự khác biệt giữa các biểu đồ. Tín hiệu gốc dường nhưng đã mất đi một phần tín hiệu nào đó khiến nó bị biến dạng. Tuy nhiên biểu đồ giữa mô phỏng bằng phần cứng và phần mềm lại được xem là giống nhau. Để hiểu rõ chi tiết hơn, chúng ta nên xem các tín hiệu trên biểu diễn trên miền tần số.
-
+Hình \ref{vldd2_2} là biều đồ biểu thị 1 phần nhỏ tín hiệu gốc của tệp đề cập ở trên. 
 \begin{figure}[H]
     \centering
     \includegraphics[width=14cm]{Images/Chuong4/tb/wav/vldd2_0.png}
@@ -568,6 +568,7 @@ Hình \ref{vldd2_2} là biều đồ biểu thị 1 phần nhỏ tín hiệu g�
     \caption[Biểu đồ miền thời gian của âm thanh sau sau khi chuyển đổi bằng phần mềm]{\bfseries \fontsize{12pt}{0pt}\selectfont  Biểu đồ miền thời gian của âm thanh sau sau khi chuyển đổi bằng phần mềm}
     \label{vldd2_1}
 \end{figure}
+Sau khi đi qua bộ chuyển đổi bằng phần cứng (hình \ref{vldd2_0}) và bộ chuyển đổi sử dụng tính toán bằng phần mềm (hình \ref{vldd2_1}), ta thấy được sự khác biệt giữa các biểu đồ trước và sau mô phỏng. Tín hiệu gốc đã mất đi một phần tín hiệu nào đó khiến nó bị biến dạng. Tuy nhiên biểu đồ giữa mô phỏng bằng phần cứng và phần mềm lại tương tự nhau. Để hiểu rõ chi tiết hơn, chúng ta nên xem các tín hiệu trên biểu diễn trên miền tần số.
 
 \begin{figure}[H]
     \centering
@@ -576,29 +577,31 @@ Hình \ref{vldd2_2} là biều đồ biểu thị 1 phần nhỏ tín hiệu g�
     \label{vldd2_psd_2}
 \end{figure}
 
-Hình \ref{vldd2_psd_2} mô tả mật độ phổ công suất của tín hiệu gốc. Chúng ta có thể thấy tín hiệu sẽ có đủ dải từ 0 - 24 kHz. Sau khi đưa qua mô phỏng tín hiệu đã bị lọc bỏ hết thành phần từ 6 - 24 kHz, điều này khiến ở miền thời gian tín hiệu sau khi chuyển đổi bị biến dạng. Hình \ref{vldd2_psd_0} và \ref{vldd2_psd_1} lần lượt là phổ của tín hiệu âm thanh sau khi đi qua mô phỏng phần cứng và phần mềm. Chúng ta có thể thấy ở dải thông, các thành phần tín hiệu ở dải tần số khá là tương tự nhau. Nó chỉ khác biệt là khi chuyển xuống dải dừng, độ suy hao của phần cứng sẽ chênh lệch với phần mềm khoảng 9 dB. Như đã đề cập ở phần trước thì độ chênh lệnh này không ảnh hưởng so với yêu cầu thiết kế là 89 dB.
 
-Khi nghe lại 2 tệp âm thanh trước và sau khi chuyển đổi bằng phần cứng, chúng ta có nhận xét sau đây: âm thanh sau khi chuyển đổi dường đi mất đi sự chi tiết, tươi sáng và sắc bén. 
+
+Hình \ref{vldd2_psd_2} mô tả mật độ phổ công suất của tín hiệu gốc. Chúng ta có thể thấy tín hiệu sẽ có đủ dải từ 0 - 24 kHz. Sau khi đưa qua mô phỏng tín hiệu đã bị lọc bỏ hết thành phần từ 6 - 24 kHz, điều này khiến ở miền thời gian tín hiệu sau khi chuyển đổi bị biến dạng. Hình \ref{vldd2_psd_0} và \ref{vldd2_psd_1} lần lượt là phổ của tín hiệu âm thanh sau khi đi qua mô phỏng phần cứng và phần mềm. Chúng ta có thể thấy ở dải thông, các thành phần tín hiệu ở dải tần số ở hai biểu đồ có độ suy hao giống nhau. Nó chỉ khác biệt là khi chuyển xuống dải dừng, độ suy hao của phần cứng sẽ chênh lệch với phần mềm khoảng 10 dB. Như đã đề cập ở phần trước thì độ chênh lệnh này không ảnh hưởng so với yêu cầu thiết kế là 89 dB.
+
+Khi nghe lại 2 tệp âm thanh trước và sau khi chuyển đổi bằng phần cứng, chúng ta có nhận xét sau đây: âm thanh sau khi chuyển đổi mất đi sự chi tiết, tươi sáng và sắc bén.
 
 Vì bộ chuyển đổi sẽ loại bỏ đi các thành phần ở tần số 6 - 24 kHz, thật trùng hợp vì đây cũng là dải tần số \textbf{Treble} (6 kHz - 20 kHz) của âm thanh. Mà dải này đảm nhận vai trò tăng độ chi tiết cho âm thanh, do đó tín hiệu nghe được bị mất cảm xúc cũng là điều hoàn toàn đúng.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=14cm]{Images/Chuong4/tb/wav/vldd2_psd_0.png}
+    \includegraphics[width=13cm]{Images/Chuong4/tb/wav/vldd2_psd_0.png}
     \caption[Biểu đồ phổ của âm thanh sau khi chuyển đổi bằng phần cứng]{\bfseries \fontsize{12pt}{0pt}\selectfont  Biểu đồ phổ của âm thanh sau khi chuyển đổi bằng phần cứng}
     \label{vldd2_psd_0}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=14cm]{Images/Chuong4/tb/wav/vldd2_psd_1.png}
+    \includegraphics[width=13cm]{Images/Chuong4/tb/wav/vldd2_psd_1.png}
     \caption[Biểu đồ phổ của âm thanh sau sau khi chuyển đổi bằng phần mềm]{\bfseries \fontsize{12pt}{0pt}\selectfont  Biểu đồ phổ của âm thanh sau sau khi chuyển đổi bằng phần mềm}
     \label{vldd2_psd_1}
 \end{figure}
 
 Tiến hành mô phỏng với tệp nhạc chỉ có giọng người.
 
-Quan sát hình \ref{vocal_psd}, tín hiệu đầu vào gốc chỉ ổn định đến tần số 10 kHz, đồng nghĩa với việc giọng nói không thu đủ dài tần (giọng của người có giọng tầm). Tín hiệu sau qua bộ chuyển đổi có phổ đã đáp ứng được yêu cầu thiết kế đã đặt ra từ trước.
+Quan sát hình \ref{vocal_psd}, tín hiệu đầu vào gốc chỉ ổn định đến tần số 10 kHz, đồng nghĩa với việc giọng nói không thu đủ dài tần (giống với dải thu của microphone đã giới thiệu ở trên). Tín hiệu sau qua bộ chuyển đổi có phổ đã đáp ứng được yêu cầu thiết kế đã đặt ra từ trước.
 
 \begin{figure}[H]
     \centering
@@ -607,11 +610,11 @@ Quan sát hình \ref{vocal_psd}, tín hiệu đầu vào gốc chỉ ổn địn
     \label{vocal_psd}
 \end{figure}
 
-Hình \ref{vocal} mô tả tín hiệu trước và sau chuyển đổi trên miền thời gian. Vì dải tần bị cắt trên tín hiệu gốc có cường độ không cao nên hầu như không có sự khác nhau giữa các biểu đồ. Thật vậy, lúc nghe lại kết quả, không có sự khác biệt giữa trước và sau.
+Hình \ref{vocal} mô tả tín hiệu trước và sau chuyển đổi trên miền thời gian. Vì tín hiệu âm thanh giọng nói ở dải dừng có cường độ không cao nên sau khi xử lý không có sự khác biệt giữa gốc và sau mô phỏng.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=13cm]{Images/Chuong4/tb/wav/vocal.png}
+    \includegraphics[width=12cm]{Images/Chuong4/tb/wav/vocal.png}
     \caption[Biểu đồ thời gian của âm thanh chỉ giọng nói trước và sau mô phỏng]{\bfseries \fontsize{12pt}{0pt}\selectfont Biểu đồ thời của âm thanh chỉ giọng nói trước và sau mô phỏng}
     \label{vocal}
 \end{figure}
