@@ -6,7 +6,7 @@
 \setcounter{table}{0}
 Ở \hyperref[chuong2]{chương 2}, chúng ta đã trình bày thảo luận về bộ chuyển đổi Sigma-Delta, phổ của tín hiệu PDM từ micro, các bộ lọc khác nhau và cách tìm ra các hệ số phù hợp cho các bộ lọc đó. Chương này mô tả các yêu cầu thiết kế, cách kết hợp tất cả lại với nhau, tạo ra bộ chuyển đổi PDM sang PCM nhiều giai đoạn và kiểm thử thiết kế bằng ngôn ngữ \textit{Python}.
 \subsection{Tổng quan về hệ thống xử lý âm thanh số sử dụng MEMS Microphone}
-Hình \ref{audio_top} mô tả một hệ thông xử lý âm thanh cơ bản sử dụng PDM MEMS microphone. Tín hiệu tương tự sau khi thu bằng micro sẽ được điều chế thành tín hiệu số dạng PDM - biểu diễn bằng 1 bit và tốc độ lấy mẫu cao. Để phân tích và tái tạo lại âm thanh thu được chúng ta phải đưa tín hiệu đó vào một hệ thống xử lý âm thanh số. Bộ PDM2PCM có vai trò chuyển đổi tín hiệu PDM sang PCM, sau đó bộ DSP sẽ điều chỉnh, cân bằng lại để nâng cao hiệu suất. Để âm thanh được phát trực tiếp ra loa, tín hiệu phải được đưa về dạng tương tự thông qua bộ chuyển đổi số tương tự (Audio-Codec) và bộ khuếch đại tín hiệu.
+Hình \ref{audio_top} mô tả một hệ thông xử lý âm thanh cơ bản sử dụng PDM MEMS microphone. Tín hiệu tương tự sau khi thu bằng micro sẽ được điều chế thành tín hiệu số dạng PDM - biểu diễn bằng 1 bit và tốc độ lấy mẫu cao. Để phân tích và tái tạo lại âm thanh thu được chúng ta phải đưa tín hiệu đó vào một hệ thống xử lý âm thanh số. Bộ PDM2PCM có vai trò chuyển đổi tín hiệu PDM sang PCM, sau đó bộ DSP sẽ điều chỉnh, cân bằng lại để nâng cao hiệu suất. Để âm thanh được phát trực tiếp ra loa, tín hiệu phải được đưa về dạng tương tự thông qua bộ chuyển đổi số tương tự (Audio Codec) và bộ khuếch đại tín hiệu.
 \begin{figure}[H]
     \centering
     \includegraphics[width=14cm]{Images/Chuong3/MoDau/audio_top.png}
@@ -133,9 +133,9 @@ Từ đó, chúng ta tóm tắt các yêu cầu thiết kế như bảng \ref{sp
 \end{table}
 
 
-\subsection{Thiết kế bộ lọc sử dụng hàm "remez" của Numpy}
+\subsection{Thiết kế bộ lọc sử dụng hàm "remez" của thư viện scipy}
 
-Ở trong đề tài này, chúng ta sẽ thiết kế bộ lọc "Equiripple FIR" bằng thuật toán \textbf{Parks-McClellan} \cite{rao2018digital}. Trong thư viện \textit{Numpy} đã có sẵn hàm chức năng \textit{remez} để thiết kế các bộ lọc theo thông số được đặt ra, việc triển khai sẽ sử dụng ngôn ngữ \textit{Python}.
+Ở trong đề tài này, chúng ta sẽ thiết kế bộ lọc "Equiripple FIR" bằng thuật toán \textbf{Parks-McClellan} \cite{rao2018digital}. Trong thư viện \textit{scipy} đã có sẵn hàm chức năng \textit{remez} để thiết kế các bộ lọc theo thông số được đặt ra, việc triển khai sẽ sử dụng ngôn ngữ \textit{Python}.
 
 Dưới đây là mô tả của hàm remez:
 \begin{table}[H]
@@ -159,7 +159,7 @@ Hàm sẽ trả về mảng chứa các đáp ứng xung của bộ lọc và c�
 
 \noindent \textbf{Tìm số lượng taps tối ưu cho bộ lọc} \label{toiuu}
 
-Lần lượt tăng N từ giá trị 1, sau đó đưa các tham số vào hàm \textbf{remez}, nó sẽ trả về độ suy hao của dải dừng và độ gợn sóng của dải thông. Lần lượt so sánh nó với yêu cầu đầu ra đã đặt ra. Đến khi hàm trả về kết quả lớn hơn hoặc bằng với yêu cầu thiết kế thì N ở vị trí này là số "taps" tối ưu nhất cho bộ lọc.
+Lần lượt tăng N từ giá trị 1, sau đó đưa các tham số vào hàm \textbf{remez}, nó sẽ trả về độ suy hao của dải dừng và độ gợn sóng của dải thông. Lần lượt so sánh nó với yêu cầu đầu ra đã xác định từ trước. Đến khi hàm trả về kết quả lớn hơn hoặc bằng với yêu cầu thiết kế thì N ở vị trí này là số "taps" tối ưu nhất cho bộ lọc.
 \begin{figure}[H]
     \centering
     \includesvg[width=14cm]{Images/Chuong3/MoDau/test_fir.svg}
@@ -252,7 +252,7 @@ Hình \ref{cic_ratios_overview} mô tả đáp ứng tần số của bộ lọc
     \item \textbf{Tỷ lệ Decimation 12x và số tầng 4}: mặc dùng phương án này chưa đáp ứng được độ gợn sóng của dải thông (0.056 db, vượt 0.006 dB so với yêu cầu), nhưng chênh lệch này rất nhỏ. Với phương án này yêu cầu thêm 2 bộ lọc Half Band và 1 bộ lọc FIR. \label{choose}
 \end{enumerate}
 
-Các phương án có tỷ lệ Decimation từ 4 trở xuống hoàn toàn có thể đáp ứng được thiết kế. Tuy nhiên, việc chọn như thế sẽ gây nên hệ số decimation cho các bộ lọc phía sau lớn, đồng nghĩa với việc phải sử dụng nhiều bộ lọc Half Band gây tốn nhiều tài nguyên. Trái với phương châm của thiết kế là sử dụng bộ CIC với thông số tối ưu nhất để các bộ lọc sau đơn giản nhất có thể.
+Các phương án có tỷ lệ Decimation từ 4 trở xuống hoàn toàn có thể đáp ứng được thiết kế. Tuy nhiên, việc chọn như thế sẽ gây nên hệ số decimation cho các bộ lọc phía sau lớn, đồng nghĩa với việc phải sử dụng nhiều bộ lọc Half Band gây tốn nhiều tài nguyên. Trái với phương châm đặt ra từ đầu của thiết kế là sử dụng bộ CIC với thông số tối ưu nhất để các bộ lọc sau đơn giản nhất có thể.
 
 \vspace{2cm}
 \begin{table}[H]
@@ -366,7 +366,7 @@ Các phương án có tỷ lệ Decimation từ 4 trở xuống hoàn toàn có 
 \end{tabular}
 \label{phepnhan}
 \end{table}
-Khi các thuộc tính của bộ lọc CIC đã được quyết định, thiết kế bộ lọc Half Band và FIR sẽ được chạy thuật toán Parks-McClellan/Remez và tối ưu (mục \ref{toiuu}) để đưa ra các hệ số bộ lọc chính xác. Từ đó, chúng ta có thể đưa ra số phép nhân xảy ra trong 1 giây, mô tả như bảng \ref{phepnhan}. Dễ dàng nhận ra \textbf{phương án 3} là phương án tối ưu nhất.
+Khi các thuộc tính của bộ lọc CIC đã được quyết định, thiết kế bộ lọc Half Band và FIR sẽ được chạy thuật toán Parks-McClellan/Remez và tối ưu (mục \ref{toiuu}) để đưa ra các hệ số bộ lọc chính xác. Từ đó, chúng ta có thể đưa ra số phép nhân xảy ra trong 1 giây, mô tả như bảng \ref{phepnhan}. Dễ dàng nhận ra \textbf{phương án 3} là phương án tối ưu nhất với số phép nhân trên 1 giây là bé nhất.
 
 Giờ thì chúng ta có thể thấy rõ sự khác biệt giữa 2 kiến trúc đơn giản (mục \ref{dongian}) và sử dụng nhiều bộ lọc trên nhiều miền tần số khác nhau. Với 3504k phép nhân trên 1 giây so với 106M phép nhân trong 1 giây, nó được cải thiện hơn 30 lần.
 \paragraph{Thiết kế bộ lọc Half Band và FIR} \label{design_fir}
@@ -494,7 +494,7 @@ Tín hiệu này, sau đó sẽ đưa qua bộ điều chế Sigma-Delta. Chúng
     \label{sd2}
 \end{figure}
 
-Hình \ref{sd1} mô tả tín hiệu đầu vào là đường màu đỏ và đường xanh là tín hiệu PDM sau khi được điều chế. Điều chúng ta cần quan tâm ở đây là phổ của tín hiệu PDM (\ref{sd2}). Chúng ta có thể dễ dàng quan sát được, khu vực hình chữ nhật ở đầu tiên (đến đường nét đứt màu xanh lá cây) là tín hiệu các sóng sin từ 0 - 24 kHz  (có thể quan sát rõ ràng ở hình \ref{sd3}), đây là khu vực chúng ta cần quan tâm. Nhiễu lượng tử được đẩy sang miền tần số cao tách biệt với khu vực tần số chứa thông tin.
+Hình \ref{sd1} mô tả tín hiệu đầu vào là đường màu đỏ và đường xanh là tín hiệu PDM sau khi được điều chế. Điều chúng ta cần quan tâm ở đây là phổ của tín hiệu PDM (hình ref{sd2}). Chúng ta có thể dễ dàng quan sát được, khu vực hình chữ nhật ở đầu tiên (đến đường nét đứt màu xanh lá cây) là tín hiệu các sóng sin từ 0 - 24 kHz  (có thể quan sát rõ ràng ở hình \ref{sd3}), đây là khu vực chúng ta cần quan tâm. Nhiễu lượng tử được đẩy sang miền tần số cao tách biệt với khu vực tần số chứa thông tin.
 
 \begin{figure}[H]
     \centering
@@ -521,7 +521,7 @@ Hình \ref{psd_pcm} mô tả phổ của tín hiệu đầu ra của hệ thốn
     \label{psd_pcm}
 \end{figure}
 
-Ở điểm 10 kHz, đồ thị bắt đầu biến thiên nhỏ hơn. Cho nên đây là điểm bắt đầu của dải dừng và kết thúc dải thông. Ở dải tần số này (10 kHz - 24 kHz), độ suy hao cao nhất là 164.8165 dB. Nó chênh lệch so với suy hao ban đầu của PDM đầu vào là 91.1963 dB (164.8165 dB - 73.6202 dB) và đây được coi là độ suy hao của dải dừng, trong khi hệ thống chỉ yêu cầu độ suy hao dải dừng là 89 dB.
+Ở điểm 10 kHz, đồ thị bắt đầu biến thiên nhỏ hơn. Cho nên đây là điểm bắt đầu của dải dừng và kết thúc dải chuyển tiếp. Ở dải tần số này (10 kHz - 24 kHz), độ suy hao cao nhất là 164.8165 dB. Nó chênh lệch so với suy hao ban đầu của PDM đầu vào là 91.1963 dB (164.8165 dB - 73.6202 dB) và đây được coi là độ suy hao của dải dừng, trong khi hệ thống chỉ yêu cầu độ suy hao dải dừng là 89 dB.
 
 \textbf{Kết luận}: Hệ thống đã hoạt động đúng với yêu cầu thiết kế đã đặt ra. Các thành phần tần số không muốn được xem đã được loại bỏ. Tín hiệu trong khoảng tần số từ 0 - 6 kHz đã được lọc chính xác.
 

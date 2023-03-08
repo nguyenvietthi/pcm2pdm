@@ -6,7 +6,7 @@
 \setcounter{table}{0}
 Trong chương này, mô hình hệ thống chuyển đổi PDM sang PCM sử dụng nhiều giai đoạn đề cập ở \hyperref[chuong3]{chương 3} được thiết kế và kiểm thử ở mức RTL (Register Transfer Logic). Ngôn ngữ mô tả phần cứng SystemVerilog được sử dụng để xây dựng thiết kế cũng như testbench. Bản thiết kế cuối cùng được mô phỏng, kiểm thử trên phần mềm Mentor Questasim và môi trường \textbf{Python}.
 \subsection{Thiết kế}
-Với yêu cầu của hệ thống số là tối ưu diện tích và công suất. Ở thiết kế này sẽ sử dụng kỹ thuật tăng tần số làm sao để một bộ nhân hoặc bộ cộng có thể thực hiện nhiều phép toán trong 1 khoảng thời gian. Với các yêu cầu như mục \ref{spec_muc}, chúng ta tiến hành thiết kế như sau.
+Với yêu cầu của hệ thống số là tối ưu diện tích và công suất. Ở thiết kế này sẽ sử dụng kỹ thuật tăng tần số làm sao để một bộ nhân hoặc bộ cộng có thể thực hiện nhiều phép toán trong 1 khoảng thời gian. Với các yêu cầu thiết kế đã được nêu ở mục \ref{spec_muc}, chúng ta tiến hành thiết kế như sau.
 \subsubsection{Vấn đề về tính toán fixed-point cho các hệ số của bộ lọc} \label{fix-fil}
 Trong phần mềm, các phép tính toán truyền thống với số dấu phẩy động đều thực hiện
 trên GPU hay CPU. Nhưng khi đưa lên phần cứng, việc triển khai dấu phẩy động cực kỳ phức tạp và tốn tài nguyên. Do đó chúng ta cần chuyển đổi các hệ số của các bộ lọc sang dấu phẩy tĩnh, song song với đó phải đảm bảo các yêu cầu đã đặt ra của hệ thống.
@@ -33,7 +33,7 @@ Từ các hệ số của từng bộ lọc đã tìm được ở mục \ref{de
     \caption[Độ suy hao dải dừng và độ gợn sóng của bộ lọc FIR ứng với N khác nhau]{\bfseries \fontsize{12pt}{0pt}\selectfont Độ suy hao dải dừng và độ gợn sóng của bộ lọc FIR ứng với N khác nhau}
     \label{firrr}
 \end{figure}
-Từ đó, chúng ta có các biểu đồ mô tả độ suy hao dải dừng và độ gợn sóng trong từng trường hợp N khác nhau của từng bộ lọc lần lượt như hình \ref{hb111}, \ref{hb222}, \ref{firrr}. Nhận thấy với N bằng 18 thì 2 bộ lọc Half Band (1) và Half Band (2) đã đủ điều kiện. Tuy nhiên, đối với bộ lọc FIR thì N là 20, do vậy, chúng ta sẽ lấy chiều dài của toàn hệ thống là 20 để thuận tiện cho việc lưu trữ cũng như trích xuất dữ liệu. Không những thế, khi tăng N thì hệ số của HB1 và HB2 sẽ dần tiệm cận với hệ số gốc hơn.
+Từ đó, chúng ta có các biểu đồ mô tả độ suy hao dải dừng và độ gợn sóng trong từng trường hợp N khác nhau của từng bộ lọc lần lượt như hình \ref{hb111}, \ref{hb222}, \ref{firrr}. Nhận thấy với N bằng 18 thì 2 bộ lọc Half Band (1) và Half Band (2) đã đủ điều kiện. Tuy nhiên, đối với bộ lọc FIR thì N là 20, do vậy, chúng ta sẽ lấy chiều dài của toàn hệ thống là 20 để thuận tiện cho việc lưu trữ cũng như trích xuất các hệ số bộ lọc. Không những thế, khi tăng N thì hệ số của HB1 và HB2 sẽ dần tiệm cận với hệ số gốc hơn.
 \begin{figure}[H]
     \centering
     \includegraphics[width=17.5cm]{Images/Chuong4/hb1.png}
@@ -57,11 +57,11 @@ Chúng ta thu đáp ứng tần số của các bộ lọc sau khi quá trình f
 
 
 
-Theo quan sát, bộ lọc chỉ biến thiên lớn ở thông số suy giảm dải dừng, còn độ gợn sóng và các thông số còn lại hầu như không thay đổi. Độ suy giảm dải dừng giảm từ 0.794 dB đối với FIR, 3 và 5 dB với 2 bộ lọc còn lại, tuy nhiên độ suy giảm đó vẫn lớn hơn 89 dB (yêu cầu của hệ thống).
+Theo quan sát, bộ lọc chỉ khác nhau lớn ở thông số suy giảm dải dừng, còn độ gợn sóng và các thông số còn lại không thay đổi. Độ suy giảm dải dừng giảm từ 0.794 dB đối với FIR, 3 và 5 dB với 2 bộ lọc còn lại, tuy nhiên độ suy giảm đó vẫn lớn hơn 89 dB (yêu cầu của hệ thống).
 
 \textbf{Kết luận}: Chúng ta sẽ sử dụng tất cả hệ số nhân với $2^{20}$ để ép thành số nguyên (hệ thập phân).
 \subsubsection{Mô tả chung}
-Bộ chuyển đổi PDM sang PCM nhiều giai đoạn sử dụng Decimation (dti\_pdm2pcm) chuyển đổi dữ liệu PDM 1 bit với tốc lấy mẫu cao thành dữ liệu PCM với  tốc độc lấy mẫu thấp hơn. Tần số cấp cho bộ gấp 4 lần tần số lấy mẫu của PDM, từ tần số này sẽ cấp và chia tần ra các tần số cần thiết cho dti\_pdm2pcm. Tín hiệu PCM đầu ra sẽ đi kèm theo sườn dương của tín hiệu đồng hồ PCM đầu ra với độ rộng bit do người dùng quyết định (16 - 32 bit), độ rộng càng lớn thì chất lượng âm thanh đầu ra càng cao. Sơ đồ chân của dti\_pdm2pcm được mô tả như hình \ref{top_pdm2pcm}.
+Bộ chuyển đổi PDM sang PCM nhiều giai đoạn sử dụng Decimation (dti\_pdm2pcm) chuyển đổi dữ liệu PDM 1 bit với tốc lấy mẫu cao thành dữ liệu PCM với  tốc độc lấy mẫu thấp hơn. Tần số cấp cho bộ gấp 4 lần tần số lấy mẫu của PDM, từ tần số này sẽ cấp và chia tần ra các tần số cần thiết cho dti\_pdm2pcm. Tín hiệu PCM đầu ra sẽ đi kèm theo sườn dương của tín hiệu đồng hồ PCM đầu ra với độ rộng bit do người dùng quyết định (thường là 24 bit), độ rộng càng lớn thì chất lượng âm thanh đầu ra càng cao. Sơ đồ chân của dti\_pdm2pcm được mô tả như hình \ref{top_pdm2pcm}.
 
 \begin{figure}[H]
     \centering
@@ -471,8 +471,8 @@ Tín hiệu PDM được đọc từ tệp text thu được bộ điều chế 
 
 \subsubsection{Kết quả mô phỏng}
 \paragraph{Tín hiệu nhiều thành phần sin}
-Như ở trong \hyperref[chuong3]{chương 3}, tín hiệu đầu vào chứa các thành phần gồm các sóng sin trong dải tần từ 0 - 24 kHz, mỗi thành phần tần số sẽ cách nhau 0.01 kHz và được biểu diễn như phương trình \ref{3sin}.
-\begin{equation} \label{3sin}
+Như ở trong \hyperref[chuong3]{chương 3}, tín hiệu đầu vào chứa các thành phần gồm các sóng sin trong dải tần từ 0 - 24 kHz, mỗi thành phần tần số sẽ cách nhau 0.01 kHz và được biểu diễn như phương trình \ref{3sins}.
+\begin{equation} \label{3sins}
     x(t) = \frac{0.5}{2400}\sum^{2400}_{f = 1}sin(2\pi \times 100 \times f \times t)
 \end{equation}
 
@@ -512,7 +512,7 @@ Ta thấy, các điểm tần số chuyển tiếp giữa các vùng (dải thô
 \end{figure}
 Nếu chúng ta lấy chuẩn của phần mềm độ suy hao dải dừng là 90.7 dB (hình \ref{d}) thì độ suy hao dải dừng của phần cứng chỉ đạt 78.768 dB, không đáp ứng được với chỉ tiêu thiết kế đặt ra là 89 dB. Những sai số đó gây ra bởi độ rộng của PCM lấy mẫu, số bit bị cắt bỏ sau mỗi tầng lọc để giảm tài nguyên và sử dụng tính toán fixed-point.
 
-Lúc này điểm mạnh của thiết kế là linh động các bộ tham số khác nhau sẽ được phát huy. Lúc này chúng ta sẽ tăng tham số độ suy hao dải dừng lên 110 dB và đưa vào phần mềm để tính toán các "parameter" để đưa vào code RTL. Nó sẽ tự động đưa ra các tham số, các hệ số của bộ lọc để tối ưu nhất cho phần cứng. Hình \ref{filter_inc} mô tả đáp ứng xung của từng bộ lọc sau khi tăng độ suy hao dải dừng và sử dụng fixed-point.
+Lúc này điểm mạnh của thiết kế là linh động các bộ tham số khác nhau sẽ được phát huy. Lúc này chúng ta sẽ tăng tham số độ suy hao dải dừng lên 110 dB và đưa vào phần mềm để tính toán các "parameter" để đưa vào code RTL. Nó sẽ tự động đưa ra các tham số, các hệ số của bộ lọc để tối ưu nhất cho phần cứng. Hình \ref{filter_inc} mô tả đáp ứng xung của từng bộ lọc sau khi tăng độ suy hao dải dừng và sử dụng fixed-point (quá trình thực hiện đã được mô tả ở mục \ref{fix-fil}).
 
 \begin{figure}[H]
     \centering

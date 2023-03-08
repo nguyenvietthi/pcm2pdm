@@ -10,6 +10,43 @@ Chương này sẽ trình bày chi tiết về quá trình sử dụng Design Co
 Design Compiler là một công cụ tổng hợp logic, cho phép tổng hợp các mạch điện tử số từ ngôn ngữ Verilog hoặc VHDL sang mạch RTL (Register-Transfer Level) và sau đó là mạch gate-level để có thể được triển khai trên ASIC hoặc FPGA. 
 
 Thiết kế được tổng hợp với thư viện standard cell \textbf{dti\_tm28hpcp\_l30\_stdcells\_7t\_rev1p0p1} của \textbf{Dolphin Technology VietNam Center} bằng phần mềm \textbf{Design Compiler}. Chúng ta có các báo cáo sau:
+\subsubsection{Kết quả phân tích timing}
+Đây là phần cần quan tâm nhất sau khi tổng hợp, vì các quy định về mặt timing là 
+buộc phải tuân thủ.
+
+
+\begin{table}[H]
+\centering
+\caption[Báo cáo timing của thiết kế]{\bfseries \fontsize{12pt}{0pt}\selectfont Báo cáo timing của thiết kế}
+\begin{tabular}{|l|l|}
+\hline
+\multicolumn{1}{|c|}{\textbf{Thông tin}} & \multicolumn{1}{c|}{{\begin{tabular}[c]{@{}c@{}}\textbf{Giá trị}\\ (ns)\end{tabular}}} \\ \hline
+Chu kỳ Critical Path Clk & 50.00000 \\ \hline
+Critical Path Slack & 35.52476 \\ \hline
+Critical Path Length & 4.43226 \\ \hline
+\end{tabular}
+\label{syn_t}
+\end{table}
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=12cm]{Images/Chuong5/syn/timing.png}
+%     \caption[Báo cáo timing của thiết kế]{\bfseries \fontsize{12pt}{0pt}\selectfont Báo cáo timing của thiết kế}
+%     \label{syn_t}
+% \end{figure}
+
+Với yêu cầu của bộ thiết là tần số chạy không cao (9216 kHz) thì về mặt timing không có gì cần phải quan tâm vì nó chắc chắn sẽ thỏa mãn. Thật vậy:
+Đưa các ràng buộc về timing như sau:
+\begin{itemize}
+    \item Tần số tổng hợp: 20 MHz ($>$ 9216 kHz)
+    \item Độ trễ đầu vào: cao nhất là 0.4 chu kỳ clock
+    \item Độ trễ đầu đầu ra: cao nhất là 0.4 chu kỳ clock
+\end{itemize}
+
+Các thông số input delay và output delay được xác định khi ta ghép khối PDM2PCM 
+với các khối khác trong hệ thống. Các khối khác chưa được hoàn thiện nên ta đặt các ràng buộc mang tính tương đối.
+
+Báo cáo về mặt timing sẽ được mô tả ở bảng \ref{syn_t}. Ta thấy slack của critical path (đường có trễ cao nhất) đang dương rất lớn, từ đó có thể kết luận thiết kế thỏa mãn về timing.
 \subsubsection{Tài nguyên sử dụng}
 
 \begin{table}[H]
@@ -29,7 +66,7 @@ Tổng cộng                                                                   
     \label{area}
     \end{table}
 
-Bảng \ref{cell}, \ref{area} mô tả vể mặt vật lý, nó chỉ rõ ra các số lượng port, net, các cell combinational và sequential. Từ đó đưa ra tổng diện tích của thiết kế.
+Bảng \ref{cell}, \ref{area} mô tả về mặt vật lý, nó chỉ rõ ra các số lượng port, net, các cell combinational và sequential. Từ đó đưa ra tổng diện tích của thiết kế.
 Nhận thấy tổng diện tích là 5465.165932 ($\mu m^2$) là trung bình ở mức chấp nhận được với những IP chuyển đổi.
 \begin{table}[H]
 \centering
@@ -38,49 +75,40 @@ Nhận thấy tổng diện tích là 5465.165932 ($\mu m^2$) là trung bình �
 \hline
 \multicolumn{2}{|c|}{\textbf{Thông tin}}                    & \multicolumn{1}{c|}{\textbf{Số lượng}} \\ \hline
 \multicolumn{2}{|l|}{Số port}                               & 29                                     \\ \hline
-\multicolumn{2}{|l|}{Số lượng dây (nets)}                   & 6000                                   \\ \hline
-\multicolumn{1}{|l|}{\multirow{2}{*}{Số cell}}   & Tuần tự  & 5274                                   \\ \cline{2-3} 
-\multicolumn{1}{|l|}{}                           & Tổ hợp   & 5938                                   \\ \hline
+\multicolumn{2}{|l|}{Số lượng dây (nets)}                   & 6002                                   \\ \hline
+\multicolumn{1}{|l|}{\multirow{2}{*}{Số cell}}   & Tuần tự  & 1664                                   \\ \cline{2-3} 
+\multicolumn{1}{|l|}{}                           & Tổ hợp   & 4276                                   \\ \hline
 \multicolumn{2}{|l|}{Số lượng hộp đen (macros/black boxes)} & 0                                      \\ \hline
 \multicolumn{2}{|l|}{Số buffer/inveter}                     & 525                                    \\ \hline
-\multicolumn{2}{|l|}{Số phần tử tham chiếu (references)}    & 56                                     \\ \hline
 \end{tabular}
     \label{cell}
     \end{table}
-\subsubsection{Kết quả phân tích timing}
-Đây là phần cần quan tâm nhất sau khi tổng hợp, vì các quy định về mặt timing là 
-buộc phải tuân thủ.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=12cm]{Images/Chuong5/syn/timing.png}
-    \caption[Báo cáo timing của thiết kế]{\bfseries \fontsize{12pt}{0pt}\selectfont Báo cáo timing của thiết kế}
-    \label{syn_t}
-\end{figure}
-
-Với yêu cầu của bộ thiết là tần số chạy không cao (9216 kHz) thì về mặt timing không có gì cần phải quan tâm vì nó chắc chắn sẽ thỏa mãn. Thật vậy:
-Đưa các ràng buộc về timing như sau:
-\begin{itemize}
-    \item Tần số tổng hợp: 20 MHz ($>$ 9216 kHz)
-    \item Độ trễ đầu vào: cao nhất là 0.4 chu kỳ clock
-    \item Độ trễ đầu đầu ra: cao nhất là 0.4 chu kỳ clock
-\end{itemize}
-
-Các thông số input delay và output delay được xác định khi ta ghép khối PDM2PCM 
-với các khối khác trong hệ thống. Các khối khác chưa được hoàn thiện nên ta đặt các ràng buộc mang tính tương đối.
-
-Báo cáo về mặt timing sẽ được mô tả ở hình \ref{syn_t}. Ta thấy slack của critical path (đường có trễ cao nhất) đang dương rất lớn, từ đó có thể kết luận thiết kế thỏa mãn về timing.
 \subsubsection{Công suất}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=14cm]{Images/Chuong5/syn/power.png}
-    \caption[Báo cáo công suất của thiết kế]{\bfseries \fontsize{12pt}{0pt}\selectfont Báo cáo công suất của thiết kế}
-    \label{syn_power}
-\end{figure}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=14cm]{Images/Chuong5/syn/power.png}
+%     \caption[Báo cáo công suất của thiết kế]{\bfseries \fontsize{12pt}{0pt}\selectfont Báo cáo công suất của thiết kế}
+%     \label{syn_power}
+% \end{figure}
+
+
 
 Báo cáo về mặt công suất chỉ ra các thông số về mặt tiêu thụ năng nương, như năng 
-lượng chuyển mạch, dòng dò, năng lượng bản thân cho các cell hoạt động. Báo cáo được mô tả như hình \ref{syn_power}.
-
+lượng chuyển mạch, dòng dò, năng lượng bản thân cho các cell hoạt động. Báo cáo được mô tả như bảng \ref{syn_power}.
+\begin{table}[H]
+\centering
+\caption[Báo cáo công suất của thiết kế]{\bfseries \fontsize{12pt}{0pt}\selectfont Báo cáo công suất của thiết kế}
+\begin{tabular}{|l|l|}
+\hline
+\multicolumn{1}{|c|}{\textbf{Thông tin}} & \multicolumn{1}{c|}{\textbf{Giá trị}} \\ \hline
+Internal Power & 7.52089e-02 (mW) \\ \hline
+Switching Power & 1.97545e-03 (mW) \\ \hline
+Leakage Power & 332.52689 (nW) \\ \hline
+Tổng cộng & 7.75168e-02 (mW) \\ \hline
+\end{tabular}
+\label{syn_power}
+\end{table}
 \subsection{Triển khai thiết kế xuống FPGA}
 Sau khi hoàn thành mô phỏng và tổng hợp, đảm bảo thiết kế hoạt động đúng chức 
 năng yêu cầu. Để đảm bảo bảo thiết kế hoạt động ổn định trong các thiết bị thực tế thì chúng ta sẽ triển khai thiết kế xuống FPGA.
@@ -89,6 +117,13 @@ năng yêu cầu. Để đảm bảo bảo thiết kế hoạt động ổn đ�
 
 Zedboard được thiết kế trên nền tảng của một vi xử lý ARM Cortex-A9 MPCore lõi kép của Xilinx, với các tính năng khác như bộ nhớ DDR3, kết nối Ethernet, USB và các cổng giao tiếp khác như PMOD và FMC. Zedboard cũng được trang bị một FPGA Xilinx 7 series để cho phép người dùng tùy chỉnh phần cứng và thiết kế các hệ thống phức tạp.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=12cm]{Images/Chuong5/fpga/zedboard.jpg}
+    \caption[Kit ZedBoard]{\bfseries \fontsize{12pt}{0pt}\selectfont Kit ZedBoard}
+    \label{zedboard}
+\end{figure}
+
 Zedboard được thiết kế trên nền tảng của một vi xử lý ARM Cortex-A9 MPCore lõi kép của Xilinx, với các tính năng khác như bộ nhớ DDR3, kết nối Ethernet, USB và các cổng giao tiếp khác như PMOD và FMC. Zedboard cũng được trang bị một FPGA Xilinx 7 series để cho phép người dùng tùy chỉnh phần cứng và thiết kế các hệ thống phức tạp.
 
 
@@ -96,12 +131,7 @@ Kit phát triển Zedboard được thiết kế để hỗ trợ các phần m�
 
 Với các tính năng và khả năng linh hoạt của nó, Zedboard là một công cụ hữu ích cho các kỹ sư và nhà phát triển trong việc phát triển các hệ thống nhúng phức tạp và đòi hỏi sự tùy chỉnh cao.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=12cm]{Images/Chuong5/fpga/zedboard.jpg}
-    \caption[Kit ZedBoard]{\bfseries \fontsize{12pt}{0pt}\selectfont Kit ZedBoard}
-    \label{zedboard}
-\end{figure}
+
 
 \subsubsection{Thiết kế bộ bao để triển khai trên hệ thống SOC} \label{wrapper_cha}
 
@@ -140,6 +170,10 @@ Tín hiệu PDM sẽ được tạo ra từ micro MEMS được bán trên thị
 
 Trên kit Zedboard đã có sẵn bộ I2S Audio CODEC - ADAU1761, nó sẽ được tận dụng để phát âm thanh ra loa. Chúng ta sẽ sử dụng thêm bộ I2S master để chuyển đổi tín hiệu PCM thành I2S sau đó dùng ADAU1761 để chuyển đổi sang tín hiệu tương tự và phát ra loa. Điều đáng chú ý ở đây, ADAU1761 được cấu hình các thông số thông qua giao tiếp SPI hoặc I2C vì vậy chúng ta sẽ sử dụng thêm bộ I2C master để làm việc này. Sơ đồ khối chi tiết và cách làm việc sẽ được trình bày ở mục tiếp theo.
 
+Để kiểm soát toàn bộ các quá trình gửi và nhận dữ liệu từ PC, bộ xử lí MicroBlaze được sử dụng để làm trung gian điều phối quá trình gửi và nhận dữ liệu
+
+Hình \ref{adau} mô tả kiến trúc bên trong của IC ADAU1761. Đầu ra âm thanh của nó có 2 kênh (stereo) được xử lý hoàn toàn riêng biệt với nhau. Bộ \textbf{PLL} để tạo ra các tần số cần dùng. Khối \textbf{Serial Data} thực chất là I2S slave, nó thu nhận tín hiệu sau đó gửi đến các bộ lọc để đưa tín hiệu ra các kênh. Việc cấu hình thiết bị sẽ do bộ \textbf{I2S/SPI Control Port} xử lý.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=14cm]{Images/Chuong5/fpga/adau.png}
@@ -147,9 +181,7 @@ Trên kit Zedboard đã có sẵn bộ I2S Audio CODEC - ADAU1761, nó sẽ đư
     \label{adau}
 \end{figure}
 
-Để kiểm soát toàn bộ các quá trình gửi và nhận dữ liệu từ PC, bộ xử lí MicroBlaze được sử dụng để làm trung gian điều phối quá trình gửi và nhận dữ liệu
 
-Hình \ref{adau} mô tả kiến trúc bên trong của IC ADAU1761. Đầu ra âm thanh của nó có 2 kênh (stereo) được xử lý hoàn toàn riêng biệt với nhau. Bộ \textbf{PLL} để tạo ra các tần số cần dùng. Khối \textbf{Serial Data} thực chất là I2S slave, nó thu nhận tín hiệu sau đó gửi đến các bộ lọc để đưa tín hiệu ra các kênh. Việc cấu hình thiết bị sẽ do bộ \textbf{I2S/SPI Control Port} xử lý.
 
 \subsubsection{Triển khai trên trên phần mềm Vivado}
 
@@ -172,13 +204,6 @@ Quy trình thực hiện sẽ bao gồm các bước như sau:
 
 
 \paragraph{Thiết kế block design}
-Hình \ref{bd1}, \ref{bd2} mô tả block design của hệ thống. Với bộ não trung tâm là vi xử lý MicroBlaze (\textbf{microblaze\_0}) đảm nhận vai trò đọc ghi và xử lý dữ liệu. Bộ Clock Wizard (\textbf{clk\_wir\_0}) thực hiện tạo ra các tần số mong muốn, ở đây ta có top\_clk ứng với tần số 50 MHz cung cấp cho toàn bộ hệ thống, i2s\_clk là tần số cấp cho bộ I2S với giá trị 36.864 MHz và tần số cấp cho bộ lọc filter\_clk là 9.216 Mhz.
-
- Khối \textbf{axi\_interconnect\_0} đảm nhận việc ánh xạ một thiết bị master AXI ra nhiều slave AXI. Hệ thống sử dụng chuẩn AXI để làm interconnect (AXI Interconnect), bộ này quản lý (phân địa chỉ) tất cả các ngoại vi. Nó được xem là bộ điều khiển sao cho việc truy xuất dữ liệu đúng với yêu cầu từ vi xử lý.
-
-Khối \textbf{axi\_apb\_bridge}, \textbf{microblaze\_0} giao tiếp theo chuẩn AXI còn các lõi 
-thiết kế thì giao tiếp bằng chuẩn APB nên cần một khối có thể chuyển đổi các chuẩn 
-giao tiếp này
 
 \begin{figure}[H]
     \centering
@@ -193,17 +218,21 @@ giao tiếp này
     \caption[Block design của hệ thống (tiếp)]{\bfseries \fontsize{12pt}{0pt}\selectfont Block design của hệ thống (tiếp)}
     \label{bd2}
 \end{figure}
+Hình \ref{bd1}, \ref{bd2} mô tả block design của hệ thống. Với bộ não trung tâm là vi xử lý MicroBlaze (\textbf{microblaze\_0}) đảm nhận vai trò đọc ghi và xử lý dữ liệu. Bộ Clock Wizard (\textbf{clk\_wir\_0}) thực hiện tạo ra các tần số mong muốn, ở đây ta có top\_clk ứng với tần số 50 MHz cung cấp cho toàn bộ hệ thống, i2s\_clk là tần số cấp cho bộ I2S với giá trị 36.864 MHz và tần số cấp cho bộ lọc filter\_clk là 9.216 Mhz.
+
+ Khối \textbf{axi\_interconnect\_0} đảm nhận việc ánh xạ một thiết bị master AXI ra nhiều slave AXI. Hệ thống sử dụng chuẩn AXI để làm interconnect (AXI Interconnect), bộ này quản lý (phân địa chỉ) tất cả các ngoại vi. Nó được xem là bộ điều khiển sao cho việc truy xuất dữ liệu đúng với yêu cầu từ vi xử lý.
+
+Khối \textbf{axi\_apb\_bridge}, \textbf{microblaze\_0} giao tiếp theo chuẩn AXI còn các lõi 
+thiết kế thì giao tiếp bằng chuẩn APB nên cần một khối có thể chuyển đổi các chuẩn 
+giao tiếp này
+% \newpage
+
 
 Bộ \textbf{AXI UART 16550} dùng để truyền và nhân dữ liệu thông qua chuẩn UART. Nó là cổng trung gian để kết nối với PC, từ đây PC có thể đọc được liệu từ hệ thống, thông thường sẽ đi kèm với câu lênh \textit{printf(char*)}.
 
 Bộ \textbf{dti\_pdm2pcm\_apb\_0} là bộ bao đã được thiết kế ở mục \ref{wrapper_cha}. Nó sử dụng chuẩn APB thực hiện đọc ghi dữ liệu, nên để kết nối với vi xử lý chúng ta cần thêm 1 bộ cầu nối để dùng chuẩn AXI.
 
 \textbf{DTI I2S Controller IP} và \textbf{DTI I2C Controller IP} lần lượt là I2S master và I2C master, tất cả các IP đều được do công ty \textbf{Dolphin Tecnology VietNam Center} phát triển. Chúng sử dụng giao thức APB để cấu hình cũng như điều khiển truyền dữ liệu.
-
-Để báo hiệu dữ liệu đã có sự thay đổi, ở đây có sử dụng thêm bộ \textbf{AXI GPIO} dùng để nháy các đèn led trên kit.
-
-Địa chỉ của từng Slave trong thiết kế được mô tả ở bảng \ref{address}.
-
 \begin{table}[H]
 \centering
     \caption[Sắp xếp địa chỉ trong block design]{\bfseries \fontsize{12pt}{0pt}\selectfont Sắp xếp địa chỉ trong block design}
@@ -269,6 +298,11 @@ Bộ \textbf{dti\_pdm2pcm\_apb\_0} là bộ bao đã được thiết kế ở m
 \end{tabular}
 \label{address}
 \end{table}
+Để báo hiệu dữ liệu đã có sự thay đổi, ở đây có sử dụng thêm bộ \textbf{AXI GPIO} dùng để nháy các đèn led trên kit.
+
+Địa chỉ của từng Slave trong thiết kế được mô tả ở bảng \ref{address}.
+
+
 
 \paragraph{Triển khai driver code} \label{code}
 Hình \ref{flow_chart} mô tả lưu đồ thuật toán của hệ thống. Trên các IP I2C, I2S, PDM2PCM đều có khối thanh ghi, ban đầu chúng ta phải gán các giá trị mặc định cho nó. Việc cấu hình các IP sẽ thực hiện sau đó, có những điều cần chú ý như sau:
@@ -306,6 +340,9 @@ Testbench lúc này sẽ tích hợp thêm 2 bộ I2C slave và I2S slave để 
     \caption[Kết quả mô phỏng (1)]{\bfseries \fontsize{12pt}{0pt}\selectfont Kết quả mô phỏng (1)}
     \label{sim_1}
 \end{figure}
+Hình \ref{sim_1} và \ref{sim_2} mô tả kết quả mô mô phỏng của thiết kế. Tín hiệu đầu ra I2C và I2S thực hiện đúng với các chức năng đã nêu ở mục \ref{code}. dti\_pdm2pcm\_wrapper thực hiện đúng với yêu cầu đặt ra.
+
+\textbf{Kết luận}: việc mô phỏng hoàn toàn chính xác với yêu cầu và chức năng đặt ra.
 
 \begin{figure}[H]
     \centering
@@ -314,9 +351,6 @@ Testbench lúc này sẽ tích hợp thêm 2 bộ I2C slave và I2S slave để 
     \label{sim_2}
 \end{figure}
 
-Hình \ref{sim_1} và \ref{sim_2} mô tả kết quả mô mô phỏng của thiết kế. Tín hiệu đầu ra I2C và I2S thực hiện đúng với các chức năng đã nêu ở mục \ref{code}. dti\_pdm2pcm\_wrapper thực hiện đúng với yêu cầu đặt ra.
-
-\textbf{Kết luận}: việc mô phỏng hoàn toàn chính xác với yêu cầu và chức năng đặt ra.
 
 \paragraph{Tổng hợp và triển khai}
 
@@ -363,9 +397,9 @@ scl\_pad                 & INOUT & AB4  & chân AC-SCK của ADAU1761     \\ \hl
 
 Hình \ref{machthat_2} mô tả mạch triển khai thực tế, sử dụng \textbf{Adafruit PDM Microphone} để thu âm thanh sau đó phát trực tiếp qua loa bằng cổng Line Out 3.5 mm.
 
-\textbf{Nhận xét}: Tín hiệu đã phát được trực tiếp từ micro đến loa. Tín hiệu ổn định không xì xào (nhiễu). Âm thanh thu từ giọng nói chi tiết, không rè và độ nhạy cao. Tiến hành kiểm thử hệ thống trong 2 giờ liên tục, thiết bị không bị nóng, hoạt động ổn định. Trong lúc không dùng, tín hiệu phát ra loa không bị rè.
+\textbf{Nhận xét}: Tín hiệu đã phát được trực tiếp từ micro đến loa. Tín hiệu ổn định không bị rè. Tiến hành kiểm thử hệ thống trong 2 giờ liên tục, thiết bị không bị nóng, hoạt động ổn định. Trong lúc không dùng, tín hiệu phát ra loa không bị rè.
 
-\textbf{Kết luận}: Kết quả truyền nhận trên FPGA thể hiện đúng các chức năng và hoạt động ổn định,.. đảm bảo bộ chuyển đổi hoạt động ổn định và đúng yêu cầu trên các thiết bị thật.
+\textbf{Kết luận}: Kết quả truyền nhận trên FPGA thể hiện đúng các chức năng và hoạt động ổn định,.. đảm bảo bộ chuyển đổi hoạt động ổn định trên các thiết bị thật.
 
 
 \begin{figure}[H]
