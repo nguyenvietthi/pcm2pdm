@@ -3,7 +3,7 @@
 \setcounter{section}{2}
 \setcounter{figure}{0}
 \setcounter{table}{0}
-Chương này sẽ trình bày tổng quan về hệ thống xử lý âm thanh số. Các khái niệm, cơ sở lý thuyết về bộ chuyển đổi tương tự số (Sigma-Delta), các kỹ thuật xử lý tín hiệu trên nhiều miền tần số, các bộ lọc tiết kiệm tài nguyên có thể ứng dụng và triển khai trên phần cứng, \ldots sẽ được lần lượt làm rõ trong chương này. Các kiến thức nền tảng được trình bày dựa trên quá trình tìm hiểu tổng hợp các nguồn tài liệu có tính xác minh cao được liệt kê dưới phần tài liệu tham khảo.
+Chương này sẽ trình bày tổng quan về hệ thống xử lý âm thanh số. Các khái niệm, cơ sở lý thuyết về bộ chuyển đổi tương tự số (Sigma-Delta), các kỹ thuật xử lý tín hiệu trên nhiều miền tần số, các bộ lọc tiết kiệm tài nguyên có thể ứng dụng và triển khai trên phần cứng, \ldots sẽ lần lượt được làm rõ trong chương này. Các kiến thức nền tảng được trình bày dựa trên quá trình tìm hiểu tổng hợp các nguồn tài liệu có tính xác minh cao được liệt kê dưới phần tài liệu tham khảo.
 
 \subsection{ Lý thuyết điều chế Sigma Delta và Pulse Density Modulation}
 Tín hiệu âm thanh là một dạng tín hiệu điện tử được tạo ra bởi dao động cơ học của màng nhạy cảm âm thanh ví dụ như loa hay micrô. Khi âm thanh được tạo ra, nó là các dao động cơ học của các đối tượng trong không gian xung quanh, chẳng hạn như giọng nói, nhạc cụ, tiếng động, và âm thanh môi trường tự nhiên. Các dao động này được chuyển đổi thành tín hiệu điện tử bằng các thiết bị thu âm, điển hình là micro hoặc đầu đọc đĩa, sau đó được xử lý để tạo ra một tín hiệu âm thanh tương ứng.
@@ -18,7 +18,7 @@ Trong một hệ thống xử lí tín hiệu âm thanh số (hình \ref{hinh21}
     \label{hinh21}
 \end{figure}
 
-Quá trình số hóa gồm 3 bước theo thứ tự sau: lấy mẫu, lượng tử và mã hóa. Trong đó, lấy mẫu là lấy các giá trị của tín hiệu tại các thời điểm rời rạc. Do đó, lấy mẫu còn gọi là rời rạc hóa. Tiếp theo, lượng tử hóa là làm gần đúng giá trị của tín hiệu tại thời điểm lấy mẫu với các mức lượng tử (giá trị rời rạc). Lượng tử hóa được xác định bởi độ chính xác của máy tính. Cuối cùng, mã hóa là biểu diễn một số theo hệ thống nhị phân mà máy tính có thể đọc được\cite{xulytinhieusobook}. Ba quá trình trên sẽ được tích hợp và thực hiện trên bộ ADC.
+Quá trình số hóa gồm 3 bước theo thứ tự sau: lấy mẫu, lượng tử và mã hóa. Trong đó, lấy mẫu là lấy các giá trị của tín hiệu tại các thời điểm rời rạc. Do đó, lấy mẫu còn gọi là rời rạc hóa. Tiếp theo, lượng tử hóa là làm gần đúng giá trị của tín hiệu tại thời điểm lấy mẫu với các mức lượng tử (giá trị rời rạc). Lượng tử hóa được xác định bởi độ chính xác của máy tính. Cuối cùng, mã hóa là biểu diễn một số theo hệ thống nhị phân mà máy tính có thể đọc được \cite{xulytinhieusobook}. Ba quá trình trên sẽ được tích hợp và thực hiện trên bộ ADC.
 
 Bộ chuyển đổi tương tự số có 3 kiến trúc phổ biến hiện tại đang được sử dụng là 
 Sigma Delta ADC, Successive Approximation ADC (SAR ADC) và Pipelined ADC.
@@ -132,7 +132,7 @@ Số bit trên mẫu (độ phân giải) là 1 thông số ảnh hưởng đế
     \caption[Sóng sin được lượng tử hóa với 8 mức]{\bfseries \fontsize{12pt}{0pt}\selectfont Sóng sin được lượng tử hóa với 8 mức}
     \label{h_quantization_noise_8}
 \end{figure}
-Trong biểu đồ hình \ref{h_quantization_noise_8}, sóng hình sin được lượng tử hóa thành 8 mức riêng biệt (3 bit). Cách rõ ràng để giảm tiếng ồn lượng tử hóa là tăng số lượng bit. Ở mức 256 (8 bit), hầu như không nhìn thấy nhiễu trên biểu đồ tuyến tính (hình \ref{h_quantization_noise_256}).
+Trong biểu đồ hình \ref{h_quantization_noise_8}, sóng hình sin được lượng tử hóa thành 8 mức riêng biệt (3 bit). Cách rõ ràng để giảm nhiễu lượng tử hóa là tăng số lượng bit. Ở mức 256 (8 bit), hầu như không nhìn thấy nhiễu trên biểu đồ tuyến tính (hình \ref{h_quantization_noise_256}).
 
 \begin{figure}[!ht]
     \centering
@@ -147,7 +147,7 @@ Với tín hiệu PDM như đã trình bày ở trên, dạng tín hiệu đầu
 
 Hình \ref{hinh22} là một ví dụ về sóng hình sin PCM 16kHz với tốc độ lấy mẫu 48kHz được chuyển đổi thành PDM bằng bộ chuyển đổi Sigma-Delta bậc một và tỷ lệ oversampling 16.
 
-Chỉ tăng tốc độ lấy mẫu quá mức (oversampling) và giảm số lượng bit đầu ra trong bộ chuyển đổi A/D không tự động giảm nhiễu lượng tử hóa. Trong thực tế, tiếng ồn là không thể tránh khỏi. Tuy nhiên, có thể đẩy nhiễu này vào các thành phần tần số nằm ngoài dải tần của tín hiệu đầu vào ban đầu, sau đó dùng bộ lọc thông thấp sẽ dễ dàng khôi phục được tín hiệu ban đầu.
+Chỉ tăng tốc độ lấy mẫu quá mức (oversampling) và giảm số lượng bit đầu ra trong bộ chuyển đổi A/D không tự động giảm nhiễu lượng tử hóa. Trong thực tế, nhiễu là không thể tránh khỏi. Tuy nhiên, có thể đẩy nhiễu này vào các thành phần tần số nằm ngoài dải tần của tín hiệu đầu vào ban đầu, sau đó dùng bộ lọc thông thấp sẽ dễ dàng khôi phục được tín hiệu ban đầu.
 \begin{figure}[!ht]
     \centering
     \includesvg[width=13cm]{Images/Chuong2/sinewave_pdm_psd.svg}
@@ -157,7 +157,7 @@ Chỉ tăng tốc độ lấy mẫu quá mức (oversampling) và giảm số l�
 
 Hình \ref{sinewave_pdm_psd} mô tả mật độ phổ công suất của tín hiệu PDM ở trên (hình \ref{hinh22}). Chúng ta có thể thấy rõ, tín hiệu đã lấy mẫu nằm ở bên trái đường xanh lục ở vị trí $24kHz$ ($1/2$ của $48kHz$ - tốc độ lấy mẫu ban đầu). Đó là nơi có tăng đột biến - sóng sin ban đầu, còn lại là nhiễu.
 
-Để giải quyết vấn đề nhiễu lượng tử, bộ điều chế Sigma-Delta sẽ giải quyết bằng cách sử dụng kiến trúc có bậc cao hơn và tăng tăng tần số lấy mẫu lên gấp nhiều lần so với tần số lớn nhất trong dải tín hiệu cần được lấy mẫu - Oversampling rate. Các cách trên sẽ trình bày ở mục \ref{inc_order} và \ref{inc_sam}.
+Để giải quyết vấn đề nhiễu lượng tử, bộ điều chế Sigma-Delta sẽ giải quyết bằng cách sử dụng kiến trúc có bậc cao hơn và tăng tần số lấy mẫu lên gấp nhiều lần so với tần số lớn nhất trong dải tín hiệu cần được lấy mẫu - Oversampling rate. Các cách trên sẽ trình bày ở mục \ref{inc_order} và \ref{inc_sam}.
 \paragraph{Sử dụng bộ điều chế Sigma-Delta có số bậc cao} \label{inc_order}
 \begin{figure}
     \centering
@@ -292,7 +292,7 @@ Hình \ref{thongthap_rf} mô tả đáp ứng tần số của 1 bộ lọc thô
     \label{thongthap_rf}
 \end{figure}
 
-\subsubsection{Bộ lọc áp ứng xung hữu hạn -  Finite impulse response (FIR) filter}
+\subsubsection{Bộ lọc đáp ứng xung hữu hạn -  Finite impulse response (FIR) filter}
 Bộ lọc FIR (Finite Impulse Response) là một loại bộ lọc tín hiệu số được sử dụng trong xử lý tín hiệu kỹ thuật số. Bộ lọc FIR có phản hồi xung hữu hạn, nghĩa là phản hồi xung của nó (hoặc phản ứng với bất kỳ đầu vào có độ dài hữu hạn nào) có độ dài hữu hạn, bởi vì nó giảm về 0 trong thời gian hữu hạn. Bộ lọc FIR có thể được sử dụng để thực hiện các tác vụ xử lý tín hiệu như lọc thông qua, lọc chặn, hay trích xuất đặc trưng tín hiệu. Bộ lọc FIR có thể được thiết kế để đáp ứng các yêu cầu xử lý tín hiệu như băng thông, độ lọc và độ trễ. Bộ lọc FIR có thể là rời rạc thời gian hoặc liên tục thời gian và là kỹ thuật số hoặc tương tự. \cite{8256573}
 \begin{figure}[H]
     \centering
@@ -308,7 +308,7 @@ Trong đó:
 \begin{itemize}
   \item $x[n]$ là tín hiệu đầu vào.
   \item $y[n]$ là tín hiệu đầu ra.
-  \item $N$ là số tầng của bộ lọc).
+  \item $N$ là số tầng của bộ lọc.
   \item $b_i$ là giá trị của đáp ứng xung thời điểm thứ $i$ với $0 \leq i \leq N$, cũng được gọi là hệ số của bộ lọc.
 \end{itemize}
 

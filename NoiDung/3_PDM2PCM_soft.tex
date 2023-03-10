@@ -171,7 +171,7 @@ Hình \ref{tapsss} mô tả biểu đồ về suy hao dải dừng và độ g�
 \subsection{Thiết kế bộ chuyển đổi  PDM sang PCM}
 Các thiết kế được đề xuất sẽ bám sát vào mô hình của bộ chuyển đổi đã trình bày ở mục \ref{mohinhpdm2pcm}.
 \subsubsection{Ý tưởng thiết kế đơn giản} \label{dongian}
-Không thực sự cần một kiến trúc bộ lọc phức tạp để chuyển đổi PDM sang PCM, chúng ta chỉ cần 1 bộ lọc thông thấp duy nhất là đã có thể đáp ứng được các thông số ở trên.
+Không thực sự cần một kiến trúc bộ lọc phức tạp để chuyển đổi PDM sang PCM, chúng ta chỉ sử dụng 1 bộ lọc thông thấp duy nhất là đã có thể đáp ứng được các thông số ở trên.
 
 Bộ lọc thông thấp sẽ có các thông số như sau: 
 \begin{itemize}
@@ -197,7 +197,7 @@ Sau tiến hành chạy thuật toán \textit{remez}, chúng ta có bộ lọc c
 
 Bộ trên có độ suy hao dải dừng là 89.035 dB, độ gợn sóng 0.01415 dB hoàn toàn thỏa mãn với yêu cầu thiết kế. Nhưng có một vấn đề, đó là số taps lớn dẫn đến phép nhân trong 1 giây khá lớn ($48000 \times 2216 = 106M \text{ phép}/s$). Trong thiết kế phần cứng, đồng nghĩa chúng ta phải dùng đến 2216 bộ nhân, điều đó gây nên hao phí tài nguyên nghiêm trọng.
 
-\textbf{Kết luận}: việc sửa dụng một bộ lọc thông thấp duy nhất không được cho là khả thi gây hao phí tài nguyên phần cứng. Phần sau sẽ trình bày kiểu thiết kế sử dụng nhiều bộ lọc tối ưu và xử lý ở nhiều miền tần số.
+\textbf{Kết luận}: việc sử dụng một bộ lọc thông thấp duy nhất không được cho là khả thi gây hao phí tài nguyên phần cứng. Phần sau sẽ trình bày kiểu thiết kế sử dụng nhiều bộ lọc tối ưu và xử lý ở nhiều miền tần số.
 
 \subsubsection{Thiết kế bộ chuyển đổi nhiều giai đoạn sử dụng hạ tần (Decimation)}
 Có rất nhiều kiến trúc đường ống để khử tín hiệu mẫu ở tốc độ cao xuống thấp \cite{pipelie1} - \cite{pipelie2}, về cơ bản sẽ được rút gọn thành các khối như hình \ref{pipeline_top}:
@@ -370,7 +370,7 @@ Khi các thuộc tính của bộ lọc CIC đã được quyết định, thi�
 
 Giờ thì chúng ta có thể thấy rõ sự khác biệt giữa 2 kiến trúc đơn giản (mục \ref{dongian}) và sử dụng nhiều bộ lọc trên nhiều miền tần số khác nhau. Với 3504k phép nhân trên 1 giây so với 106M phép nhân trong 1 giây, nó được cải thiện hơn 30 lần.
 \paragraph{Thiết kế bộ lọc Half Band và FIR} \label{design_fir}
-Với phương án \hyperref[choose]{đã được chọn ở trên} (CIC 4 tầng, tỷ lệ Decimation 12x) thì hệ số Decimation chỉ còn lại là 4, điều đó đồng nghĩ với việc chúng ta chỉ cần sử dụng thêm 2 bộ lọc Half Band với tỷ lệ Decimation mỗi bộ lọc là 2 và một bộ lọc FIR ở tầng cuối cùng. 
+Với phương án \hyperref[choose]{đã được chọn ở trên} (CIC 4 tầng, tỷ lệ Decimation 12x) thì hệ số Decimation chỉ còn lại là 4, điều đó đồng nghĩ với việc chúng ta chỉ cần sử dụng thêm 2 bộ lọc Half Band với tỷ lệ Decimation mỗi bộ lọc là 2 và một bộ lọc FIR ở tầng cuối. 
 
 Chúng ta có sơ đồ khối tổng quát của thiết kế như hình \ref{pipeline_new}.
 \begin{figure}[H]
@@ -503,7 +503,7 @@ Hình \ref{sd1} mô tả tín hiệu đầu vào là đường màu đỏ và đ
     \label{sd3}
 \end{figure}
 
-Vì biên độ các sóng sin đưa vào là bằng nhau. Nên chúng ta có thể do độ suy hao trước và sau khi mô phỏng ở từng dải tần để làm điều kiện nhận xét yêu cầu thiết kế (độ suy hao giải dừng, độ gợn sóng dải thông).
+Vì biên độ các sóng sin đưa vào là bằng nhau. Nên chúng ta có thể đo độ suy hao trước và sau khi mô phỏng ở từng dải tần để làm điều kiện nhận xét yêu cầu thiết kế (độ suy hao giải dừng, độ gợn sóng dải thông).
 
 Tiến hành mô phỏng, thu được tín hiệu ở bộ lọc FIR cuối cùng có biểu đồ ở miền thời gian như hình \ref{pcm_o}. Về miền thời gian, chúng ta sẽ rất khó để nhận xét được thiết kế đã đáp ứng được yêu cầu đặt ra hay chưa. Vì vậy, để nhận xét kỹ hơn, hãy quan sát biểu đồ mật độ công suất của tín hiệu PCM đầu ra.
 \begin{figure}[H]

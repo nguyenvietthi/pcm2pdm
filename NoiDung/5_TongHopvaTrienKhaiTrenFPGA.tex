@@ -4,7 +4,7 @@
 \setcounter{subsection}{0}
 \setcounter{figure}{0}
 \setcounter{table}{0}
-Chương này sẽ trình bày chi tiết về quá trình sử dụng Design Compiler để tổng hợp mạch điện tử số, từ các bước chuẩn bị thiết kế đến các bước tối ưu hóa và đánh giá mạch. Cuối cùng, để đảm bảo thiết kế chạy ổn định trong thiết bị thực tế thì chúng ta triển khai hệ thống đã thiết kế ở chương trước lên kit FPGA, ở đây sẽ sử dụng kit Zedboard của hãng Xilinx.
+Chương này sẽ trình bày chi tiết về quá trình sử dụng Design Compiler để tổng hợp mạch điện tử số, từ các bước chuẩn bị thiết kế đến các bước tối ưu hóa và đánh giá mạch. Cuối cùng, để đảm bảo thiết kế chạy ổn định trong thiết bị thực tế thì chúng ta triển khai hệ thống đã được xây dựng ở chương trước lên kit FPGA, ở đây sẽ sử dụng kit Zedboard của hãng Xilinx.
 
 \subsection{Tổng hợp và phân tích timing}
 Design Compiler là một công cụ tổng hợp logic, cho phép tổng hợp các mạch điện tử số từ ngôn ngữ Verilog hoặc VHDL sang mạch RTL (Register-Transfer Level) và sau đó là mạch gate-level để có thể được triển khai trên ASIC hoặc FPGA. 
@@ -67,7 +67,7 @@ Tổng cộng                                                                   
     \end{table}
 
 Bảng \ref{cell}, \ref{area} mô tả về mặt vật lý, nó chỉ rõ ra các số lượng port, net, các cell combinational và sequential. Từ đó đưa ra tổng diện tích của thiết kế.
-Nhận thấy tổng diện tích là 5465.165932 ($\mu m^2$) là trung bình ở mức chấp nhận được với những IP chuyển đổi.
+Nhận thấy tổng diện tích 5465.165932 ($\mu m^2$) là trung bình ở mức chấp nhận được với những IP chuyển đổi.
 \begin{table}[H]
 \centering
     \caption[Các báo cáo về mặt số lượng phần tử của thiết kế]{\bfseries \fontsize{12pt}{0pt}\selectfont Các báo cáo về mặt số lượng phần tử của thiết kế}
@@ -111,7 +111,7 @@ Tổng cộng & 7.75168e-02 (mW) \\ \hline
 \end{table}
 \subsection{Triển khai thiết kế xuống FPGA}
 Sau khi hoàn thành mô phỏng và tổng hợp, đảm bảo thiết kế hoạt động đúng chức 
-năng yêu cầu. Để đảm bảo bảo thiết kế hoạt động ổn định trong các thiết bị thực tế thì chúng ta sẽ triển khai thiết kế xuống FPGA.
+năng yêu cầu. Để đảm bảo thiết kế hoạt động ổn định trong các thiết bị thực tế thì chúng ta sẽ triển khai thiết kế xuống FPGA.
 
 \textbf{Giới thiệu về kit phát triển Zedboard} (hình \ref{zedboard}):
 
@@ -124,7 +124,7 @@ Zedboard được thiết kế trên nền tảng của một vi xử lý ARM Co
     \label{zedboard}
 \end{figure}
 
-Zedboard được thiết kế trên nền tảng của một vi xử lý ARM Cortex-A9 MPCore lõi kép của Xilinx, với các tính năng khác như bộ nhớ DDR3, kết nối Ethernet, USB và các cổng giao tiếp khác như PMOD và FMC. Zedboard cũng được trang bị một FPGA Xilinx 7 series để cho phép người dùng tùy chỉnh phần cứng và thiết kế các hệ thống phức tạp.
+Zedboard được thiết kế trên nền tảng của một vi xử lý ARM Cortex-A9 MPCore lõi kép của Xilinx, với các tính năng khác như bộ nhớ DDR3, kết nối Ethernet, USB và các cổng giao tiếp khác như PMOD và FMC. 
 
 
 Kit phát triển Zedboard được thiết kế để hỗ trợ các phần mềm như Xilinx SDK và Vivado Design Suite, cho phép người dùng thiết kế phần cứng và phần mềm cùng một lúc trên một nền tảng. Điều này giúp tăng hiệu suất và tối ưu hóa thiết kế phần cứng và phần mềm.
@@ -155,7 +155,7 @@ Khối \textbf{register\_block} đóng vai trò trung chuyển dữ liệu từ 
 
 Lúc này vi xử lý có thể biết lúc nào có thể đọc (có dữ liệu) thông qua thanh ghi rd\_empty, khi đó dữ liệu đã có sẵn trên thanh ghi pcm\_data và có thế đọc. Các giá trị trong thanh ghi sẽ được cập nhật liên tục với tần số của hệ thống chính.
 
-Vì thiết kế sử dụng tần số khác với tần số của hệ thống (2 miền tần số) sẽ dẫn đến thất lạc dữ liệu ở 1 số thời điểm điều đó gây mất chính xác của hệ thống. Để tránh điều này, chúng ta sẽ chèn 1 bộ đệm không đồng bộ để đồng bộ hai miền tần số. Tất cả các dữ liệu đầu ra PCM sẽ được ghi liên tục vào \textbf{async\_fifo} và tất nhiên lúc fifo đầy sẽ dừng. Bộ fifo sẽ nhận được tín hiệu đọc dữ liệu ra thông qua các sự kiện đọc từ vi xử lý thông qua bus APB, lúc này trên \textbf{register\_block} sẽ cập nhật giá trị mới. Tín hiệu rd\_empty cũng báo cho hệ thống là bộ lọc đang hay không có dữ liệu, điều này là hết sức cần thiết để thông báo cho vi xử lý biến lúc nào cần lấy dữ liệu.
+Vì thiết kế sử dụng tần số khác với tần số của hệ thống (2 miền tần số) sẽ dẫn đến thất lạc dữ liệu ở 1 số thời điểm, điều đó gây mất chính xác của hệ thống. Để  sai sót này, chúng ta sẽ chèn 1 bộ đệm không đồng bộ để đồng bộ hai miền tần số. Tất cả các dữ liệu đầu ra PCM sẽ được ghi liên tục vào \textbf{async\_fifo} và tất nhiên lúc fifo đầy sẽ dừng. Bộ fifo sẽ nhận được tín hiệu đọc dữ liệu ra thông qua các sự kiện đọc từ vi xử lý thông qua bus APB, lúc này trên \textbf{register\_block} sẽ cập nhật giá trị mới. Tín hiệu rd\_empty cũng báo cho hệ thống là bộ lọc đang hay không có dữ liệu, điều này là hết sức cần thiết để thông báo cho vi xử lý biến lúc nào cần lấy dữ liệu.
 
 \subsubsection{Ý tưởng thiết kế}
 
@@ -187,7 +187,7 @@ Hình \ref{adau} mô tả kiến trúc bên trong của IC ADAU1761. Đầu ra �
 
 Kit phát triển Zedboard được thiết kế để hỗ trợ các phần mềm như Xilinx SDK và Vivado Design Suite, cho phép người dùng thiết kế phần cứng và phần mềm cùng một lúc trên một nền tảng,  giúp tăng hiệu suất và tối ưu hóa thiết kế phần cứng và phần mềm.
 
-Do sử dụng kit trong đề tài này là Zedboard đồng nghĩa với việc chúng ta phải thực hiện tất cả các quá trình trên phần mềm Vivado - môt nền tảng phát triển của \textbf{Xilinx}.
+Do sử dụng kit trong đề tài này là Zedboard đồng nghĩa với việc chúng ta phải thực hiện tất cả các quá trình trên phần mềm Vivado - một nền tảng phát triển của \textbf{Xilinx}.
 Quy trình thực hiện sẽ bao gồm các bước như sau:
 \begin{enumerate}
     \item Tạo dự án: chọn kit sử dụng, ...
@@ -228,7 +228,7 @@ giao tiếp này
 % \newpage
 
 
-Bộ \textbf{AXI UART 16550} dùng để truyền và nhân dữ liệu thông qua chuẩn UART. Nó là cổng trung gian để kết nối với PC, từ đây PC có thể đọc được liệu từ hệ thống, thông thường sẽ đi kèm với câu lênh \textit{printf(char*)}.
+Bộ \textbf{AXI UART 16550} dùng để truyền và nhận dữ liệu thông qua chuẩn UART. Nó là cổng trung gian để kết nối với PC, từ đây PC có thể đọc được dữ liệu từ hệ thống, thông thường sẽ đi kèm với câu lênh \textit{printf(char*)}.
 
 Bộ \textbf{dti\_pdm2pcm\_apb\_0} là bộ bao đã được thiết kế ở mục \ref{wrapper_cha}. Nó sử dụng chuẩn APB thực hiện đọc ghi dữ liệu, nên để kết nối với vi xử lý chúng ta cần thêm 1 bộ cầu nối để dùng chuẩn AXI.
 
@@ -327,7 +327,7 @@ Hình \ref{flow_chart} mô tả lưu đồ thuật toán của hệ thống. Tr�
 
 Khi đã khởi tạo thành công I2C, chúng ta sẽ tiến hành sử dụng nó để cấu hình cho ADAU1761. Với trình tự một lần chuyển dữ liệu như hình \ref{i2c_timing}, với byte đầu là địa chỉ của slave, 2 byte tiếp theo là địa chỉ phụ (địa chỉ cảu từng thành ghi trong ADAU1761) và byte cuối cùng là dữ liệu. ADAU1761 cung cấp 2 bit ADDR0, ADDR1 để người dùng lựa chọn địa chỉ, với 2 bit này 1 hệ thống có thể có 4 ADAU1716.
 
-Sau khi cấu hình thành công, chúng ta tiến hành quá trình truyền bằng cách kích hoạt các clock của I2S Controler. Việc truyền sẽ lấy dữ liệu từ thành ghi TX FIFO của I2S.
+Sau khi cấu hình thành công, chúng ta tiến hành quá trình truyền bằng cách kích hoạt các clock của I2S Controler. Việc truyền sẽ lấy dữ liệu từ thanh ghi TX FIFO của I2S.
 
 Hệ thống kiểm tra trạng thái của FIFO trong PDM2PCM thông qua thanh ghi, nếu dữ liệu có tồn tại trong FIFO, vi xử lý tiến hành tách trường dữ liệu PCM trong lần đọc trước đó ghi vào TX FIFO của I2S để truyền với điều kiện trạng thái của TX FIFO không bị đầy. Quá trình này sẽ thực hiện lặp đi lặp lại.
 
@@ -340,7 +340,7 @@ Testbench lúc này sẽ tích hợp thêm 2 bộ I2C slave và I2S slave để 
     \caption[Kết quả mô phỏng (1)]{\bfseries \fontsize{12pt}{0pt}\selectfont Kết quả mô phỏng (1)}
     \label{sim_1}
 \end{figure}
-Hình \ref{sim_1} và \ref{sim_2} mô tả kết quả mô mô phỏng của thiết kế. Tín hiệu đầu ra I2C và I2S thực hiện đúng với các chức năng đã nêu ở mục \ref{code}. dti\_pdm2pcm\_wrapper thực hiện đúng với yêu cầu đặt ra.
+Hình \ref{sim_1} và \ref{sim_2} mô tả kết quả mô phỏng của thiết kế. Tín hiệu đầu ra I2C và I2S thực hiện đúng với các chức năng đã nêu ở mục \ref{code}. dti\_pdm2pcm\_wrapper thực hiện đúng với yêu cầu đặt ra.
 
 \textbf{Kết luận}: việc mô phỏng hoàn toàn chính xác với yêu cầu và chức năng đặt ra.
 
@@ -399,7 +399,7 @@ Hình \ref{machthat_2} mô tả mạch triển khai thực tế, sử dụng \te
 
 \textbf{Nhận xét}: Tín hiệu đã phát được trực tiếp từ micro đến loa. Tín hiệu ổn định không bị rè. Tiến hành kiểm thử hệ thống trong 2 giờ liên tục, thiết bị không bị nóng, hoạt động ổn định. Trong lúc không dùng, tín hiệu phát ra loa không bị rè.
 
-\textbf{Kết luận}: Kết quả truyền nhận trên FPGA thể hiện đúng các chức năng và hoạt động ổn định,.. đảm bảo bộ chuyển đổi hoạt động ổn định trên các thiết bị thật.
+\textbf{Kết luận}: Kết quả truyền nhận trên FPGA thể hiện đúng các chức năng và hoạt động ổn định,.. đảm bảo bộ chuyển đổi làm việc tốt trên các thiết bị thật.
 
 
 \begin{figure}[H]

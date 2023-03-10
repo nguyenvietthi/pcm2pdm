@@ -61,7 +61,7 @@ Theo quan sát, bộ lọc chỉ khác nhau lớn ở thông số suy giảm d�
 
 \textbf{Kết luận}: Chúng ta sẽ sử dụng tất cả hệ số nhân với $2^{20}$ để ép thành số nguyên (hệ thập phân).
 \subsubsection{Mô tả chung}
-Bộ chuyển đổi PDM sang PCM nhiều giai đoạn sử dụng Decimation (dti\_pdm2pcm) chuyển đổi dữ liệu PDM 1 bit với tốc lấy mẫu cao thành dữ liệu PCM với  tốc độc lấy mẫu thấp hơn. Tần số cấp cho bộ gấp 4 lần tần số lấy mẫu của PDM, từ tần số này sẽ cấp và chia tần ra các tần số cần thiết cho dti\_pdm2pcm. Tín hiệu PCM đầu ra sẽ đi kèm theo sườn dương của tín hiệu đồng hồ PCM đầu ra với độ rộng bit do người dùng quyết định (thường là 24 bit), độ rộng càng lớn thì chất lượng âm thanh đầu ra càng cao. Sơ đồ chân của dti\_pdm2pcm được mô tả như hình \ref{top_pdm2pcm}.
+Bộ chuyển đổi PDM sang PCM nhiều giai đoạn sử dụng Decimation (dti\_pdm2pcm) chuyển đổi dữ liệu PDM 1 bit với tốc lấy mẫu cao thành dữ liệu PCM với  tốc độ lấy mẫu thấp hơn. Tần số cấp cho bộ gấp 4 lần tần số lấy mẫu của PDM, từ tần số này sẽ cấp và chia tần ra các tần số cần thiết cho dti\_pdm2pcm. Tín hiệu PCM đầu ra sẽ đi kèm theo sườn dương của tín hiệu đồng hồ PCM đầu ra với độ rộng bit do người dùng quyết định (thường là 24 bit), độ rộng càng lớn thì chất lượng âm thanh đầu ra càng cao. Sơ đồ chân của dti\_pdm2pcm được mô tả như hình \ref{top_pdm2pcm}.
 
 \begin{figure}[H]
     \centering
@@ -87,7 +87,7 @@ pcm\_clk          & ra               & 1                    & \begin{tabular}[c]
     \label{top_signal}
 \end{table}
 
-Điều đặc biệt của thiết kế là các tham số của các bộ lọc sẽ được sinh ra từ các tính toán trên phần mềm sử dụng \textbf{Python}. Đồng nghĩa với việc, chúng ta chỉ cần điền các thông số yêu cầu ví dụ như \textbf{Dải thông}, \textbf{Dải dừng}, \textbf{Độ suy hao dải dừng}, \textbf{Độ gợn sóng của dải thông} vào phần mềm. Nó sẽ tự động tính toán và nạp các hệ số bộ lọc, tối ưu các độ rộng bit của mỗi sau bộ lọc và sau đó sẽ nạp vào RTL code. Từ đây, chúng ta có thể thiết kế bộ lọc cho bất kỳ thiết bị microphone nào. Ở trong thiết kế này, chúng ta sẽ chỉ tập trung và tối ưu thiết kế cho thiết bị \textbf{MP34DT01-M}.
+Điều đặc biệt của thiết kế là các tham số của các bộ lọc sẽ được sinh ra từ các tính toán trên phần mềm sử dụng \textbf{Python}. Đồng nghĩa với việc, chúng ta chỉ cần điền các thông số yêu cầu ví dụ như \textbf{Dải thông}, \textbf{Dải dừng}, \textbf{Độ suy hao dải dừng}, \textbf{Độ gợn sóng của dải thông} vào phần mềm. Nó sẽ tự động tính toán và nạp các hệ số bộ lọc, tối ưu các độ rộng bit của mỗi sau bộ lọc và sau đó sẽ nạp vào RTL code. Từ đây, chúng ta có thể thiết kế bộ lọc cho bất kỳ thiết bị microphone nào. Ở trong trường hợp này, chúng ta sẽ chỉ tập trung và tối ưu thiết kế cho thiết bị \textbf{MP34DT01-M}.
 
 
 \begin{table}[H]
@@ -245,7 +245,7 @@ Hình \ref{cic_top} mô tả sơ đồ khối của khối dti\_cic\_decimator.
     \label{cic_top}
 \end{figure}
 
-Việc tính toán độ rông bit cho các thanh ghi trễ được tính toán theo công thức \ref{bitcic}. Với số tầng là 4 và hệ số Decimation 12x ta có độ rộng bit như sau:
+Việc tính toán độ rộng bit cho các thanh ghi trễ được tính toán theo công thức \ref{bitcic}. Với số tầng là 4 và hệ số Decimation 12x ta có độ rộng bit như sau:
 \begin{equation}
     n_r = 1 + [4 \times log_2(2 \times 12)] = 16 (bits)
 \end{equation}
@@ -289,7 +289,7 @@ Tương tự bộ lọc CIC, 3 bộ lọc tiếp theo cũng phải sử dụng s
 \begin{itemize}
     \item Half Band (1): có 11 taps, trong đó 4 taps có hệ số bằng 0 coi như không sử dụng bộ nhân ở đây. Đồng nghĩa với việc chúng ta cần phải có 7 bộ nhân và 10 bộ cộng cho bộ HB1.
      \item Half Band (2): có 19 taps. Tương tự cách tính của HB1, HB2 cần 11 bộ nhân và 18 bộ cộng.
-     \item FIR: có 51 taps nên sẽ sửa dụng 51 bộ nhân và 50 bộ cộng.
+     \item FIR: có 51 taps nên sẽ sử dụng 51 bộ nhân và 50 bộ cộng.
 \end{itemize} 
 
 Không những thế bộ nhân là bộ có kích thước khá lớn, việc sử dụng số lượng nhiều sẽ gây tiêu tốn tài nguyên. Ý tưởng của kiến trúc này là chỉ sử dụng 1 bộ nhân duy nhất cho 3 bộ lọc và mỗi bộ lọc sử dụng 2 bộ cộng.
@@ -301,9 +301,9 @@ Không những thế bộ nhân là bộ có kích thước khá lớn, việc s
     \label{3clock}
 \end{figure}
 
-Quan sát biểu đồ thời gian của 3 clock (hình \ref{3clock}), ta có nhận xét sau: không phải tất cả ở sườn dương nào thì các bộ lọc đều phải tính toán. Việc tính toán hay không là do bộ lọc sau lấy giá trị ở thời điểm nào để tính toán. Ví dụ với bộ lọc HB2, nó chỉ lấy giá trị đầu ra của HB1 sau thời điểm (0), (2), (4) điều này đồng nghĩa với việc ở đây HB1 phải thực hiện các phép toán ở (0), (2), (4) để xuất tín hiệu cho đầu vào HB2, ở các điểm còn lại HB1 chỉ cần dịch giá trị đầu vào vào và không làm thêm gì. Điều đó tương tự với bộ lọc FIR, nó chỉ lấy đầu vào của HB2  sau thời điểm (3) để tính toán.
+Quan sát biểu đồ thời gian của 3 clock (hình \ref{3clock}), ta có nhận xét sau: không phải tất cả ở sườn dương nào thì các bộ lọc đều phải tính toán. Việc tính toán hay không là do bộ lọc sau lấy giá trị ở thời điểm nào để tính toán. Ví dụ với bộ lọc HB2, nó chỉ lấy giá trị đầu ra của HB1 sau thời điểm (0), (2), (4) điều này đồng nghĩa với việc ở đây HB1 phải thực hiện các phép toán ở (0), (2), (4) để xuất tín hiệu cho đầu vào HB2, ở các điểm còn lại HB1 chỉ cần dịch giá trị đầu vào và không làm thêm gì. Điều đó tương tự với bộ lọc FIR, nó chỉ lấy đầu vào của HB2  sau thời điểm (3) để tính toán.
 
-Dựa vào cách hoạt động trên, ta có thể tiến hành để mỗi bộ lọc sử dụng bộ nhân ở 1 thời điểm nhất định. Với ví dụ trên thứ tự sử dụng bộ nhân sẽ như sau: (0) - HB1, (1) - FIR, (2) - HB1, (3) - HB2 và lặp lại. Việc phân luồng sẽ có do bộ \textbf{dti\_filter\_controller} điều khiển.
+Dựa vào cách hoạt động trên, ta có thể  điều khiển để mỗi bộ lọc sử dụng bộ nhân ở 1 thời điểm nhất định. Với ví dụ trên thứ tự sử dụng bộ nhân sẽ như sau: (0) - HB1, (1) - FIR, (2) - HB1, (3) - HB2 và lặp lại. Việc phân luồng sẽ có do bộ \textbf{dti\_filter\_controller} điều khiển.
 
 Do bộ FIR sẽ có 52 taps, đồng nghĩa với việc trong 1 chu kỳ của HB1 phải thực hiện xong 26 lần nhân (vì hệ số đối xứng). Ta xét tần số hoạt động của HB1 là 192 kHz thì tần hoạt động của bộ nhân phải là $192 \times 26 = 4492 kHz$. Với tần số của hệ thống sử dụng (dti\_cic\_decimatior clock) là 9216 khz đã hoàn toàn đáp ứng được.
 
@@ -352,7 +352,7 @@ FIR\_SUM\_OUT\_WIDTH   & 37 & Độ rộng dữ liệu đầu ra của bộ lọ
     \label{hangso_hb_fir}
 \end{table}
 
-Trong đó việc tối ưu độ rộng của đầu ra của các bộ lọc (độ rộng của bộ cộng cuối cùng của dãy). Để tìm được giá trị tối ưu nhất, chúng ta đưa đầu vào lớn nhất và nhỏ nhất của đầu vào (đầu vào CIC 16 bit có dải giá trị [20736, -20736]), tiến hành nhân số bé nhất cho đáp ứng xung có giá trị âm và ngược lại. Lúc này đầu ra của từng tầng lọc sẽ có dải giá trị tương ứng với số bit biểu diễn nó như bảng \ref{hangso_hb_fir}. Độ rộng của bộ nhân được là giá trị biểu diễn từ hệ số của taps đã nêu ở mục \ref{fix-fil}.
+Trong đó, độ rộng đầu ra của các bộ lọc (độ rộng của bộ cộng cuối cùng của dãy) sẽ tác động đến số  lượng tài nguyên sử dụng. Để tìm được giá trị tối ưu nhất, chúng ta đưa đầu vào lớn nhất và nhỏ nhất của đầu vào (đầu vào CIC 16 bit có dải giá trị [20736, -20736]), tiến hành nhân số bé nhất cho đáp ứng xung có giá trị âm và ngược lại. Lúc này đầu ra của từng tầng lọc sẽ có dải giá trị tương ứng với số bit biểu diễn nó như bảng \ref{hangso_hb_fir}. Độ rộng của bộ nhân được là giá trị biểu diễn từ hệ số của taps đã nêu ở mục \ref{fix-fil}.
 
 \begin{figure}[H]
     \centering
@@ -385,7 +385,7 @@ Hình \ref{pre} và hình \ref{pos} mô tả kiến trúc của phần trước 
 
 Bộ nhân sử dụng ở đây là bộ nhân Booth Wallace, nó là IP số có sẵn của công ty \textbf{Dolphin Technology Việt Nam}.
 
-Với kiến trúc của bộ nhân chung (hình \ref{c_mul}), chúng ta sẽ duyệt các hệ số của các taps sau đó tiến hành nhân ở các thời điểm nhất định. Các hệ số sẽ được lưu ở bộ \textbf{coeff\_lut}, nó được xem là 1 bộ mem, các hệ số sẽ được lưu thứ tự FIR - HB1 - HB2 - HB1 (từ 0 đến 39). Dữ liệu sẽ đưa đưa ra theo địa chỉ \textit{count} tương ứng. Bảng \ref{coeffff} mô tả trình tự sắp đặt dữ liệu trong khối \textbf{coeff\_lut}.
+Với kiến trúc của bộ nhân chung (hình \ref{c_mul}), chúng ta sẽ duyệt các hệ số của các taps sau đó tiến hành nhân ở các thời điểm nhất định. Các hệ số sẽ được lưu ở bộ \textbf{coeff\_lut}, nó được xem là 1 bộ mem, các hệ số sẽ được lưu thứ tự FIR - HB1 - HB2 - HB1 (từ 0 đến 39). Dữ liệu sẽ được đưa ra theo địa chỉ \textit{count} tương ứng. Bảng \ref{coeffff} mô tả trình tự sắp đặt dữ liệu trong khối \textbf{coeff\_lut}.
 
 \textbf{dti\_count} hoạt động như một trình tạo địa chỉ và bộ điều khiển của \textbf{dti\_filter\_controller}. Giá trị đếm dùng để chọn hệ số trong bảng tra cứu hệ số bộ lọc (\textbf{dti\_coeff\_lut}).
 
@@ -401,7 +401,7 @@ Với kiến trúc của bộ nhân chung (hình \ref{c_mul}), chúng ta sẽ du
 \begin{figure}[H]
     \centering
     \includegraphics[width=13cm]{Images/Chuong4/hb_fir/control-timing.png}
-    \caption[Biểu đồ thời của dti\_filter\_controller]{\bfseries \fontsize{12pt}{0pt}\selectfont Biểu đồ thời  của dti\_filter\_controller}
+    \caption[Biểu đồ thời gian của dti\_filter\_controller]{\bfseries \fontsize{12pt}{0pt}\selectfont Biểu đồ thời gian của dti\_filter\_controller}
     \label{control_timing}
 \end{figure}
 \begin{figure}[H]
@@ -467,7 +467,7 @@ Việc mô phỏng RTL sẽ được thực hiện trên Mentor Questasim. Tươ
     \label{tb_top}
 \end{figure}
 
-Tín hiệu PDM được đọc từ tệp text thu được bộ điều chế đưa vào thiết kế với tần số lấy mẫu của PDM (2304 kHz). Dữ liệu PCM thu được đầu ra với tần số mẫu là 48 kHz đưa ghi vào tệp text. Từ tệp đó chúng ta sẽ so sánh với kết quả tính toán bằng phần mềm sử dụng ngôn ngữ \textbf{python} (hình \ref{tb_top}). Việc so sánh sẽ đựa vào biểu đồ mật độ phổ công suất và tín hiệu ở miền thời gian.
+Tín hiệu PDM được đọc từ tệp text thu được bộ điều chế đưa vào thiết kế với tần số lấy mẫu của PDM (2304 kHz). Dữ liệu PCM thu được đầu ra với tần số mẫu là 48 kHz đưa ghi vào tệp text. Từ tệp đó chúng ta sẽ so sánh với kết quả tính toán bằng phần mềm sử dụng ngôn ngữ \textbf{python} (hình \ref{tb_top}). Việc so sánh sẽ dựa vào biểu đồ mật độ phổ công suất và tín hiệu ở miền thời gian.
 
 \subsubsection{Kết quả mô phỏng}
 \paragraph{Tín hiệu nhiều thành phần sin}
@@ -481,7 +481,7 @@ Do bộ lọc trên phần mềm đã được kiểm chứng ở chương 3 cho
 
 Hình \ref{sin_1} và \ref{sin_1_h} miêu tả biểu đồ thời gian của tín hiệu PCM sau mô phỏng của cả phần cứng và phần mềm. Ở miền này chúng ta không thể nhận ra sự khác biệt giữa 2 tín hiệu. Vì vậy, để kết luận một cách rõ ràng hơn, chúng sẽ xem xét miền tần số của 2 tín hiệu. Hình \ref{sin_1_psd}, hình \ref{sin_1_psd_h} mô tả biểu đồ phổ mật độ công suất của 2 tín hiệu trên.
 
-Ta thấy, các điểm tần số chuyển tiếp giữa các vùng (dải thông, dải chuyển tiếp, dải dừng) giữa 2 tín hiệu là giống giống nhau. Tuy nhiên, khi chúng ta tập trung vào dải dừng, với phần mềm độ suy hao ở dải đó cao nhất là 146.721 dB, còn phần cứng là 134.789, chênh lệch nhau 11.932 dB. 
+Ta thấy, các điểm tần số chuyển tiếp giữa các vùng (dải thông, dải chuyển tiếp, dải dừng) giữa 2 tín hiệu là giống nhau. Tuy nhiên, khi chúng ta tập trung vào dải dừng, với phần mềm độ suy hao ở dải đó cao nhất là 146.721 dB, còn phần cứng là 134.789, chênh lệch nhau 11.932 dB. 
 
 \begin{figure}[H]
     \centering
@@ -512,7 +512,7 @@ Ta thấy, các điểm tần số chuyển tiếp giữa các vùng (dải thô
 \end{figure}
 Nếu chúng ta lấy chuẩn của phần mềm độ suy hao dải dừng là 90.7 dB (hình \ref{d}) thì độ suy hao dải dừng của phần cứng chỉ đạt 78.768 dB, không đáp ứng được với chỉ tiêu thiết kế đặt ra là 89 dB. Những sai số đó gây ra bởi độ rộng của PCM lấy mẫu, số bit bị cắt bỏ sau mỗi tầng lọc để giảm tài nguyên và sử dụng tính toán fixed-point.
 
-Lúc này điểm mạnh của thiết kế là linh động các bộ tham số khác nhau sẽ được phát huy. Lúc này chúng ta sẽ tăng tham số độ suy hao dải dừng lên 110 dB và đưa vào phần mềm để tính toán các "parameter" để đưa vào code RTL. Nó sẽ tự động đưa ra các tham số, các hệ số của bộ lọc để tối ưu nhất cho phần cứng. Hình \ref{filter_inc} mô tả đáp ứng xung của từng bộ lọc sau khi tăng độ suy hao dải dừng và sử dụng fixed-point (quá trình thực hiện đã được mô tả ở mục \ref{fix-fil}).
+Lúc này điểm mạnh của thiết kế là linh động các bộ tham số khác nhau sẽ được phát huy. Từ đó, chúng ta sẽ tăng tham số độ suy hao dải dừng lên 110 dB và đưa vào phần mềm để tính toán các "parameter" để đưa vào code RTL. Nó sẽ tự động đưa ra các tham số, các hệ số của bộ lọc để tối ưu nhất cho phần cứng. Hình \ref{filter_inc} mô tả đáp ứng xung của từng bộ lọc sau khi tăng độ suy hao dải dừng và sử dụng fixed-point (quá trình thực hiện đã được mô tả ở mục \ref{fix-fil}).
 
 \begin{figure}[H]
     \centering
@@ -565,7 +565,7 @@ Hình \ref{vldd2_2} là biều đồ biểu thị 1 phần nhỏ tín hiệu g�
 \begin{figure}[H]
     \centering
     \includegraphics[width=14cm]{Images/Chuong4/tb/wav/vldd2_1.png}
-    \caption[Biểu đồ miền thời gian của âm thanh sau sau khi chuyển đổi bằng phần mềm]{\bfseries \fontsize{12pt}{0pt}\selectfont  Biểu đồ miền thời gian của âm thanh sau sau khi chuyển đổi bằng phần mềm}
+    \caption[Biểu đồ miền thời gian của âm thanh sau khi chuyển đổi bằng phần mềm]{\bfseries \fontsize{12pt}{0pt}\selectfont  Biểu đồ miền thời gian của âm thanh sau khi chuyển đổi bằng phần mềm}
     \label{vldd2_1}
 \end{figure}
 Sau khi đi qua bộ chuyển đổi bằng phần cứng (hình \ref{vldd2_0}) và bộ chuyển đổi sử dụng tính toán bằng phần mềm (hình \ref{vldd2_1}), ta thấy được sự khác biệt giữa các biểu đồ trước và sau mô phỏng. Tín hiệu gốc đã mất đi một phần tín hiệu nào đó khiến nó bị biến dạng. Tuy nhiên biểu đồ giữa mô phỏng bằng phần cứng và phần mềm lại tương tự nhau. Để hiểu rõ chi tiết hơn, chúng ta nên xem các tín hiệu trên biểu diễn trên miền tần số.
