@@ -37,7 +37,7 @@ Sau đây là các thông số kỹ thuật của ADAU7112:
     \item Tỷ số Decimation (PDM sang PCM): 64x
     \item Độ rộng của PCM: 24 bit
     \item Tốc độ lấy mẫu đầu vào (PDM): 3.072 MHz - 6.144 MHz
-    \item Tốc độ lấy mẫu đầu ra: 9 kH - 96 kHz
+    \item Tốc độ lấy mẫu đầu ra: 9 kHz - 96 kHz
     \item Độ suy hao giải dừng: 75 dB
     \item Điện áp hoạt động: 1.70 - 3.63 V
 \end{itemize}
@@ -248,7 +248,7 @@ Hình \ref{cic_ratios_overview} mô tả đáp ứng tần số của bộ lọc
  \noindent Quan sát bảng \ref{abc}, các \textbf{phương án} sau được đưa ra:
 \begin{enumerate}
     \item \textbf{Tỷ lệ Decimation 6x và số tầng 3}: phương án này yêu cầu thêm 3 bộ lọc Half Band và 1 bộ lọc FIR cuối để đáp ứng được các thông số cuối cùng.
-    \item \textbf{Tỷ lệ Decimation 8x và số tầng 4}: phương án này yêu cần cần thêm tỷ lệ Decimation phía sau là 6x, đồng nghĩa với dùng 1 bộ lọc Half Band và 1 bộ lọc FIR cuối kèm theo 1 bộ decimation 3x.
+    \item \textbf{Tỷ lệ Decimation 8x và số tầng 4}: phương án này yêu cầu cần thêm tỷ lệ Decimation phía sau là 6x, đồng nghĩa với dùng 1 bộ lọc Half Band và 1 bộ lọc FIR cuối kèm theo 1 bộ decimation 3x.
     \item \textbf{Tỷ lệ Decimation 12x và số tầng 4}: mặc dùng phương án này chưa đáp ứng được độ gợn sóng của dải thông (0.056 db, vượt 0.006 dB so với yêu cầu), nhưng chênh lệch này rất nhỏ. Với phương án này yêu cầu thêm 2 bộ lọc Half Band và 1 bộ lọc FIR. \label{choose}
 \end{enumerate}
 
@@ -513,7 +513,7 @@ Tiến hành mô phỏng, thu được tín hiệu ở bộ lọc FIR cuối cù
     \label{pcm_o}
 \end{figure}
 
-Hình \ref{psd_pcm} mô tả phổ của tín hiệu đầu ra của hệ thống. Có thể thấy, bắt đầu từ điểm 6 kHz các thành tần số bắt đầu suy giảm mạnh. Độ suy hao của các cách thành phần tần số trong trong miền 0 - 6 kHz ổn định ở mức -73.7193 dB (hình \ref{psd_pcm}). Quay về với phổ PDM ban đầu (hình \ref{sd3}), độ suy hao là -73.6202 dB. Độ chênh lệch 0.0991 dB đã đáp ứng đúng thông số độ gợn sóng của dải thông yêu cầu (0.1 dB). 
+Hình \ref{psd_pcm} mô tả phổ của tín hiệu đầu ra của hệ thống. Có thể thấy, bắt đầu từ điểm 6 kHz các thành tần số bắt đầu suy giảm mạnh. Độ suy hao của các cách thành phần tần số trong miền 0 - 6 kHz ổn định ở mức -73.7193 dB (hình \ref{psd_pcm}). Quay về với phổ PDM ban đầu (hình \ref{sd3}), độ suy hao là -73.6202 dB. Độ chênh lệch 0.0991 dB đã đáp ứng đúng thông số độ gợn sóng của dải thông yêu cầu (0.1 dB). 
 \begin{figure}[H]
     \centering
     \includesvg[width=16.5cm]{Images/Chuong3/test/psd_pcm.svg}

@@ -305,7 +305,7 @@ Quan sát biểu đồ thời gian của 3 clock (hình \ref{3clock}), ta có nh
 
 Dựa vào cách hoạt động trên, ta có thể  điều khiển để mỗi bộ lọc sử dụng bộ nhân ở 1 thời điểm nhất định. Với ví dụ trên thứ tự sử dụng bộ nhân sẽ như sau: (0) - HB1, (1) - FIR, (2) - HB1, (3) - HB2 và lặp lại. Việc phân luồng sẽ có do bộ \textbf{dti\_filter\_controller} điều khiển.
 
-Do bộ FIR sẽ có 52 taps, đồng nghĩa với việc trong 1 chu kỳ của HB1 phải thực hiện xong 26 lần nhân (vì hệ số đối xứng). Ta xét tần số hoạt động của HB1 là 192 kHz thì tần hoạt động của bộ nhân phải là $192 \times 26 = 4492 kHz$. Với tần số của hệ thống sử dụng (dti\_cic\_decimatior clock) là 9216 khz đã hoàn toàn đáp ứng được.
+Do bộ FIR sẽ có 52 taps, đồng nghĩa với việc trong 1 chu kỳ của HB1 phải thực hiện xong 26 lần nhân (vì hệ số đối xứng). Ta xét tần số hoạt động của HB1 là 192 kHz thì tần hoạt động của bộ nhân phải là $192 \times 26 = 4492 kHz$. Với tần số của hệ thống sử dụng (dti\_cic\_decimatior clock) là 9216 kHz đã hoàn toàn đáp ứng được.
 
 \begin{figure}[H]
     \centering
@@ -595,7 +595,7 @@ Vì bộ chuyển đổi sẽ loại bỏ đi các thành phần ở tần số 
 \begin{figure}[H]
     \centering
     \includegraphics[width=13cm]{Images/Chuong4/tb/wav/vldd2_psd_1.png}
-    \caption[Biểu đồ phổ của âm thanh sau sau khi chuyển đổi bằng phần mềm]{\bfseries \fontsize{12pt}{0pt}\selectfont  Biểu đồ phổ của âm thanh sau sau khi chuyển đổi bằng phần mềm}
+    \caption[Biểu đồ phổ của âm thanh sau khi chuyển đổi bằng phần mềm]{\bfseries \fontsize{12pt}{0pt}\selectfont  Biểu đồ phổ của âm thanh sau khi chuyển đổi bằng phần mềm}
     \label{vldd2_psd_1}
 \end{figure}
 

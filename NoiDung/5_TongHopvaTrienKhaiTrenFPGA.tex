@@ -40,7 +40,7 @@ Với yêu cầu của bộ thiết là tần số chạy không cao (9216 kHz) 
 \begin{itemize}
     \item Tần số tổng hợp: 20 MHz ($>$ 9216 kHz)
     \item Độ trễ đầu vào: cao nhất là 0.4 chu kỳ clock
-    \item Độ trễ đầu đầu ra: cao nhất là 0.4 chu kỳ clock
+    \item Độ trễ đầu ra: cao nhất là 0.4 chu kỳ clock
 \end{itemize}
 
 Các thông số input delay và output delay được xác định khi ta ghép khối PDM2PCM 
@@ -160,7 +160,7 @@ Vì thiết kế sử dụng tần số khác với tần số của hệ thốn
 \subsubsection{Ý tưởng thiết kế}
 
 Tín hiệu PDM sẽ được tạo ra từ micro MEMS được bán trên thị trường. Ý tưởng ở đây là hệ thống đọc tín hiệu từ micro và sau đó phát qua loa một trong thời gian thực.
-Ý tưởng mô tả như hình hình \ref{pinouts}.
+Ý tưởng mô tả như hình \ref{pinouts}.
 \begin{figure}[H]
     \centering
     \includegraphics[width=14cm]{Images/Chuong5/fpga/top.png}
@@ -191,7 +191,7 @@ Do sử dụng kit trong đề tài này là Zedboard đồng nghĩa với việ
 Quy trình thực hiện sẽ bao gồm các bước như sau:
 \begin{enumerate}
     \item Tạo dự án: chọn kit sử dụng, ...
-    \item Pakage tất cả các IP: I2S, I2C, pdm2pcm\_wrapper
+    \item Package tất cả các IP: I2S, I2C, pdm2pcm\_wrapper
     \item Viết driver code bằng ngôn ngữ C
     \item Mô phỏng thiết kế qua phần mềm QuestaSim
     \item Gán chân vào ra ứng với các cổng trên kit
@@ -327,7 +327,7 @@ Hình \ref{flow_chart} mô tả lưu đồ thuật toán của hệ thống. Tr�
 
 Khi đã khởi tạo thành công I2C, chúng ta sẽ tiến hành sử dụng nó để cấu hình cho ADAU1761. Với trình tự một lần chuyển dữ liệu như hình \ref{i2c_timing}, với byte đầu là địa chỉ của slave, 2 byte tiếp theo là địa chỉ phụ (địa chỉ cảu từng thành ghi trong ADAU1761) và byte cuối cùng là dữ liệu. ADAU1761 cung cấp 2 bit ADDR0, ADDR1 để người dùng lựa chọn địa chỉ, với 2 bit này 1 hệ thống có thể có 4 ADAU1716.
 
-Sau khi cấu hình thành công, chúng ta tiến hành quá trình truyền bằng cách kích hoạt các clock của I2S Controler. Việc truyền sẽ lấy dữ liệu từ thanh ghi TX FIFO của I2S.
+Sau khi cấu hình thành công, chúng ta tiến hành quá trình truyền bằng cách kích hoạt các clock của I2S Controller. Việc truyền sẽ lấy dữ liệu từ thanh ghi TX FIFO của I2S.
 
 Hệ thống kiểm tra trạng thái của FIFO trong PDM2PCM thông qua thanh ghi, nếu dữ liệu có tồn tại trong FIFO, vi xử lý tiến hành tách trường dữ liệu PCM trong lần đọc trước đó ghi vào TX FIFO của I2S để truyền với điều kiện trạng thái của TX FIFO không bị đầy. Quá trình này sẽ thực hiện lặp đi lặp lại.
 
@@ -411,5 +411,5 @@ Hình \ref{machthat_2} mô tả mạch triển khai thực tế, sử dụng \te
 
 \subsection{Kết luận chương}
 
-\hyperref[chuong5]{Chương 5} trình bày về quá trình và kết quả của bước tổng hợp và triển khai thiết kế xuống FPGA. Các báo cáo về timming, tài nguyên và diện tích đã thể  hiện thiết kế  hoàn toàn có thể  triển khai thành chip ASIC. Kết quả sau khi triển khai trên FPGA đúng với kết quả dự tính đã đặt ra.
+\hyperref[chuong5]{Chương 5} trình bày về quá trình và kết quả của bước tổng hợp và triển khai thiết kế xuống FPGA. Các báo cáo về timing, tài nguyên và diện tích đã thể  hiện thiết kế  hoàn toàn có thể  triển khai thành chip ASIC. Kết quả sau khi triển khai trên FPGA đúng với kết quả dự tính đã đặt ra.
 \newpage
