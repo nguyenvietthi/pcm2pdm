@@ -15,7 +15,7 @@
 \usepackage{parskip}
 \usepackage{slashbox}
 \usepackage{multirow}
-
+\usepackage{pdfpages}
 \usetikzlibrary{calc} % Thư viện tikz
 \usepackage{indentfirst} % Thư viện thụt đầu dòng
 \renewcommand{\baselinestretch}{1.2} % Giãn dòng 1.2
@@ -84,8 +84,12 @@
 \input{PhanDau/Bia.tex} % Bìa đồ án.
 \input{PhanDau/Bia2.tex} % Bìa đồ án.
 
-\input{PhanDau/DanhGiaCanBoHuongDan} % Đánh giá quyển đồ án tốt nghiệp cho giảng viên hướng dẫn và cán bộ phản biện.
-\input{PhanDau/DanhGiaHoiDong}
+% \input{PhanDau/DanhGiaCanBoHuongDan} % Đánh giá quyển đồ án tốt nghiệp cho giảng viên hướng dẫn và cán bộ phản biện.
+% \input{PhanDau/DanhGia/DanhGia.tex}
+\includepdf[pages=-]{PhanDau/DanhGia/danh_gia_huong_dan.pdf}
+\includepdf[pages=-]{PhanDau/DanhGia/danh_gia_phan_bien.pdf}
+\includepdf[pages=-]{PhanDau/DanhGia/danh_gia_hoi_dong.pdf}
+
 \input{PhanDau/LoiNoiDau.tex} % Lời nói đầu.
 
 \input{PhanDau/LoiCamDoan.tex} % Lời cam đoan.

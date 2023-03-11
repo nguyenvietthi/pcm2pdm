@@ -276,7 +276,9 @@ pcm\_data &
     \label{cic_top_t}
 \end{table}
 
-Bảng \ref{cic_top_t} liệt kê các cổng vào ra của khối dti\_cic\_decimator. Khi chỉ sử dụng 1 bộ cộng và 1 bộ trừ, chúng ta phải phân công theo từng thời gian tính toán các phép tính 1 cách hợp lý, hình \ref{cic_top_arc} mô tả kiến trúc đáp ứng được điều kiện trên.
+Bảng \ref{cic_top_t} liệt kê các cổng vào ra của khối dti\_cic\_decimator. 
+
+Như chúng ta đã giới thiệu ở mục \ref{cic_filter_ref}, bộ lọc CIC sẽ chia ra các phần "comb" và "integrator". Hai khối này sẽ hoạt động với 2 tần số khác nhau ứng với tỷ lệ Decimation. Với số lượng các "comb" và "integrator" sẽ bằng số tầng của CIC. Mỗi "comb" sẽ sử dụng 1 bộ trừ, còn "integrator" là 1 bộ cộng. Như vậy, kiến trúc CIC 4 tầng đơn giản phải sử dụng đến 4 bộ cộng và 4 bộ trừ. Với kiến trúc này (hình \ref{cic_top_arc}), chúng ta sẽ gom chúng lại và sử dụng tần số gấp 4 lần tần số chúng hoạt động. Như vậy, chúng ta chỉ cần sử dụng 1 bộ cộng và 1 bộ trừ cho bộ lọc CIC. Lúc này, các bộ \textbf{counter} sẽ có nhiệm vụ chọn thành phần "comb" và "integrator" sử dụng bộ cộng và trừ sao cho đúng thời điểm. Thứ tự hoạt động sẽ dựa vào vị trí của thành phần đó tính từ đầu vào đến đầu ra.
 
 \begin{figure}[H]
     \centering
