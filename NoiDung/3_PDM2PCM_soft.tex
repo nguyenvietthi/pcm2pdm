@@ -6,7 +6,7 @@
 \setcounter{table}{0}
 Ở \hyperref[chuong2]{chương 2}, chúng ta đã trình bày thảo luận về bộ chuyển đổi Sigma-Delta, phổ của tín hiệu PDM từ micro, các bộ lọc khác nhau và cách tìm ra các hệ số phù hợp cho các bộ lọc đó. Chương này mô tả các yêu cầu thiết kế, cách kết hợp tất cả lại với nhau, tạo ra bộ chuyển đổi PDM sang PCM nhiều giai đoạn và kiểm thử thiết kế bằng ngôn ngữ \textit{Python}.
 \subsection{Tổng quan về hệ thống xử lý âm thanh số sử dụng MEMS Microphone}
-Hình \ref{audio_top} mô tả một hệ thông xử lý âm thanh cơ bản sử dụng PDM MEMS microphone. Tín hiệu tương tự sau khi thu bằng micro sẽ được điều chế thành tín hiệu số dạng PDM - biểu diễn bằng 1 bit và tốc độ lấy mẫu cao. Để phân tích và tái tạo lại âm thanh thu được chúng ta phải đưa tín hiệu đó vào một hệ thống xử lý âm thanh số. Bộ PDM2PCM có vai trò chuyển đổi tín hiệu PDM sang PCM, sau đó bộ DSP sẽ điều chỉnh, cân bằng lại để nâng cao hiệu suất. Để âm thanh được phát trực tiếp ra loa, tín hiệu phải được đưa về dạng tương tự thông qua bộ chuyển đổi số tương tự (Audio Codec) và bộ khuếch đại tín hiệu.
+Hình \ref{audio_top} mô tả một hệ thống xử lý âm thanh cơ bản sử dụng PDM MEMS microphone. Tín hiệu tương tự sau khi thu bằng micro sẽ được điều chế thành tín hiệu số dạng PDM - biểu diễn bằng 1 bit và tốc độ lấy mẫu cao. Để phân tích và tái tạo lại âm thanh thu được chúng ta phải đưa tín hiệu đó vào một hệ thống xử lý âm thanh số. Bộ PDM2PCM có vai trò chuyển đổi tín hiệu PDM sang PCM, sau đó bộ DSP sẽ điều chỉnh, cân bằng lại để nâng cao hiệu suất. Để âm thanh được phát trực tiếp ra loa, tín hiệu phải được đưa về dạng tương tự thông qua bộ chuyển đổi số tương tự (Audio Codec) và bộ khuếch đại tín hiệu.
 \begin{figure}[H]
     \centering
     \includegraphics[width=14cm]{Images/Chuong3/MoDau/audio_top.png}
@@ -249,7 +249,7 @@ Hình \ref{cic_ratios_overview} mô tả đáp ứng tần số của bộ lọc
 \begin{enumerate}
     \item \textbf{Tỷ lệ Decimation 6x và số tầng 3}: phương án này yêu cầu thêm 3 bộ lọc Half Band và 1 bộ lọc FIR cuối để đáp ứng được các thông số cuối cùng.
     \item \textbf{Tỷ lệ Decimation 8x và số tầng 4}: phương án này yêu cầu cần thêm tỷ lệ Decimation phía sau là 6x, đồng nghĩa với dùng 1 bộ lọc Half Band và 1 bộ lọc FIR cuối kèm theo 1 bộ decimation 3x.
-    \item \textbf{Tỷ lệ Decimation 12x và số tầng 4}: mặc dùng phương án này chưa đáp ứng được độ gợn sóng của dải thông (0.056 db, vượt 0.006 dB so với yêu cầu), nhưng chênh lệch này rất nhỏ. Với phương án này yêu cầu thêm 2 bộ lọc Half Band và 1 bộ lọc FIR. \label{choose}
+    \item \textbf{Tỷ lệ Decimation 12x và số tầng 4}: mặc dù phương án này chưa đáp ứng được độ gợn sóng của dải thông (0.056 db, vượt 0.006 dB so với yêu cầu), nhưng chênh lệch này rất nhỏ. Với phương án này yêu cầu thêm 2 bộ lọc Half Band và 1 bộ lọc FIR. \label{choose}
 \end{enumerate}
 
 Các phương án có tỷ lệ Decimation từ 4 trở xuống hoàn toàn có thể đáp ứng được thiết kế. Tuy nhiên, việc chọn như thế sẽ gây nên hệ số decimation cho các bộ lọc phía sau lớn, đồng nghĩa với việc phải sử dụng nhiều bộ lọc Half Band gây tốn nhiều tài nguyên. Trái với phương châm đặt ra từ đầu của thiết kế là sử dụng bộ CIC với thông số tối ưu nhất để các bộ lọc sau đơn giản nhất có thể.
@@ -402,7 +402,7 @@ Chúng ta có sơ đồ khối tổng quát của thiết kế như hình \ref{p
     Tần số lấy mẫu: 48 kHz\\
     Dải thông: 0 - 6 kHz\\
     Điểm dừng: 10 kHz\\
-    Độ gợn sóng của dải thông: $A_{HB2} = 0.1 - A_{CIC} - A_{HB1} - A_{HB2}$\\
+    Độ gợn sóng của dải thông: $A_{FIR} = 0.1 - A_{CIC} - A_{HB1} - A_{HB2}$\\
     Độ suy hao của dải dừng: 89 dB
 \end{enumerate}
 

@@ -87,12 +87,15 @@
 % \input{PhanDau/DanhGiaCanBoHuongDan} % Đánh giá quyển đồ án tốt nghiệp cho giảng viên hướng dẫn và cán bộ phản biện.
 % \input{PhanDau/DanhGia/DanhGia.tex}
 \includepdf[pages=-]{PhanDau/DanhGia/danh_gia_huong_dan.pdf}
+\cleardoublepage
 \includepdf[pages=-]{PhanDau/DanhGia/danh_gia_phan_bien.pdf}
+\cleardoublepage
 \includepdf[pages=-]{PhanDau/DanhGia/danh_gia_hoi_dong.pdf}
-
+\cleardoublepage
 \input{PhanDau/LoiNoiDau.tex} % Lời nói đầu.
-
+\cleardoublepage
 \input{PhanDau/LoiCamDoan.tex} % Lời cam đoan.
+\cleardoublepage
 
  % Tạo mục lục tự động
 \addtocontents{toc}{\protect\thispagestyle{empty}}
@@ -115,16 +118,23 @@
 \listoftables}
 \phantomsection\addcontentsline{toc}{section}{\numberline {} DANH MỤC BẢNG BIỂU}
 \newpage
+\cleardoublepage
 
 \input{PhanDau/Abstract.tex} % Tóm tắt đồ án 
-
+\cleardoublepage
 \pagenumbering{arabic} % Đánh số thứ tự 1,2,3...
 \input{NoiDung/1_ChuongMoDau.tex}
+\cleardoublepage
 \input{NoiDung/2_CoSoLyThuyet.tex}
+\cleardoublepage
 \input{NoiDung/3_PDM2PCM_soft.tex}
+\cleardoublepage
 \input{NoiDung/4_ThietKeIPSo.tex}
+\cleardoublepage
 \input{NoiDung/5_TongHopvaTrienKhaiTrenFPGA.tex}
+% \cleardoublepage
 \include{NoiDung/KetLuan.tex}
+\cleardoublepage
 \phantomsection\addcontentsline{toc}{section}{\numberline {}TÀI LIỆU THAM KHẢO}
 \bibliographystyle{IEEEtran}
 \bibliography{TaiLieuThamKhao}
